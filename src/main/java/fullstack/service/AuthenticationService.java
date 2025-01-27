@@ -9,6 +9,7 @@ import fullstack.rest.model.LoginRequest;
 import fullstack.rest.model.LoginResponse;
 import fullstack.service.exception.*;
 import fullstack.util.ContactValidator;
+import fullstack.util.ErrorMessages;
 import fullstack.util.Validation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -76,7 +77,7 @@ public class AuthenticationService {
         if (email != null && !email.trim().isEmpty()) {
             boolean emailInUse = userRepository.findByEmail(email).isPresent();
             if (emailInUse) {
-                throw new UserCreationException("L'email è già in uso.");
+                throw new UserCreationException(ErrorMessages.EMAIL_ALREADY_USED);
             }
         }
 
@@ -84,7 +85,7 @@ public class AuthenticationService {
             phone = ContactValidator.formatPhone(phone);
             boolean phoneInUse = userRepository.findByPhone(phone).isPresent();
             if (phoneInUse) {
-                throw new UserCreationException("Il numero di telefono è già in uso.");
+                throw new UserCreationException(ErrorMessages.PHONE_ALREADY_USED);
             }
         }
     }
