@@ -129,7 +129,7 @@ public class AuthenticationService {
     public LoginResponse authenticate(LoginRequest request) throws UserNotFoundException, WrongPasswordException, SessionAlreadyExistsException {
         Validation.validateLoginRequest(request);
 
-        Optional<User> optionalUser = userRepository.findUserByEmailOrPhone(request.getEmailOrPhone());
+        Optional<User> optionalUser = userRepository.findByEmailOrPhone(request.getEmailOrPhone());
         User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
 
         if (!user.getEmailVerified() && !user.getPhoneVerified()) {
