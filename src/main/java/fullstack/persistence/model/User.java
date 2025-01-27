@@ -113,7 +113,7 @@ public class User {
     }
 
     public void setTokenEmail(String tokenEmail) {
-        tokenEmail = tokenEmail;
+        this.tokenEmail = tokenEmail;
     }
 
     public String getTokenPhone() {
@@ -121,6 +121,6 @@ public class User {
     }
 
     public void setTokenPhone(String tokenPhone) {
-        tokenPhone = tokenPhone;
+        this.tokenPhone = tokenPhone;
     }
 }
