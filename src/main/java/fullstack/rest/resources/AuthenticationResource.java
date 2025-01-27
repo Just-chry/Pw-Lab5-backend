@@ -1,7 +1,5 @@
 package fullstack.rest.resources;
 
-import fullstack.persistence.model.User;
-import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.CreateUserRequest;
 import fullstack.rest.model.LoginRequest;
 import fullstack.rest.model.LoginResponse;
@@ -28,16 +26,10 @@ public class AuthenticationResource {
     @POST
     @Path("/register")
     public Response register(CreateUserRequest request) throws UserCreationException {
-        User user = authenticationService.register(request);
-        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
-            String verificationLink = "http://localhost:8080/auth/verifyEmail?token=" + user.getTokenEmail() + "&contact=" + user.getEmail();
-            authenticationService.sendVerificationEmail(user, verificationLink);
-        } else if (user.getPhone() != null && !user.getPhone().isEmpty()) {
-            authenticationService.sendVerificationSms(user);
-        }
-
+        authenticationService.register(request);
         return Response.ok("Registrazione completata con successo, controlla il tuo contatto per confermare.").build();
     }
+
 
     @POST
     @Path("/login")
@@ -56,7 +48,6 @@ public class AuthenticationResource {
     @Path("/logout")
     public Response logout(@CookieParam("sessionId") String sessionId) throws UserSessionNotFoundException {
         authenticationService.logout(sessionId);
-
         NewCookie expiredCookie = new NewCookie("sessionId", "", "/", null, "Session Cookie", -1, false);
         return Response.ok("Logout avvenuto con successo").cookie(expiredCookie).build();
     }
