@@ -5,10 +5,7 @@ import fullstack.rest.model.CreateUserRequest;
 import fullstack.service.AuthenticationService;
 import fullstack.service.exception.UserCreationException;
 import jakarta.inject.Inject;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
@@ -29,7 +26,7 @@ public class AuthenticationResource {
     public Response register(CreateUserRequest request) throws UserCreationException {
         User user = authenticationService.register(request);
         if (user.getEmail() != null && !user.getEmail().isEmpty()) {
-            String verificationLink = "http://localhost:3000/verificaEmail?token=" + user.getTokenEmail() + "&contact=" + user.getEmail();
+            String verificationLink = "http://localhost:8080/auth/verifyEmail?token=" + user.getTokenEmail() + "&contact=" + user.getEmail();
             authenticationService.sendVerificationEmail(user, verificationLink);
         } else if (user.getPhone() != null && !user.getPhone().isEmpty()) {
             authenticationService.sendVerificationSms(user);
@@ -37,4 +34,27 @@ public class AuthenticationResource {
 
         return Response.ok("Registrazione completata con successo, controlla il tuo contatto per confermare.").build();
     }
+
+    @GET
+    @Path("/verifyEmail")
+    public Response verifyEmail(@QueryParam("token") String token, @QueryParam("contact") String email) {
+        try {
+            authenticationService.verifyEmail(token, email);
+            return Response.ok("Email verificata con successo.").build();
+        } catch (UserCreationException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
+    @Path("/verifyPhone")
+    public Response verifyPhone(@QueryParam("token") String token, @QueryParam("contact") String phone) {
+        try {
+            authenticationService.verifyPhone(token, phone);
+            return Response.ok("Numero di telefono verificato con successo.").build();
+        } catch (UserCreationException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
+
 }

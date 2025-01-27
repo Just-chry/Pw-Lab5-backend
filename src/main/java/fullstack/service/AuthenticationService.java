@@ -11,8 +11,10 @@ import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.Response;
 
 import java.security.SecureRandom;
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -101,5 +103,40 @@ public class AuthenticationService {
         } catch (SmsSendingException e) {
             throw new UserCreationException("Errore durante l'invio dell'OTP: " + e.getMessage());
         }
+    }
+
+
+    @Transactional
+    public void verifyEmail(String token, String email) throws UserCreationException {
+        Optional<User> userOpt = userRepository.findByEmail(email);
+        if (userOpt.isEmpty()) {
+            throw new UserCreationException("Utente non trovato.");
+        }
+
+        User user = userOpt.get();
+        if (user.getTokenEmail() == null || !user.getTokenEmail().equals(token)) {
+            throw new UserCreationException("Token di verifica non valido.");
+        }
+
+        user.setEmailVerified(true);
+        user.setTokenEmail(null);
+        userRepository.persist(user);
+    }
+
+    @Transactional
+    public void verifyPhone(String token, String phone) throws UserCreationException {
+        Optional<User> userOpt = userRepository.findByPhone(phone);
+        if (userOpt.isEmpty()) {
+            throw new UserCreationException("Utente non trovato.");
+        }
+
+        User user = userOpt.get();
+        if (user.getTokenPhone() == null || !user.getTokenPhone().equals(token)) {
+            throw new UserCreationException("Token di verifica non valido.");
+        }
+
+        user.setPhoneVerified(true);
+        user.setTokenPhone(null);
+        userRepository.persist(user);
     }
 }
