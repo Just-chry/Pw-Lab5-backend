@@ -190,7 +190,7 @@ public class AuthenticationService {
     public void logout(String sessionId) throws UserSessionNotFoundException {
         Optional<UserSession> optionalSession = userSessionRepository.findBySessionId(sessionId);
         if (optionalSession.isEmpty()) {
-            throw new UserSessionNotFoundException("Sessione non valida.");
+            throw new UserSessionNotFoundException("Non c'è una sessione valida.");
         }
         userSessionRepository.delete(optionalSession.get());
     }
