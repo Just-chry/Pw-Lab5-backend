@@ -110,12 +110,9 @@ public class AuthenticationService {
 
     @Transactional
     public void verifyPhone(String token, String phone) throws UserCreationException {
-        Optional<User> userOpt = userRepository.findByPhone(phone);
-        if (userOpt.isEmpty()) {
-            throw new UserCreationException("Utente non trovato.");
-        }
+        Optional<User> optionalUser = userRepository.findByPhone(phone);
+        User user = optionalUser.orElseThrow(() -> new UserCreationException("Utente non trovato."));
 
-        User user = userOpt.get();
         if (user.getTokenPhone() == null || !user.getTokenPhone().equals(token)) {
             throw new UserCreationException("Token di verifica non valido.");
         }
