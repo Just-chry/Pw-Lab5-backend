@@ -2,11 +2,17 @@ package fullstack.rest.resources;
 
 import fullstack.persistence.model.User;
 import fullstack.rest.model.CreateUserRequest;
+import fullstack.rest.model.LoginRequest;
+import fullstack.rest.model.LoginResponse;
 import fullstack.service.AuthenticationService;
+import fullstack.service.exception.SessionAlreadyExistsException;
 import fullstack.service.exception.UserCreationException;
+import fullstack.service.exception.UserNotFoundException;
+import fullstack.service.exception.WrongPasswordException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NewCookie;
 import jakarta.ws.rs.core.Response;
 
 @Path("/auth")
@@ -33,6 +39,19 @@ public class AuthenticationResource {
         }
 
         return Response.ok("Registrazione completata con successo, controlla il tuo contatto per confermare.").build();
+    }
+
+    @POST
+    @Path("/login")
+    public Response login(LoginRequest request) {
+        try {
+            LoginResponse response = authenticationService.authenticate(request);
+
+            NewCookie sessionCookie = new NewCookie("sessionId", response.getSessionId(), "/", null, "Session Cookie", -1, false);
+            return Response.ok(response).cookie(sessionCookie).build();
+        } catch (UserNotFoundException | WrongPasswordException | SessionAlreadyExistsException e) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        }
     }
 
     @GET
