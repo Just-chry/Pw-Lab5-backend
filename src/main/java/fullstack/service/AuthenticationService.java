@@ -10,13 +10,9 @@ import fullstack.rest.model.LoginResponse;
 import fullstack.service.exception.*;
 import fullstack.util.ContactValidator;
 import fullstack.util.Validation;
-import io.quarkus.mailer.Mail;
-import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.core.Response;
-
 import java.security.SecureRandom;
 import java.util.Optional;
 import java.util.UUID;
