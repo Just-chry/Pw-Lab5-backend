@@ -15,6 +15,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -140,6 +141,16 @@ public class AuthenticationService {
             throw new WrongPasswordException("Password errata.");
         }
 
+        Optional<UserSession> existingSession = userSessionRepository.findByUserId(user.getId());
+        if (existingSession.isPresent()) {
+            UserSession session = existingSession.get();
+            if (session.getExpiresAt().isBefore(LocalDateTime.now())) {
+                userSessionRepository.delete(session);
+            } else {
+                throw new SessionAlreadyExistsException("Utente ha già una sessione attiva.");
+            }
+        }
+
         checkIfSessionExists(user.getId());
         String sessionId = createSession(user);
 
@@ -151,6 +162,7 @@ public class AuthenticationService {
         UserSession userSession = new UserSession();
         userSession.setSessionId(sessionId);
         userSession.setUser(user);
+        userSession.setExpiresAt(LocalDateTime.now().plusSeconds(10));
         userSessionRepository.persist(userSession);
         return sessionId;
     }
