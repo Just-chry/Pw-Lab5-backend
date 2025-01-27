@@ -1,10 +1,13 @@
 package fullstack.service;
 
 import fullstack.persistence.UserRepository;
+import fullstack.persistence.UserSessionRepository;
 import fullstack.persistence.model.User;
+import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.CreateUserRequest;
-import fullstack.service.exception.SmsSendingException;
-import fullstack.service.exception.UserCreationException;
+import fullstack.rest.model.LoginRequest;
+import fullstack.rest.model.LoginResponse;
+import fullstack.service.exception.*;
 import fullstack.util.Validation;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
@@ -21,13 +24,15 @@ import java.util.UUID;
 public class AuthenticationService {
     private final UserRepository userRepository;
     private final HashCalculator hashCalculator;
+    private final UserSessionRepository userSessionRepository;
     private final Mailer mailer;
     private final SmsService smsService;
 
     @Inject
-    public AuthenticationService(UserRepository userRepository, HashCalculator hashCalculator, Mailer mailer, SmsService smsService) {
+    public AuthenticationService(UserRepository userRepository, HashCalculator hashCalculator, UserSessionRepository userSessionRepository, Mailer mailer, SmsService smsService) {
         this.userRepository = userRepository;
         this.hashCalculator = hashCalculator;
+        this.userSessionRepository = userSessionRepository;
         this.mailer = mailer;
         this.smsService = smsService;
     }
@@ -139,4 +144,46 @@ public class AuthenticationService {
         user.setTokenPhone(null);
         userRepository.persist(user);
     }
+
+    @Transactional
+    public LoginResponse authenticate(LoginRequest request) throws UserNotFoundException, WrongPasswordException, SessionAlreadyExistsException {
+        Validation.validateLoginRequest(request);
+
+        Optional<User> optionalUser = userRepository.findUserByEmailOrPhone(request.getEmailOrPhone());
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
+
+        if (!user.getEmailVerified() && !user.getPhoneVerified()) {
+            throw new UnauthorizedAccessException("Contatto non verificato. Verifica il tuo indirizzo email o il tuo numero di telefono.");
+        }
+
+        String hashedProvidedPassword = hashPassword(request.getPassword());
+        if (!verifyPassword(user.getPassword(), hashedProvidedPassword)) {
+            throw new WrongPasswordException("Password errata.");
+        }
+
+        checkIfSessionExists(user.getId());
+        String sessionId = createSession(user);
+
+        return new LoginResponse(user.getName(), sessionId, "Login avvenuto con successo");
+    }
+
+    private String createSession(User user) {
+        String sessionId = UUID.randomUUID().toString();
+        UserSession userSession = new UserSession();
+        userSession.setSessionId(sessionId);
+        userSession.setUser(user);
+        userSessionRepository.persist(userSession);
+        return sessionId;
+    }
+    private void checkIfSessionExists(String userId) throws SessionAlreadyExistsException {
+        Optional<UserSession> existingSession = userSessionRepository.findByUserId(userId);
+        if (existingSession.isPresent()) {
+            throw new SessionAlreadyExistsException("Utente ha già una sessione attiva.");
+        }
+    }
+
+    public boolean verifyPassword(String actualPassword, String providedPassword) {
+        return actualPassword != null && actualPassword.equals(providedPassword);
+    }
+
 }
