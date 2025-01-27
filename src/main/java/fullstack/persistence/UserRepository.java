@@ -17,4 +17,11 @@ public class UserRepository implements PanacheRepositoryBase<User, String> {
         return find("phone", phone).firstResultOptional();
     }
 
+    public Optional<User> findUserByEmailOrPhone(String emailOrTelefono) {
+        Optional<User> userByEmail = findByEmail(emailOrTelefono);
+        if (userByEmail.isPresent()) {
+            return userByEmail;
+        }
+        return findByPhone(emailOrTelefono);
+    }
 }
