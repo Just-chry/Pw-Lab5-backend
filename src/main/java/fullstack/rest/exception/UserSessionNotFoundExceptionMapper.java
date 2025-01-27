@@ -1,5 +1,6 @@
-package fullstack.service.exception;
+package fullstack.rest.exception;
 
+import fullstack.service.exception.UserSessionNotFoundException;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.ext.ExceptionMapper;
 import jakarta.ws.rs.ext.Provider;
