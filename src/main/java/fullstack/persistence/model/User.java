@@ -1,9 +1,6 @@
 package fullstack.persistence.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.UUID;
 
@@ -23,7 +20,8 @@ public class User {
     private Boolean emailVerified;
     @Column(name = "phone_verified")
     private Boolean phoneVerified;
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role = Role.USER;
     @Column(name = "token_email")
     private String tokenEmail;
     @Column(name = "token_phone")
@@ -33,7 +31,6 @@ public class User {
         this.id = UUID.randomUUID().toString();
         this.emailVerified = false;
         this.phoneVerified = false;
-        this.role = "user";
     }
 
     public String getId() {
@@ -100,11 +97,11 @@ public class User {
         this.emailVerified = emailVerified;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role     role) {
         this.role = role;
     }
 
