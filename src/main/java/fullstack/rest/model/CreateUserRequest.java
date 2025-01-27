@@ -1,10 +1,5 @@
 package fullstack.rest.model;
 
-import fullstack.util.Validator;
-
-
-import javax.xml.bind.ValidationException;
-
 public class CreateUserRequest {
     private String name;
     private String surname;
@@ -33,45 +28,13 @@ public class CreateUserRequest {
     public String getEmail() {
         return email;
     }
-    public void setEmail(String email) throws ValidationException {
-        if (email != null && !email.trim().isEmpty()) {
-            if (Validator.isValidEmail(email)) {
-                this.email = email;
-            } else {
-                throw new ValidationException("Email non valida");
-            }
-        } else {
-            this.email = null;
-        }
+    public void setEmail(String email) {
+        this.email = email;
     }
-
     public String getPhone() {
         return phone;
     }
-
-    public void setPhone(String phone) throws ValidationException {
-        if (phone != null && !phone.trim().isEmpty()) {
-            if (!phone.startsWith("+39")) {
-                phone = "+39" + phone;
-            }
-
-            if (Validator.isValidPhone(phone)) {
-                this.phone = phone;
-            } else {
-                throw new ValidationException("Numero di telefono non valido");
-            }
-        } else {
-            this.phone = null;
-        }
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
-
-    public boolean hasValidNameAndSurname() {
-        return name != null && !name.trim().isEmpty() &&
-                surname != null && !surname.trim().isEmpty();
-    }
-
-    public boolean hasValidContact() {
-        return (email != null && !email.trim().isEmpty()) || (phone != null && !phone.trim().isEmpty());
-    }
-
 }

@@ -30,13 +30,11 @@ public class AuthenticationResource {
         return Response.ok("Registrazione completata con successo, controlla il tuo contatto per confermare.").build();
     }
 
-
     @POST
     @Path("/login")
     public Response login(LoginRequest request) {
         try {
             LoginResponse response = authenticationService.authenticate(request);
-
             NewCookie sessionCookie = new NewCookie("sessionId", response.getSessionId(), "/", null, "Session Cookie", -1, false);
             return Response.ok(response).cookie(sessionCookie).build();
         } catch (UserNotFoundException | WrongPasswordException | SessionAlreadyExistsException e) {
