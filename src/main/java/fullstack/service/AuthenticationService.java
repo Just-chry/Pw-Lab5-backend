@@ -162,7 +162,7 @@ public class AuthenticationService {
         UserSession userSession = new UserSession();
         userSession.setSessionId(sessionId);
         userSession.setUser(user);
-        userSession.setExpiresAt(LocalDateTime.now().plusSeconds(10));
+        userSession.setExpiresAt(LocalDateTime.now().plusHours(1));
         userSessionRepository.persist(userSession);
         return sessionId;
     }
