@@ -1,6 +1,7 @@
 package fullstack.util;
 
 import fullstack.rest.model.CreateUserRequest;
+import fullstack.rest.model.LoginRequest;
 import fullstack.service.exception.UserCreationException;
 
 public class Validation {
@@ -17,4 +18,15 @@ public class Validation {
         }
     }
 
+    public static void validateLoginRequest(LoginRequest request) throws IllegalArgumentException {
+        if (request == null) {
+            throw new IllegalArgumentException("La richiesta di login non può essere nulla.");
+        }
+        if (request.getEmailOrPhone() == null || request.getEmailOrPhone().isEmpty()) {
+            throw new IllegalArgumentException("Email o numero di telefono è obbligatorio.");
+        }
+        if (request.getPassword() == null || request.getPassword().isEmpty()) {
+            throw new IllegalArgumentException("La password è obbligatoria.");
+        }
+    }
 }
