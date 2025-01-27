@@ -35,7 +35,7 @@ public class AuthenticationResource {
     public Response login(LoginRequest request) {
         try {
             LoginResponse response = authenticationService.authenticate(request);
-            NewCookie sessionCookie = new NewCookie("sessionId", response.getSessionId(), "/", null, "Session Cookie", -1, false);
+            NewCookie sessionCookie = new NewCookie("sessionId", response.getSessionId(), "/", null, "Session Cookie", -1, true, true);
             return Response.ok(response).cookie(sessionCookie).build();
         } catch (UserNotFoundException | WrongPasswordException | SessionAlreadyExistsException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
@@ -46,7 +46,7 @@ public class AuthenticationResource {
     @Path("/logout")
     public Response logout(@CookieParam("sessionId") String sessionId) throws UserSessionNotFoundException {
         authenticationService.logout(sessionId);
-        NewCookie expiredCookie = new NewCookie("sessionId", "", "/", null, "Session Cookie", -1, false);
+        NewCookie expiredCookie = new NewCookie("sessionId", "", "/", null, "Session Cookie", -1, true, true);
         return Response.ok("Logout avvenuto con successo").cookie(expiredCookie).build();
     }
 
