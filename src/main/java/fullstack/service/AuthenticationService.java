@@ -8,6 +8,7 @@ import fullstack.rest.model.CreateUserRequest;
 import fullstack.rest.model.LoginRequest;
 import fullstack.rest.model.LoginResponse;
 import fullstack.service.exception.*;
+import fullstack.util.ContactValidator;
 import fullstack.util.Validation;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
@@ -84,6 +85,7 @@ public class AuthenticationService {
         }
 
         if (phone != null && !phone.trim().isEmpty()) {
+            phone = ContactValidator.formatPhone(phone);
             boolean phoneInUse = userRepository.findByPhone(phone).isPresent();
             if (phoneInUse) {
                 throw new UserCreationException("Il numero di telefono è già in uso.");
