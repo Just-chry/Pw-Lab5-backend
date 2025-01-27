@@ -186,4 +186,16 @@ public class AuthenticationService {
         return actualPassword != null && actualPassword.equals(providedPassword);
     }
 
+    public UserSession findUserSessionBySessionId(String sessionId) {
+        return userSessionRepository.findBySessionId(sessionId).orElse(null);
+    }
+
+    @Transactional
+    public void logout(String sessionId) throws UserSessionNotFoundException {
+        Optional<UserSession> optionalSession = userSessionRepository.findBySessionId(sessionId);
+        if (optionalSession.isEmpty()) {
+            throw new UserSessionNotFoundException("Sessione non valida.");
+        }
+        userSessionRepository.delete(optionalSession.get());
+    }
 }

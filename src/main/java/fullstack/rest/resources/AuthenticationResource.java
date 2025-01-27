@@ -1,14 +1,12 @@
 package fullstack.rest.resources;
 
 import fullstack.persistence.model.User;
+import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.CreateUserRequest;
 import fullstack.rest.model.LoginRequest;
 import fullstack.rest.model.LoginResponse;
 import fullstack.service.AuthenticationService;
-import fullstack.service.exception.SessionAlreadyExistsException;
-import fullstack.service.exception.UserCreationException;
-import fullstack.service.exception.UserNotFoundException;
-import fullstack.service.exception.WrongPasswordException;
+import fullstack.service.exception.*;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -52,6 +50,19 @@ public class AuthenticationResource {
         } catch (UserNotFoundException | WrongPasswordException | SessionAlreadyExistsException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         }
+    }
+
+    @DELETE
+    @Path("/logout")
+    public Response logout(@CookieParam("sessionId") String sessionId) throws UserSessionNotFoundException {
+        UserSession userSession = authenticationService.findUserSessionBySessionId(sessionId);
+        if (userSession == null) {
+            throw new UserSessionNotFoundException("Sessione non valida");
+        }
+        authenticationService.logout(sessionId);
+
+        NewCookie expiredCookie = new NewCookie("sessionId", "", "/", null, "Session Cookie", -1, false);
+        return Response.ok("Logout avvenuto con successo").cookie(expiredCookie).build();
     }
 
     @GET
