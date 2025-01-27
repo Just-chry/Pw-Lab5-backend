@@ -55,10 +55,6 @@ public class AuthenticationResource {
     @DELETE
     @Path("/logout")
     public Response logout(@CookieParam("sessionId") String sessionId) throws UserSessionNotFoundException {
-        UserSession userSession = authenticationService.findUserSessionBySessionId(sessionId);
-        if (userSession == null) {
-            throw new UserSessionNotFoundException("Sessione non valida");
-        }
         authenticationService.logout(sessionId);
 
         NewCookie expiredCookie = new NewCookie("sessionId", "", "/", null, "Session Cookie", -1, false);
