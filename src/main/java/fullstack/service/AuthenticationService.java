@@ -3,8 +3,11 @@ package fullstack.service;
 import fullstack.persistence.UserRepository;
 import fullstack.persistence.model.User;
 import fullstack.rest.model.CreateUserRequest;
+import fullstack.service.exception.SmsSendingException;
 import fullstack.service.exception.UserCreationException;
 import fullstack.util.Validation;
+import io.quarkus.mailer.Mail;
+import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -16,11 +19,15 @@ import java.util.UUID;
 public class AuthenticationService {
     private final UserRepository userRepository;
     private final HashCalculator hashCalculator;
+    private final Mailer mailer;
+    private final SmsService smsService;
 
     @Inject
-    public AuthenticationService(UserRepository userRepository, HashCalculator hashCalculator) {
+    public AuthenticationService(UserRepository userRepository, HashCalculator hashCalculator, Mailer mailer, SmsService smsService) {
         this.userRepository = userRepository;
         this.hashCalculator = hashCalculator;
+        this.mailer = mailer;
+        this.smsService = smsService;
     }
 
     @Transactional
@@ -74,6 +81,25 @@ public class AuthenticationService {
             if (phoneInUse) {
                 throw new UserCreationException("Il numero di telefono è già in uso.");
             }
+        }
+    }
+
+    public void sendVerificationEmail(User user, String verificationLink) {
+        mailer.send(Mail.withHtml(user.getEmail(),
+                "Conferma la tua registrazione",
+                "<h1>Benvenuto " + user.getName() + " " + user.getSurname() + "!</h1>" +
+                        "<p>Per favore, clicca sul link seguente per verificare il tuo indirizzo email:</p>" +
+                        "<a href=\"" + verificationLink + "\">Verifica la tua email</a>"));
+        System.out.println("Email inviata correttamente a: " + user.getEmail());
+
+    }
+
+    public void sendVerificationSms(User user) throws UserCreationException {
+        String otp = user.getTokenPhone();
+        try {
+            smsService.sendSms(user.getPhone(), "Il tuo codice OTP è: " + otp);
+        } catch (SmsSendingException e) {
+            throw new UserCreationException("Errore durante l'invio dell'OTP: " + e.getMessage());
         }
     }
 }

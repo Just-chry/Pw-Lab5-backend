@@ -28,6 +28,12 @@ public class AuthenticationResource {
     @Path("/register")
     public Response register(CreateUserRequest request) throws UserCreationException {
         User user = authenticationService.register(request);
+        if (user.getEmail() != null && !user.getEmail().isEmpty()) {
+            String verificationLink = "http://localhost:3000/verificaEmail?token=" + user.getTokenEmail() + "&contact=" + user.getEmail();
+            authenticationService.sendVerificationEmail(user, verificationLink);
+        } else if (user.getPhone() != null && !user.getPhone().isEmpty()) {
+            authenticationService.sendVerificationSms(user);
+        }
 
         return Response.ok("Registrazione completata con successo, controlla il tuo contatto per confermare.").build();
     }
