@@ -1,0 +1,44 @@
+package fullstack.rest.resources;
+
+import fullstack.persistence.model.Booking;
+import fullstack.service.BookingService;
+import jakarta.ws.rs.*;
+
+import java.util.List;
+
+@Path("/bookings")
+public class BookingResource {
+    private BookingService bookingService;
+
+    public BookingResource(BookingService bookingService) {
+        this.bookingService = bookingService;
+    }
+
+    @GET
+    public List<Booking> getAllBookings() {
+        return bookingService.getAllBookings();
+    }
+
+    @GET
+    @Path("/{id}")
+    public Booking getBookingById(@PathParam("id") String id) {
+        return bookingService.findById(id);
+    }
+
+    @POST
+    public Booking createBooking(Booking booking) {
+        return bookingService.save(booking);
+    }
+
+    @DELETE
+    @Path("/{id}")
+    public void deleteBooking(@PathParam("id") String id) {
+        bookingService.deleteById(id);
+    }
+
+    @PUT
+    @Path("/{id}")
+    public int updateBooking(@PathParam("id") String id, Booking booking) {
+        return bookingService.update(id, booking);
+    }
+}

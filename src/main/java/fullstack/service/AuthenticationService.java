@@ -1,5 +1,6 @@
 package fullstack.service;
 
+import fullstack.persistence.model.User;
 import fullstack.persistence.repository.UserRepository;
 import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.persistence.model.UserSession;
@@ -165,6 +166,7 @@ public class AuthenticationService {
         userSessionRepository.persist(userSession);
         return sessionId;
     }
+
     private void checkIfSessionExists(String userId) throws SessionAlreadyExistsException {
         Optional<UserSession> existingSession = userSessionRepository.findByUserId(userId);
         if (existingSession.isPresent()) {
