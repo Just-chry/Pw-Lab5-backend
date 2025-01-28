@@ -1,13 +1,13 @@
-package rest.resources;
+package fullstack.rest.resources;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import persistence.model.Speaker;
-import persistence.model.Tag;
-import persistence.model.Talk;
-import service.SpeakerService;
-import service.TagService;
-import service.TalkService;
+import fullstack.persistence.model.Speaker;
+import fullstack.persistence.model.Tag;
+import fullstack.persistence.model.Talk;
+import fullstack.service.SpeakerService;
+import fullstack.service.TagService;
+import fullstack.service.TalkService;
 
 import java.util.List;
 

@@ -1,8 +1,7 @@
 package fullstack.service;
 
-import fullstack.persistence.UserRepository;
-import fullstack.persistence.UserSessionRepository;
-import fullstack.persistence.model.User;
+import fullstack.persistence.repository.UserRepository;
+import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.CreateUserRequest;
 import fullstack.rest.model.LoginRequest;

@@ -1,4 +1,4 @@
-package fullstack.persistence;
+package fullstack.persistence.repository;
 
 import fullstack.persistence.model.UserSession;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
