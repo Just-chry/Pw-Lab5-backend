@@ -1,9 +1,9 @@
-package service;
+package fullstack.service;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import persistence.model.Speaker;
+import fullstack.persistence.model.Speaker;
 
 import java.util.List;
 

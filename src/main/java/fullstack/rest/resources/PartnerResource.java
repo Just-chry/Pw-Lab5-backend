@@ -1,11 +1,11 @@
-package rest.resources;
+package fullstack.rest.resources;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import persistence.model.Event;
-import persistence.model.Partner;
-import service.EventService;
-import service.PartnerService;
+import fullstack.persistence.model.Event;
+import fullstack.persistence.model.Partner;
+import fullstack.service.EventService;
+import fullstack.service.PartnerService;
 
 import java.util.List;
 

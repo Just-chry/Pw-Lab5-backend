@@ -1,11 +1,9 @@
-package service;
+package fullstack.service;
 
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import persistence.model.Event;
-import persistence.model.Partner;
-import persistence.model.Talk;
+import fullstack.persistence.model.Event;
 
 import java.time.LocalDate;
 import java.util.List;
