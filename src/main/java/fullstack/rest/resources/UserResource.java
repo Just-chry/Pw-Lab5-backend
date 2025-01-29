@@ -32,8 +32,13 @@ public class UserResource {
 
     @PUT
     @Path("/{userId}/modify/email")
-    public Response modifyPassword() {
-
+    public Response modifyEmail(@PathParam("userId") String userId, String newEmail) {
+        try {
+            userService.updateEmail(userId, newEmail);
+            return Response.ok("Email modificata con successo.").build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @PUT
