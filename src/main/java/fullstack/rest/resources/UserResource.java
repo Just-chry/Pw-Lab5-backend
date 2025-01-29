@@ -31,14 +31,33 @@ public class UserResource {
     }
 
     @PUT
-    @Path("/{userId}/profile")
-    public Response updateProfile(@PathParam("userId") String userId, User updatedUser) {
-        try {
-            userService.updateProfile(userId, updatedUser);
-            return Response.ok("Profilo aggiornato. Verifica il nuovo contatto se modificato.").build();
-        } catch (UserNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        }
+    @Path("/{userId}/modify/email")
+    public Response modifyPassword() {
+
+    }
+
+    @PUT
+    @Path("/{userId}/modify/password")
+    public Response modifyPassword() {
+
+    }
+
+    @PUT
+    @Path("/{userId}/modify/phone")
+    public Response modifyPassword() {
+
+    }
+
+    @PUT
+    @Path("/{userId}/modify/name")
+    public Response modifyPassword() {
+
+    }
+
+    @PUT
+    @Path("/{userId}/modify/surname")
+    public Response modifyPassword() {
+
     }
 
     @DELETE
