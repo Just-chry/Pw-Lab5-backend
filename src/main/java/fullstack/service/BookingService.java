@@ -51,6 +51,7 @@ public class BookingService implements PanacheRepository<Booking> {
             throw new RuntimeException("Event not found with id: " + eventId);
         }
 
+        Booking existingBooking = bookingRepository.findExistingBooking(userId, eventId);
         if (existingBooking != null) {
             throw new RuntimeException("User has already booked this event");
         }
