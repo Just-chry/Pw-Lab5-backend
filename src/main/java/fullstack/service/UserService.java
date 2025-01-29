@@ -5,6 +5,8 @@ import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.persistence.model.Role;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
+import fullstack.rest.model.AdminResponse;
+import fullstack.rest.model.UserResponse;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,6 +16,7 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static fullstack.util.Messages.USER_NOT_FOUND;
 
@@ -34,6 +37,11 @@ public class UserService {
         }
         return user;
     }
+
+    public UserResponse getUserResponseById(String userId) throws UserNotFoundException {
+        User user = getUserById(userId);
+        return new UserResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone());
+    }
     @Transactional
     public void updateProfile(String userId, User updatedUser) throws UserNotFoundException {
         User user = getUserById(userId);
@@ -48,8 +56,6 @@ public class UserService {
             String verificationLink = "http://localhost:8080/auth/verifyEmail?token=" + user.getTokenEmail() + "&contact=" + user.getEmail();
             notificationService.sendVerificationEmail(user, verificationLink);
         }
-
-        // Se il telefono è stato modificato, richiedi una nuova verifica
         if (updatedUser.getPhone() != null && !updatedUser.getPhone().equals(user.getPhone())) {
             user.setPhone(updatedUser.getPhone());
             user.setPhoneVerified(false);
@@ -60,22 +66,26 @@ public class UserService {
         userRepository.persist(user);
     }
 
-    // Elimina un utente
     @Transactional
     public void deleteUser(String userId) throws UserNotFoundException {
         User user = getUserById(userId);
         userRepository.delete(user);
     }
 
-    public List<User> listUsers(String sessionId) throws AdminAccessException, UserNotFoundException {
+    public List<AdminResponse> listUsers(String sessionId) throws AdminAccessException, UserNotFoundException {
         if (!isAdmin(sessionId)) {
             throw new AdminAccessException("Accesso negato. Solo gli amministratori possono visualizzare tutti gli utenti.");
         }
-        return userRepository.listAll();
+        return userRepository.listAll().stream()
+                .map(user -> new AdminResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone(), user.getRole().name()))
+                .collect(Collectors.toList());
     }
 
     @Transactional
-    public void promoteUserToAdmin(String userId) throws UserNotFoundException {
+    public void promoteUserToAdmin(String userId, String sessionId) throws UserNotFoundException {
+        if (!isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere gli utenti.");
+        }
         User user = getUserById(userId);
         user.setRole(Role.ADMIN);
         userRepository.persist(user);

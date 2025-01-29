@@ -1,6 +1,7 @@
 package fullstack.rest.resources;
 
 import fullstack.persistence.model.User;
+import fullstack.rest.model.AdminResponse;
 import fullstack.service.UserService;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserNotFoundException;
@@ -23,7 +24,7 @@ public class UserResource {
     @Path("/{userId}")
     public Response getUser(@PathParam("userId") String userId) {
         try {
-            return Response.ok(userService.getUserById(userId)).build();
+            return Response.ok(userService.getUserResponseById(userId)).build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -54,7 +55,7 @@ public class UserResource {
     @GET
     public Response listUsers(@CookieParam("sessionId") String sessionId) {
         try {
-            List<User> users = userService.listUsers(sessionId);
+            List<AdminResponse> users = userService.listUsers(sessionId);
             return Response.ok(users).build();
         } catch (AdminAccessException e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
@@ -66,9 +67,9 @@ public class UserResource {
 
     @PUT
     @Path("/{userId}/promote")
-    public Response promoteUserToAdmin(@PathParam("userId") String userId) {
+    public Response promoteUserToAdmin(@CookieParam("sessionId") String sessionId, @PathParam("userId") String userId) {
         try {
-            userService.promoteUserToAdmin(userId);
+            userService.promoteUserToAdmin(userId, sessionId);
             return Response.ok("Utente promosso ad admin con successo.").build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
