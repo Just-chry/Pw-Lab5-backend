@@ -7,6 +7,7 @@ import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.AdminResponse;
 import fullstack.rest.model.ModifyNameRequest;
+import fullstack.rest.model.ModifySurnameRequest;
 import fullstack.rest.model.UserResponse;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserCreationException;
@@ -134,9 +135,9 @@ public class UserService {
     }
 
     @Transactional
-    public void updateSurname(String sessionId, String newSurname) throws UserNotFoundException {
+    public void updateSurname(String sessionId, ModifySurnameRequest newSurname) throws UserNotFoundException {
         User user = getUserBySessionId(sessionId);
-        user.setSurname(newSurname);
+        user.setSurname(newSurname.getSurname());
         userRepository.persist(user);
     }
 

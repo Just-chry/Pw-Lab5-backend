@@ -3,6 +3,7 @@ package fullstack.rest.resources;
 import fullstack.persistence.model.User;
 import fullstack.rest.model.AdminResponse;
 import fullstack.rest.model.ModifyNameRequest;
+import fullstack.rest.model.ModifySurnameRequest;
 import fullstack.service.UserService;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserCreationException;
@@ -69,7 +70,7 @@ public class UserResource {
 
     @PUT
     @Path("/modify/surname")
-    public Response modifySurname(@CookieParam("sessionId") String sessionId, String newSurname) {
+    public Response modifySurname(@CookieParam("sessionId") String sessionId, ModifySurnameRequest newSurname) {
         try {
             userService.updateSurname(sessionId, newSurname);
             return Response.ok("Cognome modificato con successo.").build();
