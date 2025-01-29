@@ -20,6 +20,8 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static fullstack.util.Messages.USER_NOT_FOUND;
+
 @ApplicationScoped
 public class UserService {
 
@@ -50,9 +52,14 @@ public class UserService {
     @Transactional
     public void promoteUserToAdmin(String userId, String sessionId) throws UserNotFoundException {
         if (isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere gli utenti.");
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
         }
-        User user = getUserBySessionId(userId);
+        Optional<User> userOpt = userRepository.findUserById(userId);
+        if (userOpt.isEmpty()) {
+            throw new UserNotFoundException(USER_NOT_FOUND);
+        }
+
+        User user = userOpt.get();
         user.setRole(Role.ADMIN);
         userRepository.persist(user);
     }
@@ -151,7 +158,7 @@ public class UserService {
             throw new UserCreationException("La nuova password e la ripetizione della nuova password non corrispondono.");
         }
 
-        user.setPassword(newPasswordRequest.getNewPassword());
+        user.setPassword(hashCalculator.calculateHash(newPasswordRequest.getNewPassword()));
         userRepository.persist(user);
     }
 }
