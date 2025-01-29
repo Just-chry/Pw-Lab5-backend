@@ -14,6 +14,7 @@ import fullstack.util.Validation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -34,6 +35,7 @@ public class AuthenticationService {
         this.notificationService = notificationService;
 
     }
+
     @Transactional
     public User register(CreateUserRequest request) throws UserCreationException {
         Validation.validateUserRequest(request);
@@ -61,6 +63,7 @@ public class AuthenticationService {
         userRepository.persist(user);
         return user;
     }
+
     public String generateOtp() {
         SecureRandom random = new SecureRandom();
         int otp = 100000 + random.nextInt(900000);
@@ -126,7 +129,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public LoginResponse authenticate(LoginRequest request) throws UserNotFoundException, WrongPasswordException, SessionAlreadyExistsException {
+    public LoginResponse authenticate(LoginRequest request, Boolean rememberMe) throws UserNotFoundException, WrongPasswordException, SessionAlreadyExistsException {
         Validation.validateLoginRequest(request);
 
         Optional<User> optionalUser = userRepository.findByEmailOrPhone(request.getEmailOrPhone());
@@ -152,9 +155,14 @@ public class AuthenticationService {
         }
 
         checkIfSessionExists(user.getId());
-        String sessionId = createSession(user);
 
-        return new LoginResponse(user.getName(), sessionId, "Login avvenuto con successo");
+        if (Boolean.TRUE.equals(rememberMe)) {
+            String sessionId = createSessionLong(user);
+            return new LoginResponse(user.getName(), sessionId, "Login avvenuto con successo");
+        } else {
+            String sessionId = createSession(user);
+            return new LoginResponse(user.getName(), sessionId, "Login avvenuto con successo");
+        }
     }
 
     private String createSession(User user) {
@@ -166,6 +174,17 @@ public class AuthenticationService {
         userSessionRepository.persist(userSession);
         return sessionId;
     }
+
+    private String createSessionLong(User user) {
+        String sessionId = UUID.randomUUID().toString();
+        UserSession userSession = new UserSession();
+        userSession.setSessionId(sessionId);
+        userSession.setUser(user);
+        userSession.setExpiresAt(LocalDateTime.now().plusDays(30));
+        userSessionRepository.persist(userSession);
+        return sessionId;
+    }
+
     private void checkIfSessionExists(String userId) throws SessionAlreadyExistsException {
         Optional<UserSession> existingSession = userSessionRepository.findByUserId(userId);
         if (existingSession.isPresent()) {

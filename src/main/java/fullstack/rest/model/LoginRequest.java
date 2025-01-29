@@ -3,6 +3,7 @@ package fullstack.rest.model;
 public class LoginRequest {
     private String emailOrPhone;
     private String password;
+    private Boolean rememberMe;
 
     public String getEmailOrPhone() {
         return emailOrPhone;
@@ -15,5 +16,13 @@ public class LoginRequest {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public Boolean getRememberMe() {
+        return rememberMe;
+    }
+
+    public void setRememberMe(Boolean rememberMe) {
+        this.rememberMe = rememberMe;
     }
 }

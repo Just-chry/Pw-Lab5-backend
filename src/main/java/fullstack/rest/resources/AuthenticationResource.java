@@ -32,9 +32,9 @@ public class AuthenticationResource {
 
     @POST
     @Path("/login")
-    public Response login(LoginRequest request) {
+    public Response login(LoginRequest request, Boolean rememberMe) {
         try {
-            LoginResponse response = authenticationService.authenticate(request);
+            LoginResponse response = authenticationService.authenticate(request, rememberMe);
             NewCookie sessionCookie = new NewCookie("sessionId", response.getSessionId(), "/", null, "Session Cookie", -1, true, true);
             return Response.ok(response).cookie(sessionCookie).build();
         } catch (UserNotFoundException | WrongPasswordException | SessionAlreadyExistsException e) {
