@@ -5,10 +5,7 @@ import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.persistence.model.Role;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
-import fullstack.rest.model.AdminResponse;
-import fullstack.rest.model.ModifyNameRequest;
-import fullstack.rest.model.ModifySurnameRequest;
-import fullstack.rest.model.UserResponse;
+import fullstack.rest.model.*;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserCreationException;
 import fullstack.service.exception.UserNotFoundException;
@@ -23,8 +20,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static fullstack.util.Messages.USER_NOT_FOUND;
-
 @ApplicationScoped
 public class UserService {
 
@@ -34,6 +29,8 @@ public class UserService {
     NotificationService notificationService;
     @Inject
     UserSessionRepository userSessionRepository;
+    @Inject
+    HashCalculator hashCalculator;
 
     @Transactional
     public void deleteUser(String userId) throws UserNotFoundException {
@@ -42,7 +39,7 @@ public class UserService {
     }
 
     public List<AdminResponse> listUsers(String sessionId) throws AdminAccessException, UserNotFoundException {
-        if (!isAdmin(sessionId)) {
+        if (isAdmin(sessionId)) {
             throw new AdminAccessException("Accesso negato. Solo gli amministratori possono visualizzare tutti gli utenti.");
         }
         return userRepository.listAll().stream()
@@ -52,7 +49,7 @@ public class UserService {
 
     @Transactional
     public void promoteUserToAdmin(String userId, String sessionId) throws UserNotFoundException {
-        if (!isAdmin(sessionId)) {
+        if (isAdmin(sessionId)) {
             throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere gli utenti.");
         }
         User user = getUserBySessionId(userId);
@@ -67,7 +64,7 @@ public class UserService {
             throw new UserNotFoundException("Sessione non trovata.");
         }
         User user = session.get().getUser();
-        return user.getRole() == Role.ADMIN;
+        return user.getRole() != Role.ADMIN;
     }
 
     public User getUserBySessionId(String sessionId) throws UserNotFoundException {
@@ -141,11 +138,20 @@ public class UserService {
         userRepository.persist(user);
     }
 
-
     @Transactional
-    public void updatePassword(String userId, String newPassword) throws UserNotFoundException {
-        User user = getUserBySessionId(userId);
-        user.setPassword(newPassword);
+    public void updatePassword(String sessionId, ModifyPasswordRequest newPasswordRequest) throws UserNotFoundException, UserCreationException {
+        User user = getUserBySessionId(sessionId);
+        String hashedOldPassword = hashCalculator.calculateHash(newPasswordRequest.getOldPassword());
+
+        if (!user.getPassword().equals(hashedOldPassword)) {
+            throw new UserCreationException("La vecchia password non corrisponde.");
+        }
+
+        if (!newPasswordRequest.getNewPassword().equals(newPasswordRequest.getRepeatNewPassword())) {
+            throw new UserCreationException("La nuova password e la ripetizione della nuova password non corrispondono.");
+        }
+
+        user.setPassword(newPasswordRequest.getNewPassword());
         userRepository.persist(user);
     }
 }

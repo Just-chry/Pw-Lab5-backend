@@ -3,6 +3,7 @@ package fullstack.rest.resources;
 import fullstack.persistence.model.User;
 import fullstack.rest.model.AdminResponse;
 import fullstack.rest.model.ModifyNameRequest;
+import fullstack.rest.model.ModifyPasswordRequest;
 import fullstack.rest.model.ModifySurnameRequest;
 import fullstack.service.UserService;
 import fullstack.service.exception.AdminAccessException;
@@ -81,12 +82,14 @@ public class UserResource {
 
     @PUT
     @Path("/modify/password")
-    public Response modifyPassword(@CookieParam("sessionId") String sessionId, String newPassword) {
+    public Response modifyPassword(@CookieParam("sessionId") String sessionId, ModifyPasswordRequest newPassword) {
         try {
             userService.updatePassword(sessionId, newPassword);
             return Response.ok("Password modificata con successo.").build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (UserCreationException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
 
@@ -112,7 +115,6 @@ public class UserResource {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         }
     }
-
 
     @PUT
     @Path("/{userId}/promote")
