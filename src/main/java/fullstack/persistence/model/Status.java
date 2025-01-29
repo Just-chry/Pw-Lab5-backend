@@ -1,5 +1,5 @@
 package fullstack.persistence.model;
 
 public enum Status {
-    confirmed, pending, declined;
+    confirmed, pending, declined, canceled;
 }

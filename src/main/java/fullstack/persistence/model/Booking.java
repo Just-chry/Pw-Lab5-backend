@@ -1,10 +1,7 @@
 package fullstack.persistence.model;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.time.LocalDate;
 
@@ -14,14 +11,12 @@ public class Booking {
     @Id
     @Column(columnDefinition = "CHAR(36)")
     private String id;
-
     @Column(name = "user_id")
     private String userId;
-
     @Column(name = "event_id")
     private String eventId;
-
     private LocalDate date;
+    @Enumerated(EnumType.STRING)
     private Status status = Status.pending;
 
     public Booking(String id, String userId, String eventId, LocalDate date, Status status) {
