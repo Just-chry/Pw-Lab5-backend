@@ -24,7 +24,7 @@ public class NotificationService {
             throw new IllegalArgumentException("L'utente non ha un'email valida.");
         }
         mailer.send(Mail.withHtml(user.getEmail(),
-                "Conferma la tua registrazione",
+                "Conferma la tua email",
                 "<h1>Benvenuto " + user.getName() + " " + user.getSurname() + "!</h1>" +
                         "<p>Per favore, clicca sul link seguente per verificare il tuo indirizzo email:</p>" +
                         "<a href=\"" + verificationLink + "\">Verifica la tua email</a>"));
