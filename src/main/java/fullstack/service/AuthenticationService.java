@@ -4,12 +4,14 @@ import fullstack.persistence.UserRepository;
 import fullstack.persistence.UserSessionRepository;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
+import fullstack.persistence.repository.UserRepository;
+import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.rest.model.CreateUserRequest;
 import fullstack.rest.model.LoginRequest;
 import fullstack.rest.model.LoginResponse;
 import fullstack.service.exception.*;
 import fullstack.util.ContactValidator;
-import fullstack.util.ErrorMessages;
+import fullstack.util.Messages;
 import fullstack.util.Validation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -19,6 +21,8 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+
+import static fullstack.util.Messages.USER_NOT_FOUND;
 
 @ApplicationScoped
 public class AuthenticationService {
@@ -81,7 +85,7 @@ public class AuthenticationService {
         if (email != null && !email.trim().isEmpty()) {
             boolean emailInUse = userRepository.findByEmail(email).isPresent();
             if (emailInUse) {
-                throw new UserCreationException(ErrorMessages.EMAIL_ALREADY_USED);
+                throw new UserCreationException(Messages.EMAIL_ALREADY_USED);
             }
         }
 
@@ -89,7 +93,7 @@ public class AuthenticationService {
             phone = ContactValidator.formatPhone(phone);
             boolean phoneInUse = userRepository.findByPhone(phone).isPresent();
             if (phoneInUse) {
-                throw new UserCreationException(ErrorMessages.PHONE_ALREADY_USED);
+                throw new UserCreationException(Messages.PHONE_ALREADY_USED);
             }
         }
     }
@@ -133,7 +137,7 @@ public class AuthenticationService {
         Validation.validateLoginRequest(request);
 
         Optional<User> optionalUser = userRepository.findByEmailOrPhone(request.getEmailOrPhone());
-        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         if (!user.getEmailVerified() && !user.getPhoneVerified()) {
             throw new UnAuthorizedAccessException("Contatto non verificato. Verifica il tuo indirizzo email o il tuo numero di telefono.");
@@ -165,12 +169,13 @@ public class AuthenticationService {
         }
     }
 
+
     private String createSession(User user) {
         String sessionId = UUID.randomUUID().toString();
         UserSession userSession = new UserSession();
         userSession.setSessionId(sessionId);
         userSession.setUser(user);
-        userSession.setExpiresAt(LocalDateTime.now().plusHours(1));
+        userSession.setExpiresAt(LocalDateTime.now().plusHours(24));
         userSessionRepository.persist(userSession);
         return sessionId;
     }
