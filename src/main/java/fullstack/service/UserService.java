@@ -78,13 +78,7 @@ public class UserService {
         userRepository.persist(user);
     }
 
-    // Retrocedi un utente a user
-    @Transactional
-    public void demoteUserToUser(String userId) throws UserNotFoundException {
-        User user = getUserById(userId);
-        user.setRole(Role.USER);
-        userRepository.persist(user);
-    }
+
 
     // Genera un OTP per la verifica del telefono
     private String generateOtp() {
