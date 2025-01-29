@@ -11,7 +11,7 @@ import java.util.List;
 
 @Path("/bookings")
 public class BookingResource {
-    private BookingService bookingService;
+    private final BookingService bookingService;
 
     public BookingResource(BookingService bookingService) {
         this.bookingService = bookingService;
