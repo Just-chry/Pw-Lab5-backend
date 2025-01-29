@@ -51,7 +51,6 @@ public class UserResource {
     }
 
     @GET
-    @Path("/list")
     public Response listUsers() {
         List<User> users = userService.listUsers();
         return Response.ok(users).build();
@@ -68,15 +67,4 @@ public class UserResource {
         }
     }
 
-    // Retrocedi un utente a user
-    @PUT
-    @Path("/{userId}/demote")
-    public Response demoteUserToUser(@PathParam("userId") String userId) {
-        try {
-            userService.demoteUserToUser(userId);
-            return Response.ok("Utente retrocesso a user con successo.").build();
-        } catch (UserNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        }
-    }
 }
