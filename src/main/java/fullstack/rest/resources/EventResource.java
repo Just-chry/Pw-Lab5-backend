@@ -68,10 +68,10 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createEvent(@CookieParam("sessionId") String sessionId, Event event) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         Event savedEvent = eventService.save(event);
         return Response.ok(savedEvent).build();
     }
@@ -80,10 +80,10 @@ public class EventResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         eventService.deleteById(id);
         return Response.noContent().build();
     }
@@ -93,10 +93,10 @@ public class EventResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Event event) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         int updated = eventService.update(id, event);
         if (updated == 0) {
             return Response.status(Response.Status.NOT_FOUND).entity("Event not found").build();

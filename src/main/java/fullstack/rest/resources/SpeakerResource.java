@@ -61,10 +61,10 @@ public class SpeakerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createSpeaker(@CookieParam("sessionId") String sessionId, Speaker speaker) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.ADMIN) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         Speaker savedSpeaker = speakerService.save(speaker);
         return Response.ok(savedSpeaker).build();
     }
@@ -72,10 +72,10 @@ public class SpeakerResource {
     @DELETE
     @Path("/{id}")
     public Response deleteSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.ADMIN) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         speakerService.deleteById(id);
         return Response.noContent().build();
     }
@@ -85,10 +85,10 @@ public class SpeakerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Speaker speaker) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.ADMIN) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         int updated = speakerService.update(id, speaker);
         if (updated == 0) {
             return Response.status(Response.Status.NOT_FOUND).entity("Speaker not found").build();

@@ -56,10 +56,10 @@ public class PartnerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createPartner(@CookieParam("sessionId") String sessionId, Partner partner) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         Partner savedPartner = partnerService.save(partner);
         return Response.ok(savedPartner).build();
     }
@@ -68,10 +68,10 @@ public class PartnerResource {
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
     public Response deletePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         partnerService.delete(id);
         return Response.noContent().build();
     }
@@ -81,10 +81,10 @@ public class PartnerResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         int updated = partnerService.update(id, partner);
         if (updated == 0) {
             return Response.status(Response.Status.NOT_FOUND).entity("Partner not found").build();

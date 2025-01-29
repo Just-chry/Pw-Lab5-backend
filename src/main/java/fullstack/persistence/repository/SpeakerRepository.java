@@ -1,17 +1,11 @@
-<<<<<<<< HEAD:src/main/java/fullstack/service/SpeakerService.java
-package fullstack.service;
-========
 package fullstack.persistence.repository;
->>>>>>>> refs/heads/master:src/main/java/fullstack/persistence/repository/SpeakerRepository.java
 
 import fullstack.persistence.model.Speaker;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-<<<<<<<< HEAD:src/main/java/fullstack/service/SpeakerService.java
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Speaker;
-========
->>>>>>>> refs/heads/master:src/main/java/fullstack/persistence/repository/SpeakerRepository.java
+
 
 import java.util.List;
 

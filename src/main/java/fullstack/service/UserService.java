@@ -34,8 +34,6 @@ public class UserService {
         }
         return user;
     }
-
-    // Aggiorna il profilo utente
     @Transactional
     public void updateProfile(String userId, User updatedUser) throws UserNotFoundException {
         User user = getUserById(userId);

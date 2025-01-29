@@ -49,10 +49,10 @@ public class TagResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTag(@CookieParam("sessionId") String sessionId, Tag tag) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         Tag savedTag = tagService.save(tag);
         return Response.ok(savedTag).build();
     }
@@ -60,10 +60,10 @@ public class TagResource {
     @DELETE
     @Path("/{id}")
     public Response deleteTag(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         tagService.delete(id);
         return Response.ok().build();
     }
@@ -73,10 +73,10 @@ public class TagResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateTag(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Tag tag) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         int updated = tagService.update(id, tag);
         if (updated == 0) {
             return Response.status(Response.Status.NOT_FOUND).entity("Tag not found").build();

@@ -81,7 +81,7 @@ public class AuthenticationService {
         if (email != null && !email.trim().isEmpty()) {
             boolean emailInUse = userRepository.findByEmail(email).isPresent();
             if (emailInUse) {
-                throw new UserCreationException(ErrorMessages.EMAIL_ALREADY_USED);
+                throw new UserCreationException(Messages.EMAIL_ALREADY_USED);
             }
         }
 
@@ -89,7 +89,7 @@ public class AuthenticationService {
             phone = ContactValidator.formatPhone(phone);
             boolean phoneInUse = userRepository.findByPhone(phone).isPresent();
             if (phoneInUse) {
-                throw new UserCreationException(ErrorMessages.PHONE_ALREADY_USED);
+                throw new UserCreationException(Messages.PHONE_ALREADY_USED);
             }
         }
     }

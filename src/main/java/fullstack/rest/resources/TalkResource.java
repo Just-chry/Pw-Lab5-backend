@@ -60,10 +60,10 @@ public class TalkResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTalk(@CookieParam("sessionId") String sessionId, Talk talk) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         Talk savedTalk = talkService.save(talk);
         return Response.ok(savedTalk).build();
     }
@@ -71,10 +71,10 @@ public class TalkResource {
     @DELETE
     @Path("/{id}")
     public Response deleteTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole!= Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole!= Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         talkService.deleteById(id);
         return Response.noContent().build();
     }
@@ -84,10 +84,10 @@ public class TalkResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response updateTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Talk talk) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-        }
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         int updated = talkService.update(id, talk);
         if (updated == 0) {
             return Response.status(Response.Status.NOT_FOUND).entity("Talk not found").build();
