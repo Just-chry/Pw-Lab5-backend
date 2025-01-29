@@ -1,4 +1,4 @@
-package persistence.model;
+package fullstack.persistence.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
