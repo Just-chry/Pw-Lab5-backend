@@ -2,6 +2,7 @@ package fullstack.rest.resources;
 
 import fullstack.persistence.model.Booking;
 import fullstack.service.BookingService;
+import fullstack.service.exception.UserNotFoundException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 
@@ -27,8 +28,8 @@ public class BookingResource {
     }
 
     @POST
-    public Booking createBooking(Booking booking) {
-        return bookingService.save(booking);
+    public Booking createBooking(@CookieParam("sessionId") String sessionId, Booking booking) throws UserNotFoundException {
+        return bookingService.save(booking, sessionId);
     }
 
     @DELETE
@@ -42,6 +43,7 @@ public class BookingResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Booking updateBooking(@PathParam("id") String id, Booking booking) {
+
         return bookingService.update(id, booking);
     }
 }
