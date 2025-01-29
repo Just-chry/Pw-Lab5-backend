@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Talk;
 
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class TalkService implements PanacheRepository<Talk> {
@@ -38,6 +39,7 @@ public class TalkService implements PanacheRepository<Talk> {
 
     @Transactional
     public Talk save(Talk talk) {
+        talk.setId(UUID.randomUUID().toString());
         persist(talk);
         return talk;
     }

@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Speaker;
 
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class SpeakerService implements PanacheRepository<Speaker> {
@@ -34,6 +35,7 @@ public class SpeakerService implements PanacheRepository<Speaker> {
 
     @Transactional
     public Speaker save(Speaker speaker) {
+        speaker.setId(UUID.randomUUID().toString());
         persist(speaker);
         return speaker;
     }

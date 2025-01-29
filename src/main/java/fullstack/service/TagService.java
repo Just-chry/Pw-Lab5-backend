@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Tag;
 
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class TagService implements PanacheRepository<Tag> {
@@ -30,6 +31,7 @@ public class TagService implements PanacheRepository<Tag> {
 
     @Transactional
     public Tag save(Tag tag) {
+        tag.setId(UUID.randomUUID().toString());
         persist(tag);
         return tag;
     }

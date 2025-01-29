@@ -6,6 +6,7 @@ import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Partner;
 
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class PartnerService implements PanacheRepository<Partner> {
@@ -19,6 +20,7 @@ public class PartnerService implements PanacheRepository<Partner> {
 
     @Transactional
     public Partner save(Partner partner) {
+        partner.setId(UUID.randomUUID().toString());
         persist(partner);
         return partner;
     }

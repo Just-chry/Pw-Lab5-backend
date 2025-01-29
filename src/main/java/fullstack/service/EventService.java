@@ -8,6 +8,7 @@ import fullstack.persistence.model.Event;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class EventService implements PanacheRepository<Event> {
@@ -40,6 +41,7 @@ public class EventService implements PanacheRepository<Event> {
 
     @Transactional
     public Event save(Event event) {
+        event.setId(UUID.randomUUID().toString());
         persist(event);
         return event;
     }
