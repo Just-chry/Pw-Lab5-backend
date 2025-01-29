@@ -5,24 +5,29 @@ import fullstack.persistence.model.Event;
 import fullstack.persistence.model.Status;
 import fullstack.persistence.model.User;
 import fullstack.persistence.repository.BookingRepository;
+import fullstack.persistence.repository.UserRepository;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 
-import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @ApplicationScoped
 public class BookingService {
     private final UserService userService;
     private final EventService eventService;
     private final BookingRepository bookingRepository;
+    private final NotificationService notificationService;
+    private final UserRepository userRepository;
 
     @jakarta.inject.Inject
-    public BookingService(UserService userService, EventService eventService, BookingRepository bookingRepository) {
+    public BookingService(UserService userService, EventService eventService, BookingRepository bookingRepository, NotificationService notificationService, UserRepository userRepository) {
         this.userService = userService;
         this.eventService = eventService;
         this.bookingRepository = bookingRepository;
+        this.notificationService = notificationService;
+        this.userRepository = userRepository;
     }
 
     public List<Booking> getAllBookings() {
@@ -32,6 +37,7 @@ public class BookingService {
     public Booking findById(String id) {
         return bookingRepository.findById(id);
     }
+
 
     @Transactional
     public Booking save(String sessionId, String eventId) throws UserNotFoundException {
@@ -58,6 +64,12 @@ public class BookingService {
         event.setParticipantsCount(event.getParticipantsCount() + 1);
         eventService.persist(event);
 
+        // Send confirmation email
+        if (user.getEmail() == null  || user.getEmail().isEmpty() && user.getPhone() != null && !user.getPhone().isEmpty()) {
+            notificationService.sendBookingConfirmationSms(user, event);
+        } else  {
+            notificationService.sendBookingConfirmationEmail(user, event);
+        }
         return booking;
     }
 
@@ -80,6 +92,14 @@ public class BookingService {
 
         booking.setStatus(Status.canceled);
         bookingRepository.persistBooking(booking);
+
+        User user = userRepository.findUserById(booking.getUserId()).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + booking.getUserId()));
+
+        if ((user.getEmail() == null || user.getEmail().isEmpty()) && user.getPhone() != null && !user.getPhone().isEmpty()) {
+            notificationService.sendBookingCancellationSms(user, event);
+        } else {
+            notificationService.sendBookingCancellationEmail(user, event);
+        }
 
         return booking;
     }
