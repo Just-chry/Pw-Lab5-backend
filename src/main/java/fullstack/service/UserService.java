@@ -99,12 +99,11 @@ public class UserService {
         return user.getRole() == Role.admin;
     }
 
-    public String getUserIdBySessionId(String sessionId) throws UserNotFoundException {
+    public User getUserBySessionId(String sessionId) throws UserNotFoundException {
         Optional<UserSession> session = userSessionRepository.findBySessionId(sessionId);
         if (session.isEmpty()) {
             throw new UserNotFoundException("Sessione non trovata.");
         }
-        User user = session.get().getUser();
-        return user.getId();
+        return session.get().getUser();
     }
 }

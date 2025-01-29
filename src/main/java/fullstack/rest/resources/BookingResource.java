@@ -44,24 +44,6 @@ public class BookingResource {
     }
 
     @PUT
-    @Path("/{id}/confirm")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Booking confirmBooking(@PathParam("id") String id) {
-        //admin
-        return bookingService.confirmBooking(id);
-    }
-
-    @PUT
-    @Path("/{id}/decline")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Booking declineBooking(@PathParam("id") String id) {
-        //admin
-        return bookingService.declineBooking(id);
-    }
-
-    @PUT
     @Path("/{id}/cancel")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
