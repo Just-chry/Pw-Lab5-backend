@@ -7,28 +7,29 @@ import fullstack.persistence.model.User;
 import fullstack.persistence.repository.BookingRepository;
 import fullstack.persistence.repository.UserRepository;
 import fullstack.service.exception.UserNotFoundException;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import java.util.Optional;
 
 @ApplicationScoped
-public class BookingService {
-    private final UserService userService;
-    private final EventService eventService;
-    private final BookingRepository bookingRepository;
-    private final NotificationService notificationService;
-    private final UserRepository userRepository;
-
-    @jakarta.inject.Inject
-    public BookingService(UserService userService, EventService eventService, BookingRepository bookingRepository, NotificationService notificationService, UserRepository userRepository) {
-        this.userService = userService;
-        this.eventService = eventService;
-        this.bookingRepository = bookingRepository;
-        this.notificationService = notificationService;
-        this.userRepository = userRepository;
-    }
+public class BookingService implements PanacheRepository<Booking> {
+    @Inject
+    UserService userService;
+    @Inject
+    EventService eventService;
+    @Inject
+    BookingRepository bookingRepository;
+    @Inject
+    NotificationService notificationService;
+    @Inject
+    UserRepository userRepository;
 
     public List<Booking> getAllBookings() {
         return bookingRepository.listAll();
@@ -50,7 +51,6 @@ public class BookingService {
             throw new RuntimeException("Event not found with id: " + eventId);
         }
 
-        Booking existingBooking = bookingRepository.findExistingBooking(userId, eventId);
         if (existingBooking != null) {
             throw new RuntimeException("User has already booked this event");
         }

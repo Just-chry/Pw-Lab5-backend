@@ -3,6 +3,9 @@ package fullstack.persistence.repository;
 import fullstack.persistence.model.Speaker;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
+import fullstack.persistence.model.Speaker;
+
 
 import java.util.List;
 

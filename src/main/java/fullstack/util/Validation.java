@@ -46,4 +46,16 @@ public class Validation {
             throw new IllegalArgumentException(Messages.PASSWORD_REQUIRED);
         }
     }
+
+    public static void validateEmail(String email) throws IllegalArgumentException {
+        if (!ContactValidator.isValidEmail(email)) {
+            throw new IllegalArgumentException(Messages.INVALID_EMAIL);
+        }
+    }
+    public static void validatePhone(String phone) throws IllegalArgumentException {
+        phone = ContactValidator.formatPhone(phone);
+        if (!ContactValidator.isValidPhone(phone)) {
+            throw new IllegalArgumentException(Messages.INVALID_PHONE);
+        }
+    }
 }

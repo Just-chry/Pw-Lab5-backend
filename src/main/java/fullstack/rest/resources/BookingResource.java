@@ -3,6 +3,7 @@ package fullstack.rest.resources;
 import fullstack.persistence.model.Booking;
 import fullstack.service.BookingService;
 import fullstack.service.exception.UserNotFoundException;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -11,11 +12,8 @@ import java.util.List;
 
 @Path("/bookings")
 public class BookingResource {
-    private final BookingService bookingService;
-
-    public BookingResource(BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
+    @Inject
+    BookingService bookingService;
 
     @GET
     public List<Booking> getAllBookings() {
