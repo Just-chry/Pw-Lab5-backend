@@ -1,6 +1,7 @@
 package fullstack.persistence.model;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "tag")

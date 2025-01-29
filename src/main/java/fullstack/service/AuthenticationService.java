@@ -1,9 +1,9 @@
 package fullstack.service;
 
 import fullstack.persistence.model.User;
+import fullstack.persistence.model.UserSession;
 import fullstack.persistence.repository.UserRepository;
 import fullstack.persistence.repository.UserSessionRepository;
-import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.CreateUserRequest;
 import fullstack.rest.model.LoginRequest;
 import fullstack.rest.model.LoginResponse;
@@ -18,6 +18,8 @@ import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+
+import static fullstack.util.Messages.USER_NOT_FOUND;
 
 @ApplicationScoped
 public class AuthenticationService {
@@ -130,7 +132,7 @@ public class AuthenticationService {
         Validation.validateLoginRequest(request);
 
         Optional<User> optionalUser = userRepository.findByEmailOrPhone(request.getEmailOrPhone());
-        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         if (!user.getEmailVerified() && !user.getPhoneVerified()) {
             throw new UnAuthorizedAccessException("Contatto non verificato. Verifica il tuo indirizzo email o il tuo numero di telefono.");
@@ -157,12 +159,13 @@ public class AuthenticationService {
         return new LoginResponse(user.getName(), sessionId, "Login avvenuto con successo");
     }
 
+
     private String createSession(User user) {
         String sessionId = UUID.randomUUID().toString();
         UserSession userSession = new UserSession();
         userSession.setSessionId(sessionId);
         userSession.setUser(user);
-        userSession.setExpiresAt(LocalDateTime.now().plusHours(1));
+        userSession.setExpiresAt(LocalDateTime.now().plusHours(24));
         userSessionRepository.persist(userSession);
         return sessionId;
     }
