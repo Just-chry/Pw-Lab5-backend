@@ -30,42 +30,6 @@ public class UserService {
     @Inject
     UserSessionRepository userSessionRepository;
 
-    public User getUserById(String userId) throws UserNotFoundException {
-        User user = userRepository.findById(userId);
-        if (user == null) {
-            throw new UserNotFoundException(USER_NOT_FOUND);
-        }
-        return user;
-    }
-
-    public UserResponse getUserResponseById(String userId) throws UserNotFoundException {
-        User user = getUserById(userId);
-        return new UserResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone());
-    }
-    @Transactional
-    public void updateProfile(String userId, User updatedUser) throws UserNotFoundException {
-        User user = getUserById(userId);
-
-        user.setName(updatedUser.getName());
-        user.setSurname(updatedUser.getSurname());
-
-        if (updatedUser.getEmail() != null && !updatedUser.getEmail().equals(user.getEmail())) {
-            user.setEmail(updatedUser.getEmail());
-            user.setEmailVerified(false);
-            user.setTokenEmail(UUID.randomUUID().toString());
-            String verificationLink = "http://localhost:8080/auth/verifyEmail?token=" + user.getTokenEmail() + "&contact=" + user.getEmail();
-            notificationService.sendVerificationEmail(user, verificationLink);
-        }
-        if (updatedUser.getPhone() != null && !updatedUser.getPhone().equals(user.getPhone())) {
-            user.setPhone(updatedUser.getPhone());
-            user.setPhoneVerified(false);
-            user.setTokenPhone(generateOtp());
-            notificationService.sendVerificationSms(user, user.getTokenPhone());
-        }
-
-        userRepository.persist(user);
-    }
-
     @Transactional
     public void deleteUser(String userId) throws UserNotFoundException {
         User user = getUserById(userId);
@@ -91,11 +55,6 @@ public class UserService {
         userRepository.persist(user);
     }
 
-    private String generateOtp() {
-        SecureRandom random = new SecureRandom();
-        int otp = 100000 + random.nextInt(900000);
-        return String.valueOf(otp);
-    }
 
     public boolean isAdmin(String sessionId) throws UserNotFoundException {
         Optional<UserSession> session = userSessionRepository.findBySessionId(sessionId);
@@ -104,5 +63,18 @@ public class UserService {
         }
         User user = session.get().getUser();
         return user.getRole() == Role.ADMIN;
+    }
+
+    public User getUserById(String userId) throws UserNotFoundException {
+        User user = userRepository.findById(userId);
+        if (user == null) {
+            throw new UserNotFoundException(USER_NOT_FOUND);
+        }
+        return user;
+    }
+
+    public UserResponse getUserResponseById(String userId) throws UserNotFoundException {
+        User user = getUserById(userId);
+        return new UserResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone());
     }
 }
