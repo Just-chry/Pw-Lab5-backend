@@ -67,14 +67,24 @@ public class UserResource {
 
     @PUT
     @Path("/{userId}/modify/surname")
-    public Response modifyPassword() {
-
+    public Response modifySurname(@PathParam("userId") String userId, String newSurname) {
+        try {
+            userService.updateSurname(userId, newSurname);
+            return Response.ok("Cognome modificato con successo.").build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @PUT
     @Path("/{userId}/modify/password")
-    public Response modifyPassword() {
-
+    public Response modifyPassword(@PathParam("userId") String userId, String newPassword) {
+        try {
+            userService.updatePassword(userId, newPassword);
+            return Response.ok("Password modificata con successo.").build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @DELETE
