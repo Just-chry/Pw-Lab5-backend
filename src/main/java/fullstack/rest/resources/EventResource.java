@@ -67,9 +67,9 @@ public class EventResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createEvent(@CookieParam("SESSION_COOKIE") String sessionId, Event event) throws UserNotFoundException {
+    public Response createEvent(@CookieParam("sessionId") String sessionId, Event event) throws UserNotFoundException {
         Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.ADMIN) {
+        if (userRole != Role.admin) {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
         Event savedEvent = eventService.save(event);
@@ -79,9 +79,9 @@ public class EventResource {
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deleteEvent(@CookieParam("SESSION_COOKIE") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
+    public Response deleteEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
         Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.ADMIN) {
+        if (userRole != Role.admin) {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
         eventService.deleteById(id);
@@ -92,9 +92,9 @@ public class EventResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateEvent(@CookieParam("SESSION_COOKIE") String sessionId, @PathParam("id") String id, Event event) throws UserNotFoundException {
+    public Response updateEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Event event) throws UserNotFoundException {
         Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.ADMIN) {
+        if (userRole != Role.admin) {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
         int updated = eventService.update(id, event);

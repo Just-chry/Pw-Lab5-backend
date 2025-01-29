@@ -21,7 +21,7 @@ public class User {
     @Column(name = "phone_verified")
     private Boolean phoneVerified;
     @Enumerated(EnumType.STRING)
-    private Role role = Role.USER;
+    private Role role = Role.user;
     @Column(name = "token_email")
     private String tokenEmail;
     @Column(name = "token_phone")

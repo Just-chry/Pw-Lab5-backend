@@ -1,7 +1,7 @@
 package fullstack.service;
 
-import fullstack.persistence.UserRepository;
-import fullstack.persistence.UserSessionRepository;
+import fullstack.persistence.repository.UserRepository;
+import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.CreateUserRequest;
@@ -129,7 +129,7 @@ public class AuthenticationService {
     public LoginResponse authenticate(LoginRequest request) throws UserNotFoundException, WrongPasswordException, SessionAlreadyExistsException {
         Validation.validateLoginRequest(request);
 
-        Optional<User> optionalUser = userRepository.findByEmailOrPhone(request.getEmailOrPhone());
+        Optional<User> optionalUser = userRepository.findByEmailOrPhone(request.getEmail(), request.getPhoneNumber());
         User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
 
         if (!user.getEmailVerified() && !user.getPhoneVerified()) {
@@ -162,7 +162,7 @@ public class AuthenticationService {
         UserSession userSession = new UserSession();
         userSession.setSessionId(sessionId);
         userSession.setUser(user);
-        userSession.setExpiresAt(LocalDateTime.now().plusHours(1));
+        userSession.setExpiresAt(LocalDateTime.now().plusHours(24));
         userSessionRepository.persist(userSession);
         return sessionId;
     }

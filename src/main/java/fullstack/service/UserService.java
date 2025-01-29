@@ -1,14 +1,17 @@
 package fullstack.service;
 
-import fullstack.persistence.UserRepository;
+import fullstack.persistence.repository.UserRepository;
+import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.persistence.model.Role;
 import fullstack.persistence.model.User;
+import fullstack.persistence.model.UserSession;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -19,6 +22,12 @@ public class UserService {
 
     @Inject
     NotificationService notificationService;
+    private final UserSessionRepository userSessionRepository;
+
+    public UserService(UserSessionRepository userSessionRepository) {
+        this.userSessionRepository = userSessionRepository;
+    }
+
 
     public User getUserById(String userId) throws UserNotFoundException {
         User user = userRepository.findById(userId);
@@ -66,14 +75,14 @@ public class UserService {
     @Transactional
     public void promoteUserToAdmin(String userId) throws UserNotFoundException {
         User user = getUserById(userId);
-        user.setRole(Role.ADMIN);
+        user.setRole(Role.admin);
         userRepository.persist(user);
     }
 
     @Transactional
     public void demoteUserToUser(String userId) throws UserNotFoundException {
         User user = getUserById(userId);
-        user.setRole(Role.USER);
+        user.setRole(Role.user);
         userRepository.persist(user);
     }
 
@@ -84,10 +93,14 @@ public class UserService {
     }
 
     public Role getUserRoleBySessionId(String sessionId) throws UserNotFoundException {
-        User user = userRepository.findBySessionId(sessionId);
-        if (user == null) {
-            throw new UserNotFoundException("User not found.");
+        Optional<UserSession> userSessionOptional = userSessionRepository.findBySessionId(sessionId);
+        if (userSessionOptional.isEmpty()) {
+            throw new UserNotFoundException("Session not found or expired.");
         }
-        return user.getRole();
+        UserSession userSession = userSessionOptional.get();
+        if (userSession.getUser() == null) {
+            throw new UserNotFoundException("User associated with the session not found.");
+        }
+        return userSession.getUser().getRole();
     }
 }

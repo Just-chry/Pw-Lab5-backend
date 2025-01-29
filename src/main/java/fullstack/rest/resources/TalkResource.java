@@ -59,9 +59,9 @@ public class TalkResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createTalk(@CookieParam("SESSION_COOKIE") String sessionId, Talk talk) throws UserNotFoundException {
+    public Response createTalk(@CookieParam("sessionId") String sessionId, Talk talk) throws UserNotFoundException {
         Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.ADMIN) {
+        if (userRole != Role.admin) {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
         Talk savedTalk = talkService.save(talk);
@@ -70,9 +70,9 @@ public class TalkResource {
 
     @DELETE
     @Path("/{id}")
-    public Response deleteTalk(@CookieParam("SESSION_COOKIE") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
+    public Response deleteTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
         Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole!= Role.ADMIN) {
+        if (userRole!= Role.admin) {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
         talkService.deleteById(id);
@@ -83,9 +83,9 @@ public class TalkResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateTalk(@CookieParam("SESSION_COOKIE") String sessionId, @PathParam("id") String id, Talk talk) throws UserNotFoundException {
+    public Response updateTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Talk talk) throws UserNotFoundException {
         Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.ADMIN) {
+        if (userRole != Role.admin) {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
         int updated = talkService.update(id, talk);

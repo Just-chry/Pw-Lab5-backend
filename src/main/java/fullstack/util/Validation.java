@@ -33,17 +33,14 @@ public class Validation {
 
     public static void validateLoginRequest(LoginRequest request) throws IllegalArgumentException {
         if (request == null) {
-            throw new IllegalArgumentException(ErrorMessages.CONTACT_REQUIRED);
+            throw new IllegalArgumentException("È necessario fornire almeno un'email o un numero di telefono.");
         }
-        if (request.getEmailOrPhone() == null || request.getEmailOrPhone().isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessages.CONTACT_REQUIRED);
-        }
-
-        if (request.getEmailOrPhone().matches("\\d+")) {
-            request.setEmailOrPhone(ContactValidator.formatPhone(request.getEmailOrPhone()));
+        if ((request.getEmail() == null || request.getEmail().isEmpty()) &&
+                (request.getPhoneNumber() == null || request.getPhoneNumber().isEmpty())) {
+            throw new IllegalArgumentException("È necessario fornire almeno un'email o un numero di telefono.");
         }
         if (request.getPassword() == null || request.getPassword().isEmpty()) {
-            throw new IllegalArgumentException(ErrorMessages.PASSWORD_REQUIRED);
+            throw new IllegalArgumentException("La password è obbligatoria.");
         }
     }
 }

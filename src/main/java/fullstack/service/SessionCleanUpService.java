@@ -1,6 +1,6 @@
 package fullstack.service;
 
-import fullstack.persistence.UserSessionRepository;
+import fullstack.persistence.repository.UserSessionRepository;
 import io.quarkus.scheduler.Scheduled;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;

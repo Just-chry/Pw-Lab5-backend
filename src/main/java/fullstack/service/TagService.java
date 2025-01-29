@@ -1,5 +1,6 @@
 package fullstack.service;
 
+import fullstack.persistence.repository.TagRepository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -9,6 +10,12 @@ import java.util.List;
 
 @ApplicationScoped
 public class TagService implements PanacheRepository<Tag> {
+    private final TagRepository tagRepository;
+
+    public TagService(TagRepository tagRepository) {
+        this.tagRepository = tagRepository;
+    }
+
     public List<Tag> getAllTags() {
         return listAll();
     }
@@ -18,12 +25,7 @@ public class TagService implements PanacheRepository<Tag> {
     }
 
     public List<Tag> getTagsByTalkId(String talkId) {
-        return getEntityManager().createNativeQuery(
-                        "SELECT t.* FROM tag t " +
-                                "JOIN talk_tag et ON t.id = et.tag_id " +
-                                "WHERE et.talk_id = :talkId", Tag.class)
-                .setParameter("talkId", talkId)
-                .getResultList();
+        return tagRepository.getTagsByTalkId(talkId);
     }
 
     @Transactional

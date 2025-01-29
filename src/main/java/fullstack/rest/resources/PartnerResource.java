@@ -55,9 +55,9 @@ public class PartnerResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createPartner(@CookieParam("SESSION_COOKIE") String sessionId, Partner partner) throws UserNotFoundException {
+    public Response createPartner(@CookieParam("sessionId") String sessionId, Partner partner) throws UserNotFoundException {
         Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.ADMIN) {
+        if (userRole != Role.admin) {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
         Partner savedPartner = partnerService.save(partner);
@@ -67,9 +67,9 @@ public class PartnerResource {
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deletePartner(@CookieParam("SESSION_COOKIE") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
+    public Response deletePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
         Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.ADMIN) {
+        if (userRole != Role.admin) {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
         partnerService.delete(id);
@@ -80,9 +80,9 @@ public class PartnerResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateSpeaker(@CookieParam("SESSION_COOKIE") String sessionId, @PathParam("id") String id, Partner partner) throws UserNotFoundException {
+    public Response updateSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) throws UserNotFoundException {
         Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.ADMIN) {
+        if (userRole != Role.admin) {
             return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
         }
         int updated = partnerService.update(id, partner);
