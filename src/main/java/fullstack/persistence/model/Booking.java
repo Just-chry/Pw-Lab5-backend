@@ -22,9 +22,9 @@ public class Booking {
     private String eventId;
 
     private LocalDate date;
-    private String status;
+    private Status status = Status.pending;
 
-    public Booking(String id, String userId, String eventId, LocalDate date, String status) {
+    public Booking(String id, String userId, String eventId, LocalDate date, Status status) {
         this.id = id;
         this.userId = userId;
         this.eventId = eventId;
@@ -67,11 +67,11 @@ public class Booking {
         this.date = date;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 

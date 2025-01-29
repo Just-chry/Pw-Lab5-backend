@@ -2,9 +2,12 @@ package fullstack.service;
 
 import fullstack.persistence.model.Booking;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import jakarta.enterprise.context.ApplicationScoped;
 
 import java.util.List;
+import java.util.UUID;
 
+@ApplicationScoped
 public class BookingService implements PanacheRepository<Booking> {
     public List<Booking> getAllBookings() {
         return listAll();
@@ -15,6 +18,7 @@ public class BookingService implements PanacheRepository<Booking> {
     }
 
     public Booking save(Booking booking) {
+        booking.setId(UUID.randomUUID().toString());
         persist(booking);
         return booking;
     }
@@ -23,7 +27,8 @@ public class BookingService implements PanacheRepository<Booking> {
         delete("id", id);
     }
 
-    public int update(String id, Booking booking) {
-        return update("status =?1, where id =?3", booking.getStatus(), id);
+    public Booking update(String id, Booking booking) {
+        update("status =?1 where id =?2", booking.getStatus(), id);
+        return findById(id);
     }
 }

@@ -17,18 +17,22 @@ public class Event {
     private LocalDate date;
     @Column(name = "partner_id")
     private String partnerId;
+    @Column(name = "max_participants")
+    private int maxParticipants;
+    @Column(name = "participants_count")
+    private int participantsCount = 0;
 
-    public Event(String id, String title, String description, LocalDate date, String partnerId) {
+    public Event(String id, String title, String description, LocalDate date, String partnerId, int maxParticipants, int participantsCount) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.date = date;
         this.partnerId = partnerId;
+        this.maxParticipants = maxParticipants;
+        this.participantsCount = participantsCount;
     }
 
-    public Event() {
-
-    }
+    public Event() {}
 
     public String getId() {
         return id;
@@ -66,6 +70,22 @@ public class Event {
         return partnerId;
     }
 
+    public int getMaxParticipants() {
+        return maxParticipants;
+    }
+
+    public void setMaxParticipants(int maxParticipants) {
+        this.maxParticipants = maxParticipants;
+    }
+
+    public int getParticipantsCount() {
+        return participantsCount;
+    }
+
+    public void setParticipantsCount(int participantsCount) {
+        this.participantsCount = participantsCount;
+    }
+
     public void setPartnerId(String partnerId) {
         this.partnerId = partnerId;
     }
@@ -77,6 +97,8 @@ public class Event {
                 ", description='" + description + '\'' +
                 ", date=" + date +
                 ", partnerId='" + partnerId + '\'' +
+                ", maxParticipants=" + maxParticipants +
+                ", participantsCount=" + participantsCount +
                 '}';
     }
 }

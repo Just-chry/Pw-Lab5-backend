@@ -3,6 +3,7 @@ package fullstack.rest.resources;
 import fullstack.persistence.model.Booking;
 import fullstack.service.BookingService;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.MediaType;
 
 import java.util.List;
 
@@ -38,7 +39,9 @@ public class BookingResource {
 
     @PUT
     @Path("/{id}")
-    public int updateBooking(@PathParam("id") String id, Booking booking) {
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Booking updateBooking(@PathParam("id") String id, Booking booking) {
         return bookingService.update(id, booking);
     }
 }
