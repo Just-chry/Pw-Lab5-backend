@@ -6,9 +6,13 @@ import fullstack.persistence.model.Role;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.AdminResponse;
+import fullstack.rest.model.ModifyNameRequest;
 import fullstack.rest.model.UserResponse;
 import fullstack.service.exception.AdminAccessException;
+import fullstack.service.exception.UserCreationException;
 import fullstack.service.exception.UserNotFoundException;
+import fullstack.util.Messages;
+import fullstack.util.Validation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -32,7 +36,7 @@ public class UserService {
 
     @Transactional
     public void deleteUser(String userId) throws UserNotFoundException {
-        User user = getUserById(userId);
+        User user = getUserBySessionId(userId);
         userRepository.delete(user);
     }
 
@@ -50,7 +54,7 @@ public class UserService {
         if (!isAdmin(sessionId)) {
             throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere gli utenti.");
         }
-        User user = getUserById(userId);
+        User user = getUserBySessionId(userId);
         user.setRole(Role.ADMIN);
         userRepository.persist(user);
     }
@@ -65,27 +69,82 @@ public class UserService {
         return user.getRole() == Role.ADMIN;
     }
 
-    public User getUserById(String userId) throws UserNotFoundException {
-        User user = userRepository.findById(userId);
-        if (user == null) {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+    public User getUserBySessionId(String sessionId) throws UserNotFoundException {
+        Optional<UserSession> session = userSessionRepository.findBySessionId(sessionId);
+        if (session.isEmpty()) {
+            throw new UserNotFoundException("Sessione non trovata.");
         }
-        return user;
+        return session.get().getUser();
     }
 
     public UserResponse getUserResponseById(String userId) throws UserNotFoundException {
-        User user = getUserById(userId);
+        User user = getUserBySessionId(userId);
         return new UserResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone());
     }
 
     @Transactional
-    public void updateEmail(String userId, String newEmail) throws UserNotFoundException {
-        User user = getUserById(userId);
+    public void updateEmail(String sessionId, String newEmail) throws UserNotFoundException, UserCreationException {
+        Validation.validateEmail(newEmail);
+        checkEmail(newEmail);
+        User user = getUserBySessionId(sessionId);
         user.setEmail(newEmail);
         user.setEmailVerified(false);
         user.setTokenEmail(UUID.randomUUID().toString());
         String verificationLink = "http://localhost:8080/auth/verifyEmail?token=" + user.getTokenEmail() + "&contact=" + user.getEmail();
         notificationService.sendVerificationEmail(user, verificationLink);
+        userRepository.persist(user);
+    }
+
+    private void checkEmail(String newEmail) throws UserCreationException {
+        if (userRepository.findByEmail(newEmail).isPresent()) {
+            throw new UserCreationException(Messages.EMAIL_ALREADY_USED);
+        }
+    }
+
+
+    @Transactional
+    public void updatePhone(String sessionId, String newPhone) throws UserNotFoundException, UserCreationException {
+        Validation.validatePhone(newPhone);
+        checkPhone(newPhone);
+        User user = getUserBySessionId(sessionId);
+        user.setPhone(newPhone);
+        user.setPhoneVerified(false);
+        user.setTokenPhone(generateOtp());
+        notificationService.sendVerificationSms(user, user.getTokenPhone());
+        userRepository.persist(user);
+    }
+
+    private void checkPhone(String newPhone) throws UserCreationException {
+        if (userRepository.findByPhone(newPhone).isPresent()) {
+            throw new UserCreationException(Messages.PHONE_ALREADY_USED);
+        }
+    }
+
+    private String generateOtp() {
+        SecureRandom random = new SecureRandom();
+        int otp = 100000 + random.nextInt(900000);
+        return String.valueOf(otp);
+    }
+
+    @Transactional
+    public void updateName(String sessionId, ModifyNameRequest newName) throws UserNotFoundException {
+        User user = getUserBySessionId(sessionId);
+        user.setName(newName.getName());
+        userRepository.persist(user);
+    }
+
+    @Transactional
+    public void updateSurname(String sessionId, String newSurname) throws UserNotFoundException {
+        User user = getUserBySessionId(sessionId);
+        user.setSurname(newSurname);
+        userRepository.persist(user);
+    }
+
+
+    @Transactional
+    public void updatePassword(String userId, String newPassword) throws UserNotFoundException {
+        User user = getUserBySessionId(userId);
+        user.setPassword(newPassword);
         userRepository.persist(user);
     }
 }
