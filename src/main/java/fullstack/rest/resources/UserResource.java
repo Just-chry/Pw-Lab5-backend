@@ -1,10 +1,7 @@
 package fullstack.rest.resources;
 
 import fullstack.persistence.model.User;
-import fullstack.rest.model.AdminResponse;
-import fullstack.rest.model.ModifyNameRequest;
-import fullstack.rest.model.ModifyPasswordRequest;
-import fullstack.rest.model.ModifySurnameRequest;
+import fullstack.rest.model.*;
 import fullstack.service.UserService;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserCreationException;
@@ -36,7 +33,7 @@ public class UserResource {
 
     @PUT
     @Path("/modify/email")
-    public Response modifyEmail(@CookieParam("sessionId") String sessionId, String newEmail) {
+    public Response modifyEmail(@CookieParam("sessionId") String sessionId, ModifyEmailRequest newEmail) {
         try {
             userService.updateEmail(sessionId, newEmail);
             return Response.ok("Email modificata con successo.").build();
@@ -48,7 +45,7 @@ public class UserResource {
 
     @PUT
     @Path("/modify/phone")
-    public Response modifyPhone(@CookieParam("sessionId") String sessionId, String newPhone) {
+    public Response modifyPhone(@CookieParam("sessionId") String sessionId, ModifyPhoneRquest newPhone) {
         try {
             userService.updatePhone(sessionId, newPhone);
             return Response.ok("Telefono modificato con successo.").build();

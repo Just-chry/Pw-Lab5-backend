@@ -83,22 +83,26 @@ public class UserService {
     }
 
     public UserResponse getUserResponseById(String userId) throws UserNotFoundException {
-        User user = getUserBySessionId(userId);
+        User user = userRepository.findUserById(userId).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         return new UserResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone());
     }
 
+
+
     @Transactional
-    public void updateEmail(String sessionId, String newEmail) throws UserNotFoundException, UserCreationException {
-        Validation.validateEmail(newEmail);
-        checkEmail(newEmail);
+    public void updateEmail(String sessionId, ModifyEmailRequest newEmail) throws UserNotFoundException, UserCreationException {
+        Validation.validateEmail(newEmail.getEmail());
+        checkEmail(newEmail.getEmail());
         User user = getUserBySessionId(sessionId);
-        user.setEmail(newEmail);
+        user.setEmail(newEmail.getEmail());
         user.setEmailVerified(false);
         user.setTokenEmail(UUID.randomUUID().toString());
         String verificationLink = "http://localhost:8080/auth/verifyEmail?token=" + user.getTokenEmail() + "&contact=" + user.getEmail();
         notificationService.sendVerificationEmail(user, verificationLink);
+
         userRepository.persist(user);
     }
+
 
     private void checkEmail(String newEmail) throws UserCreationException {
         if (userRepository.findByEmail(newEmail).isPresent()) {
@@ -108,7 +112,8 @@ public class UserService {
 
 
     @Transactional
-    public void updatePhone(String sessionId, String newPhone) throws UserNotFoundException, UserCreationException {
+    public void updatePhone(String sessionId, ModifyPhoneRquest newPhoneRequest) throws UserNotFoundException, UserCreationException {
+        String newPhone = newPhoneRequest.getPhone();
         Validation.validatePhone(newPhone);
         checkPhone(newPhone);
         User user = getUserBySessionId(sessionId);
@@ -116,8 +121,10 @@ public class UserService {
         user.setPhoneVerified(false);
         user.setTokenPhone(generateOtp());
         notificationService.sendVerificationSms(user, user.getTokenPhone());
+
         userRepository.persist(user);
     }
+
 
     private void checkPhone(String newPhone) throws UserCreationException {
         if (userRepository.findByPhone(newPhone).isPresent()) {
