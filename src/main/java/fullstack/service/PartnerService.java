@@ -1,7 +1,8 @@
 package fullstack.service;
 
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import fullstack.persistence.repository.PartnerRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Partner;
 
@@ -9,34 +10,36 @@ import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
-public class PartnerService implements PanacheRepository<Partner> {
+public class PartnerService {
+    @Inject
+    PartnerRepository partnerRepository;
+
     public List<Partner> getAllPartners() {
-        return listAll();
+        return partnerRepository.listAll();
     }
 
     public Partner findById(String id) {
-        return find("id", id).firstResult();
+        return partnerRepository.findById(id);
     }
 
     @Transactional
     public Partner save(Partner partner) {
         partner.setId(UUID.randomUUID().toString());
-        persist(partner);
+        partnerRepository.persist(partner);
         return partner;
     }
 
     @Transactional
-    public Partner deleteById(String id) {
-        delete("id", id);
-        return null;
+    public void deleteById(String id) {
+        partnerRepository.deleteById(id);
     }
 
     @Transactional
     public int update(String id, Partner partner) {
-        return update("name = ?1, description = ?2, place = ?3, website = ?4, email = ?5, image = ?6, value = ?7 where id = ?8", partner.getName(), partner.getDescription(), partner.getPlace(), partner.getWebsite(), partner.getEmail(), partner.getImage(), partner.getValue(), id);
+        return partnerRepository.update(id, partner);
     }
 
     public List<Partner> findByValue(String value) {
-        return list("value", value);
+        return partnerRepository.findByValue(value);
     }
 }
