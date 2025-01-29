@@ -77,4 +77,15 @@ public class UserService {
         User user = getUserById(userId);
         return new UserResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone());
     }
+
+    @Transactional
+    public void updateEmail(String userId, String newEmail) throws UserNotFoundException {
+        User user = getUserById(userId);
+        user.setEmail(newEmail);
+        user.setEmailVerified(false);
+        user.setTokenEmail(UUID.randomUUID().toString());
+        String verificationLink = "http://localhost:8080/auth/verifyEmail?token=" + user.getTokenEmail() + "&contact=" + user.getEmail();
+        notificationService.sendVerificationEmail(user, verificationLink);
+        userRepository.persist(user);
+    }
 }
