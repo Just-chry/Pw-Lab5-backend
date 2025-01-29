@@ -2,8 +2,10 @@ package fullstack.rest.resources;
 
 import fullstack.persistence.model.User;
 import fullstack.rest.model.AdminResponse;
+import fullstack.rest.model.ModifyNameRequest;
 import fullstack.service.UserService;
 import fullstack.service.exception.AdminAccessException;
+import fullstack.service.exception.UserCreationException;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -31,34 +33,34 @@ public class UserResource {
     }
 
     @PUT
-    @Path("/{userId}/modify/email")
-    public Response modifyEmail(@PathParam("userId") String userId, String newEmail) {
+    @Path("/modify/email")
+    public Response modifyEmail(@CookieParam("sessionId") String sessionId, String newEmail) {
         try {
-            userService.updateEmail(userId, newEmail);
+            userService.updateEmail(sessionId, newEmail);
             return Response.ok("Email modificata con successo.").build();
-        } catch (UserNotFoundException e) {
+        } catch (UserNotFoundException | UserCreationException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 
 
     @PUT
-    @Path("/{userId}/modify/phone")
-    public Response modifyPhone(@PathParam("userId") String userId, String newPhone) {
+    @Path("/modify/phone")
+    public Response modifyPhone(@CookieParam("sessionId") String sessionId, String newPhone) {
         try {
-            userService.updatePhone(userId, newPhone);
+            userService.updatePhone(sessionId, newPhone);
             return Response.ok("Telefono modificato con successo.").build();
-        } catch (UserNotFoundException e) {
+        } catch (UserNotFoundException | UserCreationException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 
 
     @PUT
-    @Path("/{userId}/modify/name")
-    public Response modifyName(@PathParam("userId") String userId, String newName) {
+    @Path("/modify/name")
+    public Response modifyName(@CookieParam("sessionId") String sessionId, ModifyNameRequest newName) {
         try {
-            userService.updateName(userId, newName);
+            userService.updateName(sessionId, newName);
             return Response.ok("Nome modificato con successo.").build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
@@ -66,10 +68,10 @@ public class UserResource {
     }
 
     @PUT
-    @Path("/{userId}/modify/surname")
-    public Response modifySurname(@PathParam("userId") String userId, String newSurname) {
+    @Path("/modify/surname")
+    public Response modifySurname(@CookieParam("sessionId") String sessionId, String newSurname) {
         try {
-            userService.updateSurname(userId, newSurname);
+            userService.updateSurname(sessionId, newSurname);
             return Response.ok("Cognome modificato con successo.").build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
@@ -77,10 +79,10 @@ public class UserResource {
     }
 
     @PUT
-    @Path("/{userId}/modify/password")
-    public Response modifyPassword(@PathParam("userId") String userId, String newPassword) {
+    @Path("/modify/password")
+    public Response modifyPassword(@CookieParam("sessionId") String sessionId, String newPassword) {
         try {
-            userService.updatePassword(userId, newPassword);
+            userService.updatePassword(sessionId, newPassword);
             return Response.ok("Password modificata con successo.").build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
