@@ -41,16 +41,16 @@ public class UserResource {
         }
     }
 
-    @PUT
-    @Path("/{userId}/modify/password")
-    public Response modifyPassword() {
-
-    }
 
     @PUT
     @Path("/{userId}/modify/phone")
-    public Response modifyPassword() {
-
+    public Response modifyPhone(@PathParam("userId") String userId, String newPhone) {
+        try {
+            userService.updatePhone(userId, newPhone);
+            return Response.ok("Telefono modificato con successo.").build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @PUT
@@ -61,6 +61,12 @@ public class UserResource {
 
     @PUT
     @Path("/{userId}/modify/surname")
+    public Response modifyPassword() {
+
+    }
+
+    @PUT
+    @Path("/{userId}/modify/password")
     public Response modifyPassword() {
 
     }
