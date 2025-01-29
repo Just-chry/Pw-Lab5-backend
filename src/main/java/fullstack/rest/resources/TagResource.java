@@ -1,11 +1,15 @@
 package fullstack.rest.resources;
 
+import fullstack.persistence.model.Role;
+import fullstack.service.UserService;
+import fullstack.service.exception.UserNotFoundException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import fullstack.persistence.model.Tag;
 import fullstack.persistence.model.Talk;
 import fullstack.service.TagService;
 import fullstack.service.TalkService;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -13,10 +17,12 @@ import java.util.List;
 public class TagResource {
     private final TagService tagService;
     private final TalkService talkService;
+    private final UserService userService;
 
-    public TagResource(TagService tagService, TalkService talkService) {
+    public TagResource(TagService tagService, TalkService talkService, UserService userService) {
         this.tagService = tagService;
         this.talkService = talkService;
+        this.userService = userService;
     }
 
     @GET
@@ -42,21 +48,39 @@ public class TagResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Tag createTag(Tag tag) {
-        return tagService.save(tag);
+    public Response createTag(@CookieParam("sessionId") String sessionId, Tag tag) throws UserNotFoundException {
+        Role userRole = userService.getUserRoleBySessionId(sessionId);
+        if (userRole != Role.admin) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+        }
+        Tag savedTag = tagService.save(tag);
+        return Response.ok(savedTag).build();
     }
 
     @DELETE
     @Path("/{id}")
-    public void deleteTag(@PathParam("id") String id) {
-        tagService.deleteById(id);
+    public Response deleteTag(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
+        Role userRole = userService.getUserRoleBySessionId(sessionId);
+        if (userRole != Role.admin) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+        }
+        tagService.delete(id);
+        return Response.ok().build();
     }
 
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public int updateTag(@PathParam("id") String id, Tag tag) {
-        return tagService.update(id, tag);
+    public Response updateTag(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Tag tag) throws UserNotFoundException {
+        Role userRole = userService.getUserRoleBySessionId(sessionId);
+        if (userRole != Role.admin) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+        }
+        int updated = tagService.update(id, tag);
+        if (updated == 0) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Tag not found").build();
+        }
+        return Response.ok().build();
     }
 }

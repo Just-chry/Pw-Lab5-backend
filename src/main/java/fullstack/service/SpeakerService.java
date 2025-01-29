@@ -1,14 +1,22 @@
 package fullstack.service;
 
+import fullstack.persistence.repository.SpeakerRepository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Speaker;
 
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class SpeakerService implements PanacheRepository<Speaker> {
+    private final SpeakerRepository speakerRepository;
+
+    public SpeakerService(SpeakerRepository speakerRepository) {
+        this.speakerRepository = speakerRepository;
+    }
+
     public List<Speaker> getAllSpeakers() {
         return listAll();
     }
@@ -18,27 +26,16 @@ public class SpeakerService implements PanacheRepository<Speaker> {
     }
 
     public List<Speaker> getSpeakerByTalkId(String talkId) {
-        return getEntityManager().createNativeQuery(
-                        "SELECT t.* FROM speaker t " +
-                                "JOIN talk_speaker et ON t.id = et.speaker_id " +
-                                "WHERE et.talk_id = :talkId", Speaker.class)
-                .setParameter("talkId", talkId)
-                .getResultList();
+        return speakerRepository.getSpeakerByTalkId(talkId);
     }
 
     public List<Speaker> getSpeakersByEventId(String eventId) {
-        return getEntityManager().createNativeQuery(
-                        "SELECT s.* FROM speaker s " +
-                                "JOIN talk_speaker ts ON s.id = ts.speaker_id " +
-                                "JOIN talk t ON ts.talk_id = t.id " +
-                                "JOIN event_talk et ON t.id = et.talk_id " +
-                                "WHERE et.event_id = :eventId", Speaker.class)
-                .setParameter("eventId", eventId)
-                .getResultList();
+        return speakerRepository.getSpeakersByEventId(eventId);
     }
 
     @Transactional
     public Speaker save(Speaker speaker) {
+        speaker.setId(UUID.randomUUID().toString());
         persist(speaker);
         return speaker;
     }

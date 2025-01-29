@@ -17,6 +17,7 @@ public class Partner {
     private String website;
     private String email;
     private String image;
+    @Column(name = "value", columnDefinition = "varchar(255)")
     private String  value;
 
     public Partner(String id, String name, String description, String place, String website, String email, String image, String value) {

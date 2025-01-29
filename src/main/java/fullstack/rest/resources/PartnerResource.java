@@ -1,11 +1,15 @@
 package fullstack.rest.resources;
 
+import fullstack.persistence.model.Role;
+import fullstack.service.UserService;
+import fullstack.service.exception.UserNotFoundException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import fullstack.persistence.model.Event;
 import fullstack.persistence.model.Partner;
 import fullstack.service.EventService;
 import fullstack.service.PartnerService;
+import jakarta.ws.rs.core.Response;
 
 import java.util.List;
 
@@ -13,10 +17,12 @@ import java.util.List;
 public class PartnerResource {
     private final PartnerService partnerService;
     private final EventService eventService;
+    private final UserService userService;
 
-    public PartnerResource(PartnerService partnerService, EventService eventService) {
+    public PartnerResource(PartnerService partnerService, EventService eventService, UserService userService) {
         this.partnerService = partnerService;
         this.eventService = eventService;
+        this.userService = userService;
     }
 
     @GET
@@ -49,22 +55,40 @@ public class PartnerResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Partner createPartner(Partner partner) {
-        return partnerService.save(partner);
+    public Response createPartner(@CookieParam("sessionId") String sessionId, Partner partner) throws UserNotFoundException {
+        Role userRole = userService.getUserRoleBySessionId(sessionId);
+        if (userRole != Role.admin) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+        }
+        Partner savedPartner = partnerService.save(partner);
+        return Response.ok(savedPartner).build();
+    }
+
+    @DELETE
+    @Path("/{id}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response deletePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
+        Role userRole = userService.getUserRoleBySessionId(sessionId);
+        if (userRole != Role.admin) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+        }
+        partnerService.delete(id);
+        return Response.noContent().build();
     }
 
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public int updateSpeaker(@PathParam("id") String id, Partner partner) {
-        return partnerService.update(id, partner);
-    }
-
-    @DELETE
-    @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Partner deletePartner(@PathParam("id") String id) {
-        return partnerService.deleteById(id);
+    public Response updateSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) throws UserNotFoundException {
+        Role userRole = userService.getUserRoleBySessionId(sessionId);
+        if (userRole != Role.admin) {
+            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+        }
+        int updated = partnerService.update(id, partner);
+        if (updated == 0) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Partner not found").build();
+        }
+        return Response.ok(updated).build();
     }
 }

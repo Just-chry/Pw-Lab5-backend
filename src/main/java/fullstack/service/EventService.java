@@ -1,5 +1,6 @@
 package fullstack.service;
 
+import fullstack.persistence.repository.EventRepository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -7,9 +8,16 @@ import fullstack.persistence.model.Event;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 
 @ApplicationScoped
 public class EventService implements PanacheRepository<Event> {
+    private final EventRepository eventRepository;
+
+    public EventService(EventRepository eventRepository) {
+        this.eventRepository = eventRepository;
+    }
+
     public List<Event> getAllEvents() {
         return listAll();
     }
@@ -24,13 +32,7 @@ public class EventService implements PanacheRepository<Event> {
     }
 
     public List<Event> getEventsBySpeakerId(String speakerId) {
-        return getEntityManager().createNativeQuery(
-                        "SELECT e.* FROM event e " +
-                                "JOIN event_talk et ON e.id = et.event_id " +
-                                "JOIN talk_speaker ts ON et.talk_id = ts.talk_id " +
-                                "WHERE ts.speaker_id = :speakerId", Event.class)
-                .setParameter("speakerId", speakerId)
-                .getResultList();
+        return eventRepository.getEventsBySpeakerId(speakerId);
     }
 
     public List<Event> getEventsByPartnerId(String partnerId) {
@@ -39,6 +41,7 @@ public class EventService implements PanacheRepository<Event> {
 
     @Transactional
     public Event save(Event event) {
+        event.setId(UUID.randomUUID().toString());
         persist(event);
         return event;
     }

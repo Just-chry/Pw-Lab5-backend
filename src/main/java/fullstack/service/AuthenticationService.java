@@ -1,7 +1,7 @@
 package fullstack.service;
 
-import fullstack.persistence.UserRepository;
-import fullstack.persistence.UserSessionRepository;
+import fullstack.persistence.repository.UserRepository;
+import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.CreateUserRequest;
@@ -81,7 +81,7 @@ public class AuthenticationService {
         if (email != null && !email.trim().isEmpty()) {
             boolean emailInUse = userRepository.findByEmail(email).isPresent();
             if (emailInUse) {
-                throw new UserCreationException(Messages.EMAIL_ALREADY_USED);
+                throw new UserCreationException(ErrorMessages.EMAIL_ALREADY_USED);
             }
         }
 
@@ -89,7 +89,7 @@ public class AuthenticationService {
             phone = ContactValidator.formatPhone(phone);
             boolean phoneInUse = userRepository.findByPhone(phone).isPresent();
             if (phoneInUse) {
-                throw new UserCreationException(Messages.PHONE_ALREADY_USED);
+                throw new UserCreationException(ErrorMessages.PHONE_ALREADY_USED);
             }
         }
     }
@@ -98,12 +98,12 @@ public class AuthenticationService {
     public void verifyEmail(String token, String email) throws UserCreationException {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            throw new UserCreationException(USER_NOT_FOUND);
+            throw new UserCreationException("Utente non trovato.");
         }
 
         User user = userOpt.get();
         if (user.getTokenEmail() == null || !user.getTokenEmail().equals(token)) {
-            throw new UserCreationException(INVALID_TOKEN);
+            throw new UserCreationException("Token di verifica non valido.");
         }
 
         user.setEmailVerified(true);
@@ -162,7 +162,7 @@ public class AuthenticationService {
         UserSession userSession = new UserSession();
         userSession.setSessionId(sessionId);
         userSession.setUser(user);
-        userSession.setExpiresAt(LocalDateTime.now().plusHours(1));
+        userSession.setExpiresAt(LocalDateTime.now().plusHours(24));
         userSessionRepository.persist(userSession);
         return sessionId;
     }
