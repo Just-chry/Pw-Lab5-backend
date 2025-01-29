@@ -1,30 +1,36 @@
 package fullstack.service;
 
 import fullstack.persistence.UserRepository;
+import fullstack.persistence.UserSessionRepository;
 import fullstack.persistence.model.Role;
 import fullstack.persistence.model.User;
+import fullstack.persistence.model.UserSession;
+import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserNotFoundException;
-import fullstack.util.ErrorMessages;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+
+import static fullstack.util.Messages.USER_NOT_FOUND;
 
 @ApplicationScoped
 public class UserService {
 
     @Inject
     UserRepository userRepository;
-
     @Inject
     NotificationService notificationService;
+    @Inject
+    UserSessionRepository userSessionRepository;
 
     public User getUserById(String userId) throws UserNotFoundException {
         User user = userRepository.findById(userId);
         if (user == null) {
-            throw new UserNotFoundException("Utente non trovato.");
+            throw new UserNotFoundException(USER_NOT_FOUND);
         }
         return user;
     }
@@ -34,11 +40,9 @@ public class UserService {
     public void updateProfile(String userId, User updatedUser) throws UserNotFoundException {
         User user = getUserById(userId);
 
-        // Aggiorna nome e cognome
         user.setName(updatedUser.getName());
         user.setSurname(updatedUser.getSurname());
 
-        // Se l'email è stata modificata, richiedi una nuova verifica
         if (updatedUser.getEmail() != null && !updatedUser.getEmail().equals(user.getEmail())) {
             user.setEmail(updatedUser.getEmail());
             user.setEmailVerified(false);
@@ -65,12 +69,13 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    // Lista di tutti gli utenti
-    public List<User> listUsers() {
+    public List<User> listUsers(String sessionId) throws AdminAccessException, UserNotFoundException {
+        if (!isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono visualizzare tutti gli utenti.");
+        }
         return userRepository.listAll();
     }
 
-    // Promuovi un utente a admin
     @Transactional
     public void promoteUserToAdmin(String userId) throws UserNotFoundException {
         User user = getUserById(userId);
@@ -78,12 +83,18 @@ public class UserService {
         userRepository.persist(user);
     }
 
-
-
-    // Genera un OTP per la verifica del telefono
     private String generateOtp() {
         SecureRandom random = new SecureRandom();
         int otp = 100000 + random.nextInt(900000);
         return String.valueOf(otp);
+    }
+
+    public boolean isAdmin(String sessionId) throws UserNotFoundException {
+        Optional<UserSession> session = userSessionRepository.findBySessionId(sessionId);
+        if (session.isEmpty()) {
+            throw new UserNotFoundException("Sessione non trovata.");
+        }
+        User user = session.get().getUser();
+        return user.getRole() == Role.ADMIN;
     }
 }

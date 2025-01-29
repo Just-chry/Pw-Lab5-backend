@@ -2,6 +2,7 @@ package fullstack.rest.resources;
 
 import fullstack.persistence.model.User;
 import fullstack.service.UserService;
+import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -51,10 +52,17 @@ public class UserResource {
     }
 
     @GET
-    public Response listUsers() {
-        List<User> users = userService.listUsers();
-        return Response.ok(users).build();
+    public Response listUsers(@CookieParam("sessionId") String sessionId) {
+        try {
+            List<User> users = userService.listUsers(sessionId);
+            return Response.ok(users).build();
+        } catch (AdminAccessException e) {
+            return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        }
     }
+
 
     @PUT
     @Path("/{userId}/promote")
