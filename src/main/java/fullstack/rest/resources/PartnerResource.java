@@ -80,7 +80,7 @@ public class PartnerResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) throws UserNotFoundException {
+    public Response updatePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) throws UserNotFoundException {
 //        Role userRole = userService.getUserRoleBySessionId(sessionId);
 //        if (userRole != Role.admin) {
 //            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();

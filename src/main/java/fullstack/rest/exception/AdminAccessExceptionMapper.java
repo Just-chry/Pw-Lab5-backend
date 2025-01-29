@@ -7,7 +7,6 @@ import jakarta.ws.rs.ext.Provider;
 
 @Provider
 public class AdminAccessExceptionMapper implements ExceptionMapper<AdminAccessException> {
-
     @Override
     public Response toResponse(AdminAccessException exception) {
         return Response.status(Response.Status.FORBIDDEN)

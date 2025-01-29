@@ -1,11 +1,10 @@
 package fullstack.service;
 
-
+import fullstack.persistence.model.Talk;
 import fullstack.persistence.repository.TalkRepository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import fullstack.persistence.model.Talk;
 
 import java.util.List;
 import java.util.UUID;

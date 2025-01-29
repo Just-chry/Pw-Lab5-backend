@@ -1,21 +1,19 @@
 package fullstack.service;
 
+import fullstack.persistence.model.Speaker;
 import fullstack.persistence.repository.SpeakerRepository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-import fullstack.persistence.model.Speaker;
 
 import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
 public class SpeakerService implements PanacheRepository<Speaker> {
-    private final SpeakerRepository speakerRepository;
-
-    public SpeakerService(SpeakerRepository speakerRepository) {
-        this.speakerRepository = speakerRepository;
-    }
+    @Inject
+    SpeakerRepository speakerRepository;
 
     public List<Speaker> getAllSpeakers() {
         return listAll();

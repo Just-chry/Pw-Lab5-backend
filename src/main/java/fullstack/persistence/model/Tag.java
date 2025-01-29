@@ -1,6 +1,7 @@
 package fullstack.persistence.model;
 
 import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "tag")
@@ -8,7 +9,6 @@ public class Tag {
     @Id
     @Column(columnDefinition = "CHAR(36)")
     private String id;
-
     private String name;
 
     public String getId() {
