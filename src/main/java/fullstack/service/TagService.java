@@ -35,7 +35,7 @@ public class TagService implements PanacheRepository<Tag> {
     }
 
     @Transactional
-    public void deleteById(String id) {
+    public void delete(String id) {
         delete("id", id);
     }
 
