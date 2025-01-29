@@ -4,8 +4,6 @@ import fullstack.persistence.UserRepository;
 import fullstack.persistence.UserSessionRepository;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
-import fullstack.persistence.repository.UserRepository;
-import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.rest.model.CreateUserRequest;
 import fullstack.rest.model.LoginRequest;
 import fullstack.rest.model.LoginResponse;
@@ -29,7 +27,7 @@ public class AuthenticationService {
     private final UserRepository userRepository;
     private final HashCalculator hashCalculator;
     private final UserSessionRepository userSessionRepository;
-    private NotificationService notificationService;
+    private final NotificationService notificationService;
 
     @Inject
     public AuthenticationService(UserRepository userRepository, HashCalculator hashCalculator, UserSessionRepository userSessionRepository, NotificationService notificationService) {
