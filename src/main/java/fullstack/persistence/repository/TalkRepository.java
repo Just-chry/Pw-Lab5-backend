@@ -5,7 +5,7 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 
 import java.util.List;
 
-public class TalkResitory implements PanacheRepository<Talk> {
+public class TalkRepository implements PanacheRepository<Talk> {
     public List<Talk> getTalksByEventId(String eventId) {
         return getEntityManager().createNativeQuery(
                         "SELECT t.* FROM talk t " +

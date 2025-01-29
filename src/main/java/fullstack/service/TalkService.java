@@ -1,6 +1,6 @@
 package fullstack.service;
 
-import fullstack.persistence.repository.TalkResitory;
+import fullstack.persistence.repository.TalkRepository;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -10,9 +10,9 @@ import java.util.List;
 
 @ApplicationScoped
 public class TalkService implements PanacheRepository<Talk> {
-    private final TalkResitory talkRepository;
+    private final TalkRepository talkRepository;
 
-    public TalkService(TalkResitory talkRepository) {
+    public TalkService(TalkRepository talkRepository) {
         this.talkRepository = talkRepository;
     }
 
