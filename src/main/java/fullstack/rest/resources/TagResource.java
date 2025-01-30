@@ -12,6 +12,8 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/tags")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class TagResource {
     private final TagService tagService;
     private final TalkService talkService;
@@ -22,28 +24,23 @@ public class TagResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Tag> getAllTags() {
         return tagService.getAllTags();
     }
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Tag getTagById(@PathParam("id") String id) {
         return tagService.findById(id);
     }
 
     @GET
     @Path("/{id}/talks")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Talk> getTagsByTalkId(@PathParam("id") String tagId) {
         return talkService.getTagsByTalkId(tagId);
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response createTag(@CookieParam("sessionId") String sessionId, Tag tag) {
         try {
             Tag savedTag = tagService.save(sessionId, tag);
@@ -66,8 +63,6 @@ public class TagResource {
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response updateTag(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Tag tag)  {
         try {
         int updated = tagService.update(sessionId, id, tag);
