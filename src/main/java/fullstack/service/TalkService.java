@@ -2,8 +2,11 @@ package fullstack.service;
 
 import fullstack.persistence.model.Talk;
 import fullstack.persistence.repository.TalkRepository;
+import fullstack.service.exception.AdminAccessException;
+import fullstack.service.exception.UserNotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
 import java.util.List;
@@ -11,9 +14,13 @@ import java.util.UUID;
 
 @ApplicationScoped
 public class TalkService implements PanacheRepository<Talk> {
+
+    private final UserService userService;
     private final TalkRepository talkRepository;
 
-    public TalkService(TalkRepository talkRepository) {
+    @Inject
+    public TalkService(UserService userService, TalkRepository talkRepository) {
+        this.userService = userService;
         this.talkRepository = talkRepository;
     }
 
@@ -38,19 +45,33 @@ public class TalkService implements PanacheRepository<Talk> {
     }
 
     @Transactional
-    public Talk save(Talk talk) {
+    public Talk save(String sessionId, Talk talk) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+        }
         talk.setId(UUID.randomUUID().toString());
         persist(talk);
         return talk;
     }
 
     @Transactional
-    public void deleteById(String id) {
+    public void deleteById(String sessionId,String id) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+        }
         talkRepository.deleteById(id);
     }
 
     @Transactional
     public int update(String id, Talk talk) {
         return talkRepository.update(id, talk);
+    }
+
+    @Transactional
+    public int updateTalk(String sessionId, String id, Talk talk) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+        }
+        return update(id, talk);
     }
 }
