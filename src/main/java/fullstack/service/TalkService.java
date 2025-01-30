@@ -80,12 +80,9 @@ public class TalkService implements PanacheRepository<Talk> {
     }
 
     @Transactional
-    public void deleteById(String sessionId,String id) throws SessionException, NoContentException {
+    public void deleteById(String sessionId,String id) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
-        }
-        if(talkRepository.findById(id) == null) {
-            throw new NoContentException(TALK_NOT_FOUND);
         }
         talkRepository.deleteById(id);
     }
