@@ -77,8 +77,8 @@ public class EventResource {
     @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
         try {
-        eventService.deleteById(sessionId, id);
-        return Response.noContent().build();
+            eventService.deleteById(sessionId, id);
+            return Response.noContent().build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
@@ -88,13 +88,10 @@ public class EventResource {
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Event event)  {
+    public Response updateEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Event event) {
         try {
-        int updated = eventService.update(sessionId, id, event);
-        if (updated == 0) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Event not found").build();
-        }
-        return Response.ok().build();
+            eventService.update(sessionId, id, event);
+            return Response.ok().build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }

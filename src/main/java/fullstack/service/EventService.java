@@ -67,7 +67,11 @@ public class EventService implements PanacheRepository<Event> {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
-        return eventRepository.update(id, event);
+        int updated = eventRepository.update(id, event);
+        if (updated == 0) {
+            throw new UserNotFoundException("Event not found");
+        }
+        return updated;
     }
 }
 
