@@ -11,6 +11,8 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/bookings")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class BookingResource {
     @Inject
     BookingService bookingService;
@@ -28,8 +30,6 @@ public class BookingResource {
 
     @POST
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response createBooking(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
         try {
             Booking booking = bookingService.save(sessionId, id);
@@ -43,13 +43,12 @@ public class BookingResource {
 
     @PUT
     @Path("/{id}/cancel")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Booking cancelBooking(@PathParam("id") String id) {
+    public Response cancelBooking(@PathParam("id") String id) {
         try {
-            return bookingService.cancelBooking(id);
+            Booking booking = bookingService.cancelBooking(id);
+            return Response.ok(booking).build();
         } catch (UserNotFoundException e) {
-            throw new WebApplicationException(e.getMessage(), Response.Status.NOT_FOUND);
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 }
