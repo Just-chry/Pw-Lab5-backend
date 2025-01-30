@@ -8,6 +8,8 @@ import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import static fullstack.util.Messages.INVALID_PHONE;
+
 @ApplicationScoped
 public class NotificationService {
 
@@ -34,7 +36,7 @@ public class NotificationService {
 
     public void sendVerificationSms(User user, String otp) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
+            throw new IllegalArgumentException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "Il tuo codice OTP è: " + otp);
@@ -56,7 +58,7 @@ public class NotificationService {
 
     public void sendPasswordResetSms(User user) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
+            throw new IllegalArgumentException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "Il tuo codice per reimpostare la password è: " + user.getTokenPassword());
@@ -83,7 +85,7 @@ public class NotificationService {
 
     public void sendBookingConfirmationSms(User user, Event event) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
+            throw new IllegalArgumentException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "La tua prenotazione per l'evento \"" + event.getTitle() + "\" è stata confermata.");
@@ -109,7 +111,7 @@ public class NotificationService {
 
     public void sendBookingCancellationSms(User user, Event event) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
+            throw new IllegalArgumentException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "La tua prenotazione per l'evento \"" + event.getTitle() + "\" è stata cancellata.");
