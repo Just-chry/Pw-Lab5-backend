@@ -1,8 +1,12 @@
 package fullstack.persistence.repository;
 
+
 import fullstack.persistence.model.Talk;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
+import fullstack.persistence.model.Talk;
+
 
 import java.util.List;
 

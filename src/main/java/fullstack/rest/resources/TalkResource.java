@@ -60,7 +60,10 @@ public class TalkResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response createTalk(@CookieParam("sessionId") String sessionId, Talk talk) throws UserNotFoundException {
-
+//        Role userRole = userService.getUserRoleBySessionId(sessionId);
+//        if (userRole != Role.admin) {
+//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+//        }
         Talk savedTalk = talkService.save(talk);
         return Response.ok(savedTalk).build();
     }

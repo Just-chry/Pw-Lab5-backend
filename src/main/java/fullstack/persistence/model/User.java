@@ -21,7 +21,7 @@ public class User {
     @Column(name = "phone_verified")
     private Boolean phoneVerified;
     @Enumerated(EnumType.STRING)
-    private Role role = Role.user;
+    private Role role = Role.USER;
     @Column(name = "token_email")
     private String tokenEmail;
     @Column(name = "token_phone")
@@ -101,7 +101,7 @@ public class User {
         return role;
     }
 
-    public void setRole(Role     role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
