@@ -14,6 +14,8 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/events")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class EventResource {
 
     private final EventService eventService;
@@ -27,42 +29,35 @@ public class EventResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Event> getAllEvents() {
         return eventService.getAllEvents();
     }
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Event getEventById(@PathParam("id") String id) {
         return eventService.findById(id);
     }
 
     @GET
     @Path("/{id}/talks")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Talk> getTalksByEventId(@PathParam("id") String eventId) {
         return talkService.getTalksByEventId(eventId);
     }
 
     @GET
     @Path("/{id}/speakers")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Speaker> getSpeakersByEventId(@PathParam("id") String eventId) {
         return speakerService.getSpeakersByEventId(eventId);
     }
 
     @GET
     @Path("date/{date}")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Event> getEventByDate(@PathParam("date") String date) {
         return eventService.findByDate(date);
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response createEvent(@CookieParam("sessionId") String sessionId, Event event) {
         try {
             Event savedEvent = eventService.save(sessionId, event);
@@ -74,7 +69,6 @@ public class EventResource {
 
     @DELETE
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
         try {
             eventService.deleteById(sessionId, id);
@@ -86,8 +80,6 @@ public class EventResource {
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response updateEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Event event) {
         try {
             eventService.update(sessionId, id, event);
