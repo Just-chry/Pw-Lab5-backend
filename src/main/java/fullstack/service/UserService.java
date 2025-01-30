@@ -168,4 +168,38 @@ public class UserService {
         user.setPassword(hashCalculator.calculateHash(newPasswordRequest.getNewPassword()));
         userRepository.persist(user);
     }
+
+    @Transactional
+    public void forgottenPassword(String emailOrPhone) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findByEmailOrPhone(emailOrPhone);
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
+
+        String verificationCode = generateOtp();
+        user.setTokenPassword(verificationCode);
+        userRepository.persist(user);
+
+        if (emailOrPhone.contains("@")) {
+            notificationService.sendPasswordResetEmail(user);
+        } else {
+            notificationService.sendPasswordResetSms(user);
+        }
+    }
+
+    @Transactional
+    public void updatePasswordWithCode(String emailOrPhone, String verificationCode, String newPassword, String repeatNewPassword) throws UserNotFoundException, UserCreationException {
+        Optional<User> optionalUser = userRepository.findByEmailOrPhone(emailOrPhone);
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
+
+        if (!user.getTokenPassword().equals(verificationCode)) {
+            throw new UserCreationException("Codice di verifica non valido.");
+        }
+
+        if (!newPassword.equals(repeatNewPassword)) {
+            throw new UserCreationException("Le due password non corrispondono.");
+        }
+
+        user.setPassword(hashCalculator.calculateHash(newPassword));
+        user.setTokenPassword(null); // Invalidate the token after use
+        userRepository.persist(user);
+    }
 }

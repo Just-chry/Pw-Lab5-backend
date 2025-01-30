@@ -175,6 +175,16 @@ public class AuthenticationService {
         return sessionId;
     }
 
+    private String createSessionLong(User user) {
+        String sessionId = UUID.randomUUID().toString();
+        UserSession userSession = new UserSession();
+        userSession.setSessionId(sessionId);
+        userSession.setUser(user);
+        userSession.setExpiresAt(LocalDateTime.now().plusDays(30));
+        userSessionRepository.persist(userSession);
+        return sessionId;
+    }
+
     private void checkIfSessionExists(String userId) throws SessionAlreadyExistsException {
         Optional<UserSession> existingSession = userSessionRepository.findByUserId(userId);
         if (existingSession.isPresent()) {

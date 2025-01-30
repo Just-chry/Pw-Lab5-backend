@@ -43,6 +43,27 @@ public class NotificationService {
         }
     }
 
+    public void sendPasswordResetEmail(User user) {
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("L'utente non ha un'email valida.");
+        }
+        mailer.send(Mail.withHtml(user.getEmail(),
+                "Reimposta la tua password",
+                "<h1>Ciao " + user.getName() + " " + user.getSurname() + "!</h1>" +
+                        "<p>Per reimpostare la tua password, utilizza il seguente codice: " + user.getTokenPassword() + "</p>"));
+        System.out.println("Email inviata correttamente a: " + user.getEmail());
+    }
+
+    public void sendPasswordResetSms(User user) {
+        if (user.getPhone() == null || user.getPhone().isEmpty()) {
+            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
+        }
+        try {
+            smsService.sendSms(user.getPhone(), "Il tuo codice per reimpostare la password è: " + user.getTokenPassword());
+        } catch (SmsSendingException e) {
+            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
+        }
+    }
 
     public void sendBookingConfirmationEmail(User user, Event event) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {

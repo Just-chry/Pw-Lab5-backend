@@ -124,4 +124,25 @@ public class UserResource {
         }
     }
 
+    @POST
+    @Path("/forgottenPassword")
+    public Response forgottenPassword(ForgottenPasswordRequest request) {
+        try {
+            userService.forgottenPassword(request.getEmailOrPhone());
+            return Response.ok("Codice di verifica inviato con successo.").build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("/updatePasswordWithCode")
+    public Response updatePasswordWithCode(UpdatePasswordWithCodeRequest request) {
+        try {
+            userService.updatePasswordWithCode(request.getEmailOrPhone(), request.getVerificationCode(), request.getNewPassword(), request.getRepeatNewPassword());
+            return Response.ok("Password aggiornata con successo.").build();
+        } catch (UserNotFoundException | UserCreationException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
+    }
 }
