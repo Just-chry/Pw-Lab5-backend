@@ -13,7 +13,9 @@ public class Messages {
     public static final String INVALID_TOKEN = "Token non valido.";
     public static final String ADMIN_REQUIRED = "Accesso negato. Solo gli amministratori hanno questa funzionalità";
     public static final String SESSION_NOT_FOUND = "Sessione non trovata.";
+    public static final String SESSION_ALREADY_EXISTS = "Sessione già esistente.";
     public static final String SMS_ERROR = "Errore durante l'invio dell'SMS: ";
-    public static final String BOOKING_NOT_FOUND = "Prenotazione non trovata con id: ";
-    public static final String EVENT_NOT_FOUND = "Evento non trovato con id: ";
+    public static final String BOOKING_NOT_FOUND = "Prenotazione non trovata";
+    public static final String EVENT_NOT_FOUND = "Evento non trovato";
+    public static final String SPEAKER_EVENT_NOT_FOUND = "Eventi non trovati per il partner";
 }

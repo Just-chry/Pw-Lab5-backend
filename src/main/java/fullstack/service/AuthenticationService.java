@@ -100,12 +100,12 @@ public class AuthenticationService {
     public void verifyEmail(String token, String email) throws UserCreationException {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            throw new UserCreationException("Utente non trovato.");
+            throw new UserCreationException(USER_NOT_FOUND);
         }
 
         User user = userOpt.get();
         if (user.getTokenEmail() == null || !user.getTokenEmail().equals(token)) {
-            throw new UserCreationException("Token di verifica non valido.");
+            throw new UserCreationException(INVALID_TOKEN);
         }
 
         user.setEmailVerified(true);
@@ -149,7 +149,7 @@ public class AuthenticationService {
             if (session.getExpiresAt().isBefore(LocalDateTime.now())) {
                 userSessionRepository.delete(session);
             } else {
-                throw new SessionAlreadyExistsException("Utente ha già una sessione attiva.");
+                throw new SessionAlreadyExistsException(SESSION_ALREADY_EXISTS);
             }
         }
 
@@ -187,7 +187,7 @@ public class AuthenticationService {
     private void checkIfSessionExists(String userId) throws SessionAlreadyExistsException {
         Optional<UserSession> existingSession = userSessionRepository.findByUserId(userId);
         if (existingSession.isPresent()) {
-            throw new SessionAlreadyExistsException("Utente ha già una sessione attiva.");
+            throw new SessionAlreadyExistsException(SESSION_ALREADY_EXISTS);
         }
     }
 

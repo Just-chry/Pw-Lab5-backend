@@ -2,7 +2,6 @@ package fullstack.service;
 
 import fullstack.persistence.repository.EventRepository;
 import fullstack.service.exception.AdminAccessException;
-import fullstack.service.exception.UserNotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
@@ -14,7 +13,7 @@ import org.hibernate.SessionException;
 import java.util.List;
 import java.util.UUID;
 
-import static fullstack.util.Messages.ADMIN_REQUIRED;
+import static fullstack.util.Messages.*;
 
 @ApplicationScoped
 public class EventService implements PanacheRepository<Event> {
@@ -30,7 +29,7 @@ public class EventService implements PanacheRepository<Event> {
     public List<Event> getAllEvents() throws NoContentException {
         List<Event> events = listAll();
         if (events.isEmpty()) {
-            throw new NoContentException("No events found.");
+            throw new NoContentException(EVENT_NOT_FOUND);
         }
         return events;
     }
@@ -38,7 +37,7 @@ public class EventService implements PanacheRepository<Event> {
     public Event findById(String id) throws NoContentException {
         Event event = eventRepository.findById(id);
         if (event == null) {
-            throw new NoContentException("Event not found");
+            throw new NoContentException(EVENT_NOT_FOUND);
         }
         return event;
     }
@@ -46,7 +45,7 @@ public class EventService implements PanacheRepository<Event> {
     public List<Event> findByDate(String date) throws NoContentException {
         List<Event> events = eventRepository.findByDate(date);
         if (events.isEmpty()) {
-            throw new NoContentException("No events found for the given date.");
+            throw new NoContentException(EVENT_NOT_FOUND);
         }
         return events;
     }
@@ -54,7 +53,7 @@ public class EventService implements PanacheRepository<Event> {
     public List<Event> getEventsBySpeakerId(String speakerId) throws NoContentException {
         List<Event> events = eventRepository.getEventsBySpeakerId(speakerId);
         if (events.isEmpty()) {
-            throw new NoContentException("No events found for the given speaker ID.");
+            throw new NoContentException(SPEAKER_EVENT_NOT_FOUND);
         }
         return events;
     }
@@ -62,7 +61,7 @@ public class EventService implements PanacheRepository<Event> {
     public List<Event> getEventsByPartnerId(String partnerId) throws NoContentException {
         List<Event> events = eventRepository.getEventsByPartnerId(partnerId);
         if (events.isEmpty()) {
-            throw new NoContentException("No events found for the given partner ID.");
+            throw new NoContentException(SPEAKER_EVENT_NOT_FOUND);
         }
         return events;
     }
@@ -92,7 +91,7 @@ public class EventService implements PanacheRepository<Event> {
         }
         int updated = eventRepository.update(id, event);
         if (updated == 0) {
-            throw new SessionException("Event not found");
+            throw new SessionException(EVENT_NOT_FOUND);
         }
         return updated;
     }

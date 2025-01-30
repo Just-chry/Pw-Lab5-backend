@@ -34,7 +34,7 @@ public class BookingService implements PanacheRepository<Booking> {
     public List<Booking> getAllBookings() throws NoContentException {
         List<Booking> bookings = bookingRepository.listAll();
         if (bookings.isEmpty()) {
-            throw new NoContentException("No bookings found.");
+            throw new NoContentException(BOOKING_NOT_FOUND);
         }
         return bookings;
     }
@@ -42,7 +42,7 @@ public class BookingService implements PanacheRepository<Booking> {
     public Booking findById(String id) throws NoContentException {
         Booking booking = bookingRepository.findById(id);
         if (booking == null) {
-            throw new NoContentException("Booking not found");
+            throw new NoContentException(BOOKING_NOT_FOUND);
         }
         return booking;
     }
