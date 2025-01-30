@@ -2,6 +2,7 @@ package fullstack.rest.resources;
 
 import fullstack.persistence.model.Booking;
 import fullstack.service.BookingService;
+import fullstack.service.exception.BookingException;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -24,7 +25,7 @@ public class BookingResource {
             List<Booking> bookings = bookingService.getAllBookings();
             return Response.ok(bookings).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -35,7 +36,7 @@ public class BookingResource {
             Booking booking = bookingService.findById(id);
             return Response.ok(booking).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -47,10 +48,10 @@ public class BookingResource {
             return Response.status(Response.Status.CREATED).entity(booking).build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
-        } catch (RuntimeException e) {
-            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        } catch (BookingException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
 
@@ -60,10 +61,10 @@ public class BookingResource {
         try {
             Booking booking = bookingService.cancelBooking(id);
             return Response.ok(booking).build();
-        } catch (UserNotFoundException e) {
+        } catch (UserNotFoundException | BookingException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 }

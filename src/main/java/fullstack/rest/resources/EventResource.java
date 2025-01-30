@@ -35,7 +35,7 @@ public class EventResource {
             List<Event> events = eventService.getAllEvents();
             return Response.ok(events).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -46,7 +46,7 @@ public class EventResource {
             Event event = eventService.findById(id);
             return Response.ok(event).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -57,7 +57,7 @@ public class EventResource {
             List<Talk> talks = talkService.getTalksByEventId(eventId);
             return Response.ok(talks).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -68,7 +68,7 @@ public class EventResource {
             List<Speaker> speakers = speakerService.getSpeakersByEventId(eventId);
             return Response.ok(speakers).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -79,7 +79,7 @@ public class EventResource {
             List<Event> events = eventService.findByDate(date);
             return Response.ok(events).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 

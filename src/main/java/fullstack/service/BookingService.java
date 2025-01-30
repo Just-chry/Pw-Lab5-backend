@@ -6,6 +6,7 @@ import fullstack.persistence.model.Status;
 import fullstack.persistence.model.User;
 import fullstack.persistence.repository.BookingRepository;
 import fullstack.persistence.repository.UserRepository;
+import fullstack.service.exception.BookingException;
 import fullstack.service.exception.UserNotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -48,18 +49,18 @@ public class BookingService implements PanacheRepository<Booking> {
 
 
     @Transactional
-    public Booking save(String sessionId, String eventId) throws UserNotFoundException, NoContentException {
+    public Booking save(String sessionId, String eventId) throws UserNotFoundException, NoContentException, BookingException {
         User user = userService.getUserBySessionId(sessionId);
         String userId = user.getId();
         Event event = eventService.findById(eventId);
 
         Booking existingBooking = bookingRepository.findExistingBooking(userId, eventId);
         if (existingBooking != null) {
-            throw new RuntimeException("User has already booked this event");
+            throw new BookingException("User has already booked this event");
         }
 
         if (event.getParticipantsCount() >= event.getMaxParticipants()) {
-            throw new RuntimeException("Cannot confirm booking: event is fully booked");
+            throw new BookingException("Cannot confirm booking: event is fully booked");
         }
 
         Booking booking = bookingRepository.createBooking(userId, eventId);
@@ -76,10 +77,10 @@ public class BookingService implements PanacheRepository<Booking> {
     }
 
     @Transactional
-    public Booking cancelBooking(String id) throws UserNotFoundException, NoContentException {
+    public Booking cancelBooking(String id) throws UserNotFoundException, BookingException, NoContentException {
         Booking booking = bookingRepository.findById(id);
         if (booking == null) {
-            throw new IllegalArgumentException(BOOKING_NOT_FOUND + id);
+            throw new BookingException(BOOKING_NOT_FOUND + id);
         }
 
         Event event = eventService.findById(booking.getEventId());
