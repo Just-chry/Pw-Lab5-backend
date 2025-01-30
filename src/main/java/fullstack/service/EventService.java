@@ -1,6 +1,10 @@
 package fullstack.service;
 
+import fullstack.persistence.model.Tag;
+import fullstack.persistence.model.Talk;
 import fullstack.persistence.repository.EventRepository;
+import fullstack.persistence.repository.TagRepository;
+import fullstack.persistence.repository.TalkRepository;
 import fullstack.service.exception.AdminAccessException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -14,6 +18,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static fullstack.util.Messages.*;
+
+import static fullstack.util.Messages.ADMIN_REQUIRED;
 
 @ApplicationScoped
 public class EventService implements PanacheRepository<Event> {
@@ -72,7 +78,19 @@ public class EventService implements PanacheRepository<Event> {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
         event.setId(UUID.randomUUID().toString());
+        event.setMaxParticipants(event.getMaxParticipants());
         persist(event);
+
+        for (Talk talk : talks) {
+            Talk existingTalk = talkRepository.findByTitle(talk.getTitle());
+            if (existingTalk == null) {
+                talk.setId(UUID.randomUUID().toString());
+                talkRepository.persist(talk);
+            } else {
+                talk = existingTalk;
+            }
+            talkRepository.associateTalkWithEvent(event.getId(), talk.getId());
+        }
         return event;
     }
 

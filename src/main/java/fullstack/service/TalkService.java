@@ -1,6 +1,10 @@
 package fullstack.service;
 
+import fullstack.persistence.model.Speaker;
+import fullstack.persistence.model.Tag;
 import fullstack.persistence.model.Talk;
+import fullstack.persistence.model.User;
+import fullstack.persistence.repository.TagRepository;
 import fullstack.persistence.repository.TalkRepository;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserNotFoundException;
@@ -20,14 +24,16 @@ import static fullstack.util.Messages.TALK_NOT_FOUND;
 @ApplicationScoped
 public class TalkService implements PanacheRepository<Talk> {
 
-    private final UserService userService;
-    private final TalkRepository talkRepository;
-
     @Inject
-    public TalkService(UserService userService, TalkRepository talkRepository) {
-        this.userService = userService;
-        this.talkRepository = talkRepository;
-    }
+    UserService userService;
+    @Inject
+    TalkRepository talkRepository;
+    @Inject
+    SpeakerService speakerService;
+    @Inject
+    TagRepository tagRepository;
+    @Inject
+    TagService tagService;
 
     public List<Talk> getAllTalks() throws NoContentException {
         List<Talk> talks = listAll();
@@ -70,12 +76,27 @@ public class TalkService implements PanacheRepository<Talk> {
     }
 
     @Transactional
-    public Talk save(String sessionId, Talk talk) throws SessionException {
+    public Talk save(String sessionId, Talk talk, List<String> tagNames) throws SessionException, UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
+        User user = userService.getUserBySessionId(sessionId);
+        String userId = user.getId();
+        Speaker speaker = speakerService.findOrCreateSpeaker(userId);
         talk.setId(UUID.randomUUID().toString());
-        persist(talk);
+        talkRepository.persist(talk);
+        talkRepository.updateTalkSpeaker(talk.getId(), speaker.getId());
+
+        for (String tagName : tagNames) {
+            Tag tag = tagRepository.findByName(tagName);
+            if (tag == null) {
+                tag = new Tag();
+                tag.setName(tagName);
+                tagService.save(tag);
+            }
+            tagRepository.associateTagWithTalk(talk.getId(), tag.getId().toString());
+        }
+
         return talk;
     }
 

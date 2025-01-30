@@ -2,7 +2,6 @@ package fullstack.service;
 
 import fullstack.persistence.model.Event;
 import fullstack.persistence.model.User;
-import fullstack.service.exception.ContactException;
 import fullstack.service.exception.SmsSendingException;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;

@@ -1,5 +1,6 @@
 package fullstack.rest.resources;
 
+import fullstack.service.exception.SessionAlreadyExistsException;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -73,12 +74,14 @@ public class TalkResource {
     }
 
     @POST
-    public Response createTalk(@CookieParam("sessionId") String sessionId, Talk talk) {
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response createTalk(@CookieParam("sessionId") String sessionId, CreateTalkRequest request) {
         try {
-            Talk savedTalk = talkService.save(sessionId, talk);
-            return Response.ok(savedTalk).build();
+            Talk talk = talkService.save(sessionId, request.getTalk(), request.getTagNames());
+            return Response.ok(talk).build();
         } catch (SessionException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
     }
 
@@ -88,7 +91,7 @@ public class TalkResource {
         try {
             talkService.deleteById(sessionId, id);
             return Response.noContent().build();
-        } catch (SessionException e) {
+        } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

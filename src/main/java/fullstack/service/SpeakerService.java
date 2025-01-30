@@ -1,7 +1,9 @@
 package fullstack.service;
 
 import fullstack.persistence.model.Speaker;
+import fullstack.persistence.model.User;
 import fullstack.persistence.repository.SpeakerRepository;
+import fullstack.persistence.repository.UserRepository;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -11,6 +13,7 @@ import jakarta.ws.rs.core.NoContentException;
 import org.hibernate.SessionException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static fullstack.util.Messages.ADMIN_REQUIRED;
@@ -21,10 +24,13 @@ public class SpeakerService {
 
     private final SpeakerRepository speakerRepository;
     private final UserService userService;
+    private final UserRepository userRepository;
+
     @Inject
-    public SpeakerService(SpeakerRepository speakerRepository, UserService userService) {
+    public SpeakerService(SpeakerRepository speakerRepository, UserService userService, UserRepository userRepository) {
         this.speakerRepository = speakerRepository;
         this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     public List<Speaker> getAllSpeakers() throws NoContentException {
@@ -86,5 +92,23 @@ public class SpeakerService {
         if (updated == 0) {
             throw new NoContentException(SPEAKER_NOT_FOUND);
         }
+    }
+
+    @Transactional
+    public Speaker findOrCreateSpeaker(String userId) throws UserNotFoundException {
+        Speaker s = speakerRepository.findByUserId(userId);
+        if (s == null) {
+            Optional<User> user = userRepository.findUserById(userId);
+            if (user.isEmpty()) {
+                throw new UserNotFoundException("User not found");
+            }
+            s = new Speaker();
+            s.setId(UUID.randomUUID().toString());
+            s.setUserId(userId);
+            s.setName(user.get().getName());
+            s.setSurname(user.get().getSurname());
+            speakerRepository.persist(s);
+        }
+        return s;
     }
 }

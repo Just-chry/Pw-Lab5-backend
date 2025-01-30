@@ -5,8 +5,6 @@ import fullstack.persistence.model.Talk;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import fullstack.persistence.model.Talk;
-
 
 import java.util.List;
 
@@ -43,6 +41,10 @@ public class TalkRepository implements PanacheRepository<Talk> {
         return find("id", id).firstResult();
     }
 
+    public Talk findByTitle(String title) {
+        return find("title", title).firstResult();
+    }
+
     public int update(String id, Talk talk) {
         return update("title = ?1, description = ?2 where id = ?3", talk.getTitle(), talk.getDescription(), id);
     }
@@ -50,4 +52,22 @@ public class TalkRepository implements PanacheRepository<Talk> {
     public void deleteById(String id) {
         delete("id", id);
     }
+
+    @Transactional
+    public void updateTalkSpeaker(String talkId, String speakerId) {
+        getEntityManager().createNativeQuery(
+                        "INSERT INTO talk_speaker (talk_id, speaker_id) VALUES (:talkId, :speakerId)")
+                .setParameter("talkId", talkId)
+                .setParameter("speakerId", speakerId)
+                .executeUpdate();
+    }
+
+    public void associateTalkWithEvent(String eventId, String talkId) {
+        getEntityManager().createNativeQuery(
+                        "INSERT INTO event_talk (event_id, talk_id) VALUES (:eventId, :talkId)")
+                .setParameter("eventId", eventId)
+                .setParameter("talkId", talkId)
+                .executeUpdate();
+    }
 }
+
