@@ -135,7 +135,7 @@ public class AuthenticationService {
         User user = optionalUser.orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         if (!user.getEmailVerified() && !user.getPhoneVerified()) {
-            throw new UnAuthorizedAccessException(UNVERIFIED_CONTACT);
+            throw new ContactException(UNVERIFIED_CONTACT);
         }
 
         String hashedProvidedPassword = hashPassword(request.getPassword());
