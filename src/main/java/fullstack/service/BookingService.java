@@ -30,12 +30,20 @@ public class BookingService implements PanacheRepository<Booking> {
     @Inject
     UserRepository userRepository;
 
-    public List<Booking> getAllBookings() {
-        return bookingRepository.listAll();
+    public List<Booking> getAllBookings() throws NoContentException {
+        List<Booking> bookings = bookingRepository.listAll();
+        if (bookings.isEmpty()) {
+            throw new NoContentException("No bookings found.");
+        }
+        return bookings;
     }
 
-    public Booking findById(String id) {
-        return bookingRepository.findById(id);
+    public Booking findById(String id) throws NoContentException {
+        Booking booking = bookingRepository.findById(id);
+        if (booking == null) {
+            throw new NoContentException("Booking not found");
+        }
+        return booking;
     }
 
 
@@ -59,10 +67,9 @@ public class BookingService implements PanacheRepository<Booking> {
         event.setParticipantsCount(event.getParticipantsCount() + 1);
         eventService.persist(event);
 
-        // Send confirmation email
-        if (user.getEmail() == null  || user.getEmail().isEmpty() && user.getPhone() != null && !user.getPhone().isEmpty()) {
+        if (user.getEmail() == null || user.getEmail().isEmpty() && user.getPhone() != null && !user.getPhone().isEmpty()) {
             notificationService.sendBookingConfirmationSms(user, event);
-        } else  {
+        } else {
             notificationService.sendBookingConfirmationEmail(user, event);
         }
         return booking;

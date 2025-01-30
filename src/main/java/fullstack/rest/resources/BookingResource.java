@@ -6,6 +6,7 @@ import fullstack.service.exception.UserNotFoundException;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
@@ -18,14 +19,24 @@ public class BookingResource {
     BookingService bookingService;
 
     @GET
-    public List<Booking> getAllBookings() {
-        return bookingService.getAllBookings();
+    public Response getAllBookings() {
+        try {
+            List<Booking> bookings = bookingService.getAllBookings();
+            return Response.ok(bookings).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    public Booking getBookingById(@PathParam("id") String id) {
-        return bookingService.findById(id);
+    public Response getBookingById(@PathParam("id") String id) {
+        try {
+            Booking booking = bookingService.findById(id);
+            return Response.ok(booking).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @POST
@@ -38,6 +49,8 @@ public class BookingResource {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         } catch (RuntimeException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
         }
     }
 
@@ -49,6 +62,8 @@ public class BookingResource {
             return Response.ok(booking).build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
         }
     }
 }
