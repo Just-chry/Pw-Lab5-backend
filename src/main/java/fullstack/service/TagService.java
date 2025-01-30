@@ -1,8 +1,11 @@
 package fullstack.service;
 
 import fullstack.persistence.repository.TagRepository;
+import fullstack.service.exception.AdminAccessException;
+import fullstack.service.exception.UserNotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Tag;
 
@@ -12,9 +15,12 @@ import java.util.UUID;
 @ApplicationScoped
 public class TagService implements PanacheRepository<Tag> {
     private final TagRepository tagRepository;
+    private  final UserService userService;
 
-    public TagService(TagRepository tagRepository) {
+    @Inject
+    public TagService(TagRepository tagRepository, UserService userService) {
         this.tagRepository = tagRepository;
+        this.userService = userService;
     }
 
     public List<Tag> getAllTags() {
@@ -30,19 +36,28 @@ public class TagService implements PanacheRepository<Tag> {
     }
 
     @Transactional
-    public Tag save(Tag tag) {
+    public Tag save(String sessionId, Tag tag) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+        }
         tag.setId(UUID.randomUUID().toString());
         persist(tag);
         return tag;
     }
 
     @Transactional
-    public void delete(String id) {
+    public void delete(String sessionId, String id) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+        }
         tagRepository.deleteById(id);
     }
 
     @Transactional
-    public int update(String id, Tag tag) {
+    public int update(String sessionId, String id, Tag tag) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+        }
         return tagRepository.update(id, tag);
     }
 }

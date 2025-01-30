@@ -63,11 +63,6 @@ public class TalkService implements PanacheRepository<Talk> {
     }
 
     @Transactional
-    public int update(String id, Talk talk) {
-        return talkRepository.update(id, talk);
-    }
-
-    @Transactional
     public int updateTalk(String sessionId, String id, Talk talk) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
