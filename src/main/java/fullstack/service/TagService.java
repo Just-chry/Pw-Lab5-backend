@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static fullstack.util.Messages.ADMIN_REQUIRED;
+import static fullstack.util.Messages.TAG_NOT_FOUND;
 
 @ApplicationScoped
 public class TagService implements PanacheRepository<Tag> {
@@ -30,7 +31,7 @@ public class TagService implements PanacheRepository<Tag> {
     public List<Tag> getAllTags() throws NoContentException {
         List<Tag> tags = listAll();
         if (tags.isEmpty()) {
-            throw new NoContentException("No tags found.");
+            throw new NoContentException(TAG_NOT_FOUND);
         }
         return tags;
     }
@@ -38,7 +39,7 @@ public class TagService implements PanacheRepository<Tag> {
     public Tag findById(String id) throws  NoContentException {
         Tag tag = tagRepository.findById(id);
         if (tag == null) {
-            throw new NoContentException("Tag not found");
+            throw new NoContentException(TAG_NOT_FOUND);
         }
         return tag;
     }
@@ -46,7 +47,7 @@ public class TagService implements PanacheRepository<Tag> {
     public List<Tag> getTagsByTalkId(String talkId) throws NoContentException {
         List<Tag> tags = tagRepository.getTagsByTalkId(talkId);
         if (tags.isEmpty()) {
-            throw new NoContentException("No tags found for the given talk ID.");
+            throw new NoContentException(TAG_NOT_FOUND);
         }
         return tags;
     }
@@ -76,7 +77,7 @@ public class TagService implements PanacheRepository<Tag> {
         }
         int updated = tagRepository.update(id, tag);
         if (updated == 0) {
-            throw new UserNotFoundException("Tag not found");
+            throw new UserNotFoundException(TAG_NOT_FOUND);
         }
     }
 }
