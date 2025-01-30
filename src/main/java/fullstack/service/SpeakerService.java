@@ -7,6 +7,7 @@ import fullstack.service.exception.UserNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.NoContentException;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,8 +33,12 @@ public class SpeakerService {
         return speakerRepository.findById(id);
     }
 
-    public List<Speaker> getSpeakerByTalkId(String talkId) {
-        return speakerRepository.getSpeakerByTalkId(talkId);
+    public List<Speaker> getSpeakerByTalkId(String talkId) throws NoContentException {
+        List<Speaker> speakers = speakerRepository.getSpeakerByTalkId(talkId);
+        if (speakers.isEmpty()) {
+            throw new NoContentException("No speakers found for the given talk ID.");
+        }
+        return speakers;
     }
 
     public List<Speaker> getSpeakersByEventId(String eventId) {

@@ -65,10 +65,13 @@ public class TalkService implements PanacheRepository<Talk> {
     }
 
     @Transactional
-    public int updateTalk(String sessionId, String id, Talk talk) throws UserNotFoundException {
+    public void updateTalk(String sessionId, String id, Talk talk) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
-        return update(id, talk);
+        int updated = update(id, talk);
+        if (updated == 0) {
+            throw new UserNotFoundException("Talk not found");
+        }
     }
 }

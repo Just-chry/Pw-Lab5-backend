@@ -8,6 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Tag;
+import jakarta.ws.rs.core.NoContentException;
 
 import java.util.List;
 import java.util.UUID;
@@ -33,8 +34,12 @@ public class TagService implements PanacheRepository<Tag> {
         return tagRepository.findById(id);
     }
 
-    public List<Tag> getTagsByTalkId(String talkId) {
-        return tagRepository.getTagsByTalkId(talkId);
+    public List<Tag> getTagsByTalkId(String talkId) throws NoContentException {
+        List<Tag> tags = tagRepository.getTagsByTalkId(talkId);
+        if (tags.isEmpty()) {
+            throw new NoContentException("No tags found for the given talk ID.");
+        }
+        return tags;
     }
 
     @Transactional
