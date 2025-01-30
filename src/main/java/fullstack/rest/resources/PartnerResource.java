@@ -13,6 +13,8 @@ import jakarta.ws.rs.core.Response;
 import java.util.List;
 
 @Path("/partners")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class PartnerResource {
     private final PartnerService partnerService;
     private final EventService eventService;
@@ -23,35 +25,29 @@ public class PartnerResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Partner> getAllPartners() {
         return partnerService.getAllPartners();
     }
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Partner getPartnerById(@PathParam("id") String id) {
         return partnerService.findById(id);
     }
 
     @GET
     @Path("/{id}/events")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Event> getEventsByPartnerId(@PathParam("id") String partnerId) {
         return eventService.getEventsByPartnerId(partnerId);
     }
 
     @GET
     @Path("/value/{value}")
-    @Produces(MediaType.APPLICATION_JSON)
     public List<Partner> getPartnerByName(@PathParam("value") String value) {
         return partnerService.findByValue(value);
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response createPartner(@CookieParam("sessionId") String sessionId, Partner partner) {
         try {
             Partner savedPartner = partnerService.save(sessionId, partner);
@@ -63,7 +59,6 @@ public class PartnerResource {
 
     @DELETE
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response deletePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
         try {
             partnerService.deleteById(sessionId, id);
@@ -75,8 +70,6 @@ public class PartnerResource {
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response updatePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) {
         try {
             int updated = partnerService.update(sessionId, id, partner);
