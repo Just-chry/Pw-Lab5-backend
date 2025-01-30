@@ -1,6 +1,5 @@
 package fullstack.rest.resources;
 
-import fullstack.persistence.model.Role;
 import fullstack.service.UserService;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.ws.rs.*;

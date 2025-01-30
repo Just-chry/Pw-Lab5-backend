@@ -3,12 +3,10 @@ package fullstack.service;
 import fullstack.persistence.repository.PartnerRepository;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserNotFoundException;
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Partner;
-
 import java.util.List;
 import java.util.UUID;
 

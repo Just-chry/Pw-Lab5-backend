@@ -7,16 +7,11 @@ import fullstack.persistence.model.User;
 import fullstack.persistence.repository.BookingRepository;
 import fullstack.persistence.repository.UserRepository;
 import fullstack.service.exception.UserNotFoundException;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
-
-import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
-import java.util.Optional;
 
 import static fullstack.util.Messages.*;
 
