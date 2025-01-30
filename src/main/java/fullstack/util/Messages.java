@@ -15,5 +15,5 @@ public class Messages {
     public static final String SESSION_NOT_FOUND = "Sessione non trovata.";
     public static final String SMS_ERROR = "Errore durante l'invio dell'SMS: ";
     public static final String BOOKING_NOT_FOUND = "Prenotazione non trovata con id: ";
-
+    public static final String EVENT_NOT_FOUND = "Evento non trovato con id: ";
 }
