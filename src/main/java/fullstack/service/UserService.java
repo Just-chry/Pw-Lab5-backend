@@ -6,9 +6,7 @@ import fullstack.persistence.model.Role;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.*;
-import fullstack.service.exception.AdminAccessException;
-import fullstack.service.exception.UserCreationException;
-import fullstack.service.exception.UserNotFoundException;
+import fullstack.service.exception.*;
 import fullstack.util.Messages;
 import fullstack.util.Validation;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -160,11 +158,11 @@ public class UserService {
         String hashedOldPassword = hashCalculator.calculateHash(newPasswordRequest.getOldPassword());
 
         if (!user.getPassword().equals(hashedOldPassword)) {
-            throw new UserCreationException("La vecchia password non corrisponde.");
+            throw new PasswordException(OLD_PASSWORD_NOT_MATCH);
         }
 
         if (!newPasswordRequest.getNewPassword().equals(newPasswordRequest.getRepeatNewPassword())) {
-            throw new UserCreationException("La nuova password e la ripetizione della nuova password non corrispondono.");
+            throw new PasswordException(NEW_PASSWORD_NOT_MATCH);
         }
 
         user.setPassword(hashCalculator.calculateHash(newPasswordRequest.getNewPassword()));
@@ -193,15 +191,15 @@ public class UserService {
         User user = optionalUser.orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         if (!user.getTokenPassword().equals(verificationCode)) {
-            throw new UserCreationException("Codice di verifica non valido.");
+            throw new TokenException(INVALID_TOKEN);
         }
 
         if (!newPassword.equals(repeatNewPassword)) {
-            throw new UserCreationException("Le due password non corrispondono.");
+            throw new PasswordException(NEW_PASSWORD_NOT_MATCH);
         }
 
         user.setPassword(hashCalculator.calculateHash(newPassword));
-        user.setTokenPassword(null); // Invalidate the token after use
+        user.setTokenPassword(null);
         userRepository.persist(user);
     }
 }
