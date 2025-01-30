@@ -12,6 +12,8 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static fullstack.util.Messages.ADMIN_REQUIRED;
+
 @ApplicationScoped
 public class TalkService implements PanacheRepository<Talk> {
 
@@ -47,7 +49,7 @@ public class TalkService implements PanacheRepository<Talk> {
     @Transactional
     public Talk save(String sessionId, Talk talk) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         talk.setId(UUID.randomUUID().toString());
         persist(talk);
@@ -57,7 +59,7 @@ public class TalkService implements PanacheRepository<Talk> {
     @Transactional
     public void deleteById(String sessionId,String id) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         talkRepository.deleteById(id);
     }
@@ -65,7 +67,7 @@ public class TalkService implements PanacheRepository<Talk> {
     @Transactional
     public int updateTalk(String sessionId, String id, Talk talk) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         return update(id, talk);
     }
