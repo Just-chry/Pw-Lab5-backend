@@ -12,6 +12,8 @@ import fullstack.persistence.model.Partner;
 import java.util.List;
 import java.util.UUID;
 
+import static fullstack.util.Messages.ADMIN_REQUIRED;
+
 @ApplicationScoped
 public class PartnerService {
 
@@ -34,7 +36,7 @@ public class PartnerService {
     @Transactional
     public Partner save(String sessionId, Partner partner) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         partner.setId(UUID.randomUUID().toString());
         partnerRepository.persist(partner);
@@ -44,7 +46,7 @@ public class PartnerService {
     @Transactional
     public void deleteById(String sessionId, String id) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         partnerRepository.deleteById(id);
     }
@@ -52,7 +54,7 @@ public class PartnerService {
     @Transactional
     public int update(String sessionId, String id, Partner partner) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         return partnerRepository.update(id, partner);
     }
