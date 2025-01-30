@@ -17,6 +17,14 @@ public class Validation {
             throw new UserCreationException(Messages.PASSWORD_REQUIRED);
         }
 
+        if (request.getPasswordConfirmation() == null || request.getPasswordConfirmation().trim().isEmpty()) {
+            throw new UserCreationException(Messages.PASSWORD_CONFIRMATION_REQUIRED);
+        }
+
+        if (!request.getPasswordConfirmation().equals(request.getPassword())) {
+            throw new UserCreationException(Messages.PASSWORD_MISMATCH);
+        }
+
         if (request.getEmail() != null && !request.getEmail().trim().isEmpty()) {
             if (!ContactValidator.isValidEmail(request.getEmail())) {
                 throw new UserCreationException(Messages.INVALID_EMAIL);
