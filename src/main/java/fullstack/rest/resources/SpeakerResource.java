@@ -100,7 +100,7 @@ public class SpeakerResource {
         try {
             speakerService.update(sessionId, id, speaker);
             return Response.ok().build();
-        } catch (SessionException e) {
+        } catch (NoContentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

@@ -85,13 +85,13 @@ public class EventService implements PanacheRepository<Event> {
     }
 
     @Transactional
-    public int update(String sessionId, String id, Event event) throws SessionException {
+    public int update(String sessionId, String id, Event event) throws SessionException, NoContentException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
         int updated = eventRepository.update(id, event);
         if (updated == 0) {
-            throw new SessionException(EVENT_NOT_FOUND);
+            throw new NoContentException(EVENT_NOT_FOUND);
         }
         return updated;
     }

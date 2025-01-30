@@ -84,7 +84,7 @@ public class TagResource {
         try {
             tagService.update(sessionId, id, tag);
             return Response.ok().build();
-        } catch (UserNotFoundException e) {
+        } catch (NoContentException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Utente non trovato").build();
         }
     }

@@ -62,11 +62,15 @@ public class PartnerService {
     }
 
     @Transactional
-    public int update(String sessionId, String id, Partner partner) throws SessionException {
+    public int update(String sessionId, String id, Partner partner) throws SessionException, NoContentException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
-        return partnerRepository.update(id, partner);
+        int updated = partnerRepository.update(id, partner);
+        if (updated == 0) {
+            throw new NoContentException(PARTNER_NOT_FOUND);
+        }
+        return updated;
     }
 
     public List<Partner> findByValue(String value) throws NoContentException {

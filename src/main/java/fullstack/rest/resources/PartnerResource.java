@@ -95,11 +95,8 @@ public class PartnerResource {
     public Response updatePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) {
         try {
             int updated = partnerService.update(sessionId, id, partner);
-            if (updated == 0) {
-                return Response.status(Response.Status.NOT_FOUND).entity("Partner not found").build();
-            }
             return Response.ok(updated).build();
-        } catch (SessionException e) {
+        } catch (SessionException | NoContentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

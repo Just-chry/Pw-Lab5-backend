@@ -99,7 +99,7 @@ public class TalkResource {
         try {
             talkService.updateTalk(sessionId, id, talk);
             return Response.ok().build();
-        } catch (SessionException e) {
+        } catch (NoContentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

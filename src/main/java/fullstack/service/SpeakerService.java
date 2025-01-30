@@ -78,13 +78,13 @@ public class SpeakerService {
     }
 
     @Transactional
-    public void update(String sessionId, String id, Speaker speaker) throws SessionException {
+    public void update(String sessionId, String id, Speaker speaker) throws NoContentException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
         int updated = speakerRepository.update(id, speaker);
         if (updated == 0) {
-            throw new SessionException(SPEAKER_NOT_FOUND);
+            throw new NoContentException(SPEAKER_NOT_FOUND);
         }
     }
 }

@@ -111,7 +111,7 @@ public class EventResource {
         try {
             eventService.update(sessionId, id, event);
             return Response.ok().build();
-        } catch (SessionException e) {
+        } catch (SessionException | NoContentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
