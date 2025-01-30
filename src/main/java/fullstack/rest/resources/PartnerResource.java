@@ -55,40 +55,40 @@ public class PartnerResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createPartner(@CookieParam("sessionId") String sessionId, Partner partner) throws UserNotFoundException {
-//        Role userRole = userService.getUserRoleBySessionId(sessionId);
-//        if (userRole != Role.admin) {
-//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-//        }
-        Partner savedPartner = partnerService.save(partner);
-        return Response.ok(savedPartner).build();
+    public Response createPartner(@CookieParam("sessionId") String sessionId, Partner partner) {
+        try {
+            Partner savedPartner = partnerService.save(sessionId, partner);
+            return Response.ok(savedPartner).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @DELETE
     @Path("/{id}")
     @Produces(MediaType.APPLICATION_JSON)
-    public Response deletePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
-//        Role userRole = userService.getUserRoleBySessionId(sessionId);
-//        if (userRole != Role.admin) {
-//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-//        }
-        partnerService.delete(id);
-        return Response.noContent().build();
+    public Response deletePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
+        try {
+            partnerService.deleteById(sessionId, id);
+            return Response.noContent().build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updatePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) throws UserNotFoundException {
-//        Role userRole = userService.getUserRoleBySessionId(sessionId);
-//        if (userRole != Role.admin) {
-//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-//        }
-        int updated = partnerService.update(id, partner);
-        if (updated == 0) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Partner not found").build();
+    public Response updatePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) {
+        try {
+            int updated = partnerService.update(sessionId, id, partner);
+            if (updated == 0) {
+                return Response.status(Response.Status.NOT_FOUND).entity("Partner not found").build();
+            }
+            return Response.ok(updated).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
-        return Response.ok(updated).build();
     }
 }
