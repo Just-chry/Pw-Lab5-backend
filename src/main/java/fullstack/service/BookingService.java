@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.Optional;
 
-import static fullstack.util.Messages.BOOKING_NOT_FOUND;
+import static fullstack.util.Messages.*;
 
 @ApplicationScoped
 public class BookingService implements PanacheRepository<Booking> {
@@ -50,7 +50,7 @@ public class BookingService implements PanacheRepository<Booking> {
         // Check if the event exists
         Event event = eventService.findById(eventId);
         if (event == null) {
-            throw new RuntimeException("Event not found with id: " + eventId);
+            throw new RuntimeException(EVENT_NOT_FOUND + eventId);
         }
 
         Booking existingBooking = bookingRepository.findExistingBooking(userId, eventId);
@@ -77,7 +77,7 @@ public class BookingService implements PanacheRepository<Booking> {
     }
 
     @Transactional
-    public Booking cancelBooking(String id) {
+    public Booking cancelBooking(String id) throws UserNotFoundException {
         Booking booking = bookingRepository.findById(id);
         if (booking == null) {
             throw new IllegalArgumentException(BOOKING_NOT_FOUND + id);
@@ -85,7 +85,7 @@ public class BookingService implements PanacheRepository<Booking> {
 
         Event event = eventService.findById(booking.getEventId());
         if (event == null) {
-            throw new IllegalArgumentException("Event not found with id: " + booking.getEventId());
+            throw new IllegalArgumentException(EVENT_NOT_FOUND + booking.getEventId());
         }
 
         if (booking.getStatus() == Status.confirmed) {
@@ -96,7 +96,7 @@ public class BookingService implements PanacheRepository<Booking> {
         booking.setStatus(Status.canceled);
         bookingRepository.persistBooking(booking);
 
-        User user = userRepository.findUserById(booking.getUserId()).orElseThrow(() -> new IllegalArgumentException("User not found with id: " + booking.getUserId()));
+        User user = userRepository.findUserById(booking.getUserId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND + booking.getUserId()));
 
         if ((user.getEmail() == null || user.getEmail().isEmpty()) && user.getPhone() != null && !user.getPhone().isEmpty()) {
             notificationService.sendBookingCancellationSms(user, event);
