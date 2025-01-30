@@ -8,6 +8,8 @@ import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import static fullstack.util.Messages.*;
+
 @ApplicationScoped
 public class NotificationService {
 
@@ -22,7 +24,7 @@ public class NotificationService {
 
     public void sendVerificationEmail(User user, String verificationLink) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un'email valida.");
+            throw new IllegalArgumentException(INVALID_EMAIL);
         }
         mailer.send(Mail.withHtml(user.getEmail(),
                 "Conferma la tua email",
@@ -34,18 +36,18 @@ public class NotificationService {
 
     public void sendVerificationSms(User user, String otp) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
+            throw new IllegalArgumentException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "Il tuo codice OTP è: " + otp);
         } catch (SmsSendingException e) {
-            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
+            throw new RuntimeException(SMS_ERROR + e.getMessage(), e);
         }
     }
 
     public void sendPasswordResetEmail(User user) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un'email valida.");
+            throw new IllegalArgumentException(INVALID_EMAIL);
         }
         mailer.send(Mail.withHtml(user.getEmail(),
                 "Reimposta la tua password",
@@ -56,18 +58,18 @@ public class NotificationService {
 
     public void sendPasswordResetSms(User user) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
+            throw new IllegalArgumentException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "Il tuo codice per reimpostare la password è: " + user.getTokenPassword());
         } catch (SmsSendingException e) {
-            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
+            throw new RuntimeException(SMS_ERROR + e.getMessage(), e);
         }
     }
 
     public void sendBookingConfirmationEmail(User user, Event event) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un'email valida.");
+            throw new IllegalArgumentException(INVALID_EMAIL);
         }
         String emailContent = "<h1>Conferma Prenotazione</h1>" +
                 "<p>Ciao " + user.getName() + " " + user.getSurname() + ",</p>" +
@@ -83,18 +85,18 @@ public class NotificationService {
 
     public void sendBookingConfirmationSms(User user, Event event) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
+            throw new IllegalArgumentException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "La tua prenotazione per l'evento \"" + event.getTitle() + "\" è stata confermata.");
         } catch (SmsSendingException e) {
-            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
+            throw new RuntimeException(SMS_ERROR+ e.getMessage(), e);
         }
     }
 
     public void sendBookingCancellationEmail(User user, Event event) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un'email valida.");
+            throw new IllegalArgumentException(INVALID_EMAIL);
         }
         String emailContent = "<h1>Cancellazione Prenotazione</h1>" +
                 "<p>Ciao " + user.getName() + " " + user.getSurname() + ",</p>" +
@@ -109,12 +111,12 @@ public class NotificationService {
 
     public void sendBookingCancellationSms(User user, Event event) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
+            throw new IllegalArgumentException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "La tua prenotazione per l'evento \"" + event.getTitle() + "\" è stata cancellata.");
         } catch (SmsSendingException e) {
-            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
+            throw new RuntimeException(SMS_ERROR + e.getMessage(), e);
         }
     }
 }

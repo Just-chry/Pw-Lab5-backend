@@ -20,8 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static fullstack.util.Messages.INVALID_TOKEN;
-import static fullstack.util.Messages.USER_NOT_FOUND;
+import static fullstack.util.Messages.*;
 
 @ApplicationScoped
 public class AuthenticationService {
@@ -200,7 +199,7 @@ public class AuthenticationService {
     public void logout(String sessionId) throws UserSessionNotFoundException {
         Optional<UserSession> optionalSession = userSessionRepository.findBySessionId(sessionId);
         if (optionalSession.isEmpty()) {
-            throw new UserSessionNotFoundException("Non c'è una sessione valida.");
+            throw new UserSessionNotFoundException(SESSION_NOT_FOUND);
         }
         userSessionRepository.delete(optionalSession.get());
     }
