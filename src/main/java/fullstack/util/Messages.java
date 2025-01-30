@@ -19,4 +19,9 @@ public class Messages {
     public static final String EVENT_NOT_FOUND = "Evento non trovato";
     public static final String SPEAKER_EVENT_NOT_FOUND = "Eventi non trovati per il partner";
     public static final String PARTNER_NOT_FOUND = "Partner non trovato";
+    public static final String WRONG_PASSWORD = "Password errata.";
+    public static final String UNVERIFIED_CONTACT = "Contatto non verificato. Verifica il tuo indirizzo email o il tuo numero di telefono.";
+
+    //Success
+    public static final String LOGiN_SUCCESS = "Login avvenuto con successo.";
 }

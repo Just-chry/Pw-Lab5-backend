@@ -135,12 +135,12 @@ public class AuthenticationService {
         User user = optionalUser.orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         if (!user.getEmailVerified() && !user.getPhoneVerified()) {
-            throw new UnAuthorizedAccessException("Contatto non verificato. Verifica il tuo indirizzo email o il tuo numero di telefono.");
+            throw new UnAuthorizedAccessException(UNVERIFIED_CONTACT);
         }
 
         String hashedProvidedPassword = hashPassword(request.getPassword());
         if (!verifyPassword(user.getPassword(), hashedProvidedPassword)) {
-            throw new WrongPasswordException("Password errata.");
+            throw new WrongPasswordException(WRONG_PASSWORD);
         }
 
         Optional<UserSession> existingSession = userSessionRepository.findByUserId(user.getId());
@@ -157,10 +157,10 @@ public class AuthenticationService {
 
         if (Boolean.TRUE.equals(rememberMe)) {
             String sessionId = createSessionLong(user);
-            return new LoginResponse(user.getName(), sessionId, "Login avvenuto con successo");
+            return new LoginResponse(user.getName(), sessionId, LOGiN_SUCCESS);
         } else {
             String sessionId = createSession(user);
-            return new LoginResponse(user.getName(), sessionId, "Login avvenuto con successo");
+            return new LoginResponse(user.getName(), sessionId, LOGiN_SUCCESS);
         }
     }
 
