@@ -8,8 +8,7 @@ import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
-import static fullstack.util.Messages.INVALID_EMAIL;
-import static fullstack.util.Messages.INVALID_PHONE;
+import static fullstack.util.Messages.*;
 
 @ApplicationScoped
 public class NotificationService {
@@ -42,7 +41,7 @@ public class NotificationService {
         try {
             smsService.sendSms(user.getPhone(), "Il tuo codice OTP è: " + otp);
         } catch (SmsSendingException e) {
-            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
+            throw new RuntimeException(SMS_ERROR + e.getMessage(), e);
         }
     }
 
@@ -64,7 +63,7 @@ public class NotificationService {
         try {
             smsService.sendSms(user.getPhone(), "Il tuo codice per reimpostare la password è: " + user.getTokenPassword());
         } catch (SmsSendingException e) {
-            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
+            throw new RuntimeException(SMS_ERROR + e.getMessage(), e);
         }
     }
 
@@ -91,7 +90,7 @@ public class NotificationService {
         try {
             smsService.sendSms(user.getPhone(), "La tua prenotazione per l'evento \"" + event.getTitle() + "\" è stata confermata.");
         } catch (SmsSendingException e) {
-            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
+            throw new RuntimeException(SMS_ERROR+ e.getMessage(), e);
         }
     }
 
@@ -117,7 +116,7 @@ public class NotificationService {
         try {
             smsService.sendSms(user.getPhone(), "La tua prenotazione per l'evento \"" + event.getTitle() + "\" è stata cancellata.");
         } catch (SmsSendingException e) {
-            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
+            throw new RuntimeException(SMS_ERROR + e.getMessage(), e);
         }
     }
 }
