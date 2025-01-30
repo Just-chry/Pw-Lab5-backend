@@ -46,8 +46,12 @@ public class EventService implements PanacheRepository<Event> {
         return events;
     }
 
-    public List<Event> getEventsByPartnerId(String partnerId) {
-        return eventRepository.getEventsByPartnerId(partnerId);
+    public List<Event> getEventsByPartnerId(String partnerId) throws NoContentException {
+        List<Event> events = eventRepository.getEventsByPartnerId(partnerId);
+        if (events.isEmpty()) {
+            throw new NoContentException("No events found for the given partner ID.");
+        }
+        return events;
     }
 
     @Transactional

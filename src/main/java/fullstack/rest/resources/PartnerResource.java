@@ -8,6 +8,7 @@ import fullstack.persistence.model.Event;
 import fullstack.persistence.model.Partner;
 import fullstack.service.EventService;
 import fullstack.service.PartnerService;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
@@ -25,26 +26,46 @@ public class PartnerResource {
     }
 
     @GET
-    public List<Partner> getAllPartners() {
-        return partnerService.getAllPartners();
+    public Response getAllPartners() {
+        try {
+            List<Partner> partners = partnerService.getAllPartners();
+            return Response.ok(partners).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    public Partner getPartnerById(@PathParam("id") String id) {
-        return partnerService.findById(id);
+    public Response getPartnerById(@PathParam("id") String id) {
+        try {
+            Partner partner = partnerService.findById(id);
+            return Response.ok(partner).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}/events")
-    public List<Event> getEventsByPartnerId(@PathParam("id") String partnerId) {
-        return eventService.getEventsByPartnerId(partnerId);
+    public Response getEventsByPartnerId(@PathParam("id") String partnerId) {
+        try {
+            List<Event> events = eventService.getEventsByPartnerId(partnerId);
+            return Response.ok(events).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/value/{value}")
-    public List<Partner> getPartnerByName(@PathParam("value") String value) {
-        return partnerService.findByValue(value);
+    public Response getPartnerByName(@PathParam("value") String value) {
+        try {
+            List<Partner> partners = partnerService.findByValue(value);
+            return Response.ok(partners).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @POST
