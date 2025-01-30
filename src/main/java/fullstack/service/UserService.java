@@ -20,8 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static fullstack.util.Messages.ADMIN_REQUIRED;
-import static fullstack.util.Messages.USER_NOT_FOUND;
+import static fullstack.util.Messages.*;
 
 @ApplicationScoped
 public class UserService {
@@ -69,7 +68,7 @@ public class UserService {
     public boolean isAdmin(String sessionId) throws UserNotFoundException {
         Optional<UserSession> session = userSessionRepository.findBySessionId(sessionId);
         if (session.isEmpty()) {
-            throw new UserNotFoundException("Sessione non trovata.");
+            throw new UserNotFoundException(SESSION_NOT_FOUND);
         }
         User user = session.get().getUser();
         return user.getRole() != Role.ADMIN;
@@ -78,7 +77,7 @@ public class UserService {
     public User getUserBySessionId(String sessionId) throws UserNotFoundException {
         Optional<UserSession> session = userSessionRepository.findBySessionId(sessionId);
         if (session.isEmpty()) {
-            throw new UserNotFoundException("Sessione non trovata.");
+            throw new UserNotFoundException(SESSION_NOT_FOUND);
         }
         return session.get().getUser();
     }
