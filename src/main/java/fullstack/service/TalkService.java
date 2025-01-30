@@ -1,6 +1,8 @@
 package fullstack.service;
 
+import fullstack.persistence.model.Speaker;
 import fullstack.persistence.model.Talk;
+import fullstack.persistence.model.User;
 import fullstack.persistence.repository.TalkRepository;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserNotFoundException;
@@ -15,14 +17,13 @@ import java.util.UUID;
 @ApplicationScoped
 public class TalkService implements PanacheRepository<Talk> {
 
-    private final UserService userService;
-    private final TalkRepository talkRepository;
-
     @Inject
-    public TalkService(UserService userService, TalkRepository talkRepository) {
-        this.userService = userService;
-        this.talkRepository = talkRepository;
-    }
+    UserService userService;
+    @Inject
+    TalkRepository talkRepository;
+    @Inject
+    SpeakerService speakerService;
+
 
     public List<Talk> getAllTalks() {
         return listAll();
@@ -46,11 +47,12 @@ public class TalkService implements PanacheRepository<Talk> {
 
     @Transactional
     public Talk save(String sessionId, Talk talk) throws UserNotFoundException {
-        if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
-        }
+        User user = userService.getUserBySessionId(sessionId);
+        String userId = user.getId();
+        Speaker speaker = speakerService.findOrCreateSpeaker(userId);
         talk.setId(UUID.randomUUID().toString());
-        persist(talk);
+        talkRepository.persist(talk);
+        talkRepository.updateTalkSpeaker(talk.getId(), speaker.getId());
         return talk;
     }
 

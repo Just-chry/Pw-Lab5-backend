@@ -12,6 +12,10 @@ public class SpeakerRepository implements PanacheRepository<Speaker> {
         return find("id", id).firstResult();
     }
 
+    public Speaker findByUserId(String userId) {
+        return find("userId", userId).firstResult();
+    }
+
     public void deleteById(String id) {
         delete("id", id);
     }
