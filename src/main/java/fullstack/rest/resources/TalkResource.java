@@ -29,14 +29,24 @@ public class TalkResource {
     }
 
     @GET
-    public List<Talk> getAllTalks() {
-        return talkService.getAllTalks();
+    public Response getAllTalks() {
+        try {
+            List<Talk> talks = talkService.getAllTalks();
+            return Response.ok(talks).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    public Talk getTalkById(@PathParam("id") String id) {
-        return talkService.findById(id);
+    public Response getTalkById(@PathParam("id") String id) {
+        try {
+            Talk talk = talkService.findById(id);
+            return Response.ok(talk).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @GET

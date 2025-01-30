@@ -7,6 +7,7 @@ import fullstack.persistence.model.Tag;
 import fullstack.persistence.model.Talk;
 import fullstack.service.TagService;
 import fullstack.service.TalkService;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
@@ -24,20 +25,35 @@ public class TagResource {
     }
 
     @GET
-    public List<Tag> getAllTags() {
-        return tagService.getAllTags();
+    public Response getAllTags() {
+        try {
+            List<Tag> tags = tagService.getAllTags();
+            return Response.ok(tags).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    public Tag getTagById(@PathParam("id") String id) {
-        return tagService.findById(id);
+    public Response getTagById(@PathParam("id") String id) {
+        try {
+            Tag tag = tagService.findById(id);
+            return Response.ok(tag).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}/talks")
-    public List<Talk> getTagsByTalkId(@PathParam("id") String tagId) {
-        return talkService.getTagsByTalkId(tagId);
+    public Response getTagsByTalkId(@PathParam("id") String tagId) {
+        try {
+            List<Talk> tags = talkService.getTagsByTalkId(tagId);
+            return Response.ok(tags).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @POST

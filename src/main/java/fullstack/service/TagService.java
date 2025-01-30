@@ -26,12 +26,20 @@ public class TagService implements PanacheRepository<Tag> {
         this.userService = userService;
     }
 
-    public List<Tag> getAllTags() {
-        return listAll();
+    public List<Tag> getAllTags() throws NoContentException {
+        List<Tag> tags = listAll();
+        if (tags.isEmpty()) {
+            throw new NoContentException("No tags found.");
+        }
+        return tags;
     }
 
-    public Tag findById(String id) {
-        return tagRepository.findById(id);
+    public Tag findById(String id) throws  NoContentException {
+        Tag tag = tagRepository.findById(id);
+        if (tag == null) {
+            throw new NoContentException("Tag not found");
+        }
+        return tag;
     }
 
     public List<Tag> getTagsByTalkId(String talkId) throws NoContentException {

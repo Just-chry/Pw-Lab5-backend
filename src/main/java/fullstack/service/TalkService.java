@@ -27,12 +27,20 @@ public class TalkService implements PanacheRepository<Talk> {
         this.talkRepository = talkRepository;
     }
 
-    public List<Talk> getAllTalks() {
-        return listAll();
+    public List<Talk> getAllTalks() throws NoContentException {
+        List<Talk> talks = listAll();
+        if (talks.isEmpty()) {
+            throw new NoContentException("No talks found.");
+        }
+        return talks;
     }
 
-    public Talk findById(String id) {
-        return talkRepository.findById(id);
+    public Talk findById(String id) throws UserNotFoundException {
+        Talk talk = talkRepository.findById(id);
+        if (talk == null) {
+            throw new UserNotFoundException("Talk not found");
+        }
+        return talk;
     }
 
     public List<Talk> getTalksByEventId(String eventId) {
@@ -47,8 +55,12 @@ public class TalkService implements PanacheRepository<Talk> {
         return talks;
     }
 
-    public List<Talk> getTagsByTalkId(String tagId) {
-        return talkRepository.getTagsByTalkId(tagId);
+    public List<Talk> getTagsByTalkId(String tagId) throws NoContentException {
+        List<Talk> tags = talkRepository.getTagsByTalkId(tagId);
+        if (tags.isEmpty()) {
+            throw new NoContentException("No tags found for the given talk ID.");
+        }
+        return tags;
     }
 
     @Transactional
