@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static fullstack.util.Messages.ADMIN_REQUIRED;
+import static fullstack.util.Messages.SPEAKER_NOT_FOUND;
 
 @ApplicationScoped
 public class SpeakerService {
@@ -29,7 +30,7 @@ public class SpeakerService {
     public List<Speaker> getAllSpeakers() throws NoContentException {
         List<Speaker> speakers = speakerRepository.listAll();
         if (speakers.isEmpty()) {
-            throw new NoContentException("No speakers found.");
+            throw new NoContentException(SPEAKER_NOT_FOUND);
         }
         return speakers;
     }
@@ -37,7 +38,7 @@ public class SpeakerService {
     public Speaker findById(String id) throws UserNotFoundException {
         Speaker speaker = speakerRepository.findById(id);
         if (speaker == null) {
-            throw new UserNotFoundException("Speaker not found");
+            throw new UserNotFoundException(SPEAKER_NOT_FOUND);
         }
         return speaker;
     }
@@ -45,7 +46,7 @@ public class SpeakerService {
     public List<Speaker> getSpeakerByTalkId(String talkId) throws NoContentException {
         List<Speaker> speakers = speakerRepository.getSpeakerByTalkId(talkId);
         if (speakers.isEmpty()) {
-            throw new NoContentException("No speakers found for the given talk ID.");
+            throw new NoContentException(SPEAKER_NOT_FOUND);
         }
         return speakers;
     }
@@ -53,7 +54,7 @@ public class SpeakerService {
     public List<Speaker> getSpeakersByEventId(String eventId) throws NoContentException {
         List<Speaker> speakers = speakerRepository.getSpeakersByEventId(eventId);
         if (speakers.isEmpty()) {
-            throw new NoContentException("No speakers found for the given event ID.");
+            throw new NoContentException(SPEAKER_NOT_FOUND);
         }
         return speakers;
     }
@@ -83,7 +84,7 @@ public class SpeakerService {
         }
         int updated = speakerRepository.update(id, speaker);
         if (updated == 0) {
-            throw new SessionException("Speaker not found");
+            throw new SessionException(SPEAKER_NOT_FOUND);
         }
     }
 }

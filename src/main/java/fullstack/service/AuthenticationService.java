@@ -157,10 +157,10 @@ public class AuthenticationService {
 
         if (Boolean.TRUE.equals(rememberMe)) {
             String sessionId = createSessionLong(user);
-            return new LoginResponse(user.getName(), sessionId, LOGiN_SUCCESS);
+            return new LoginResponse(user.getName(), sessionId, LOGIN_SUCCESS);
         } else {
             String sessionId = createSession(user);
-            return new LoginResponse(user.getName(), sessionId, LOGiN_SUCCESS);
+            return new LoginResponse(user.getName(), sessionId, LOGIN_SUCCESS);
         }
     }
 
