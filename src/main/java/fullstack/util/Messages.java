@@ -12,4 +12,5 @@ public class Messages {
     public static final String USER_NOT_FOUND = "Utente non trovato.";
     public static final String INVALID_TOKEN = "Token non valido.";
     public static final String ADMIN_REQUIRED = "Accesso negato. Solo gli amministratori hanno questa funzionalità";
+    public static final String SESSION_NOT_FOUND = "Sessione non trovata.";
 }
