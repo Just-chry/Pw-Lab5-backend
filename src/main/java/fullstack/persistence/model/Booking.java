@@ -17,7 +17,7 @@ public class Booking {
     private String eventId;
     private LocalDate date;
     @Enumerated(EnumType.STRING)
-    private Status status = Status.confirmed;
+    private Status status = Status.CONFIRMED;
 
     public Booking(String id, String userId, String eventId, LocalDate date, Status status) {
         this.id = id;

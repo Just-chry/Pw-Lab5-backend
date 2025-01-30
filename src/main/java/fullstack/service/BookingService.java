@@ -83,12 +83,12 @@ public class BookingService implements PanacheRepository<Booking> {
             throw new IllegalArgumentException(EVENT_NOT_FOUND + booking.getEventId());
         }
 
-        if (booking.getStatus() == Status.confirmed) {
+        if (booking.getStatus() == Status.CONFIRMED) {
             event.setParticipantsCount(event.getParticipantsCount() - 1);
             eventService.persist(event);
         }
 
-        booking.setStatus(Status.canceled);
+        booking.setStatus(Status.CANCELED);
         bookingRepository.persistBooking(booking);
 
         User user = userRepository.findUserById(booking.getUserId()).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND + booking.getUserId()));

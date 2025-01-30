@@ -1,6 +1,10 @@
 package fullstack.service;
 
+import fullstack.persistence.model.Tag;
+import fullstack.persistence.model.Talk;
 import fullstack.persistence.repository.EventRepository;
+import fullstack.persistence.repository.TagRepository;
+import fullstack.persistence.repository.TalkRepository;
 import fullstack.service.exception.AdminAccessException;
 import fullstack.service.exception.UserNotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
@@ -15,14 +19,12 @@ import static fullstack.util.Messages.ADMIN_REQUIRED;
 
 @ApplicationScoped
 public class EventService implements PanacheRepository<Event> {
-    private final EventRepository eventRepository;
-    private final UserService userService;
-
     @Inject
-    public EventService(EventRepository eventRepository, UserService userService) {
-        this.eventRepository = eventRepository;
-        this.userService = userService;
-    }
+    EventRepository eventRepository;
+    @Inject
+    UserService userService;
+    @Inject
+    TalkRepository talkRepository;
 
     public List<Event> getAllEvents() {
         return listAll();
@@ -45,12 +47,24 @@ public class EventService implements PanacheRepository<Event> {
     }
 
     @Transactional
-    public Event save(String sessionId, Event event) throws UserNotFoundException {
+    public Event save(String sessionId, Event event, List<Talk> talks) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
         event.setId(UUID.randomUUID().toString());
+        event.setMaxParticipants(event.getMaxParticipants());
         persist(event);
+
+        for (Talk talk : talks) {
+            Talk existingTalk = talkRepository.findByTitle(talk.getTitle());
+            if (existingTalk == null) {
+                talk.setId(UUID.randomUUID().toString());
+                talkRepository.persist(talk);
+            } else {
+                talk = existingTalk;
+            }
+            talkRepository.associateTalkWithEvent(event.getId(), talk.getId());
+        }
         return event;
     }
 
