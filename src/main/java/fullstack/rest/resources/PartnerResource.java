@@ -16,12 +16,10 @@ import java.util.List;
 public class PartnerResource {
     private final PartnerService partnerService;
     private final EventService eventService;
-    private final UserService userService;
 
-    public PartnerResource(PartnerService partnerService, EventService eventService, UserService userService) {
+    public PartnerResource(PartnerService partnerService, EventService eventService) {
         this.partnerService = partnerService;
         this.eventService = eventService;
-        this.userService = userService;
     }
 
     @GET
