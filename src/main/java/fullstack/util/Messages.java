@@ -13,4 +13,5 @@ public class Messages {
     public static final String INVALID_TOKEN = "Token non valido.";
     public static final String ADMIN_REQUIRED = "Accesso negato. Solo gli amministratori hanno questa funzionalità";
     public static final String SESSION_NOT_FOUND = "Sessione non trovata.";
+    public static final String SMS_ERROR = "Errore durante l'invio dell'SMS: ";
 }
