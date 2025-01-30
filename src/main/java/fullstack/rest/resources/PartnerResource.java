@@ -31,7 +31,7 @@ public class PartnerResource {
             List<Partner> partners = partnerService.getAllPartners();
             return Response.ok(partners).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -42,7 +42,7 @@ public class PartnerResource {
             Partner partner = partnerService.findById(id);
             return Response.ok(partner).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -53,7 +53,7 @@ public class PartnerResource {
             List<Event> events = eventService.getEventsByPartnerId(partnerId);
             return Response.ok(events).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -64,7 +64,7 @@ public class PartnerResource {
             List<Partner> partners = partnerService.findByValue(value);
             return Response.ok(partners).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
