@@ -13,6 +13,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+import static fullstack.util.Messages.ADMIN_REQUIRED;
+
 @ApplicationScoped
 public class EventService implements PanacheRepository<Event> {
     private final EventRepository eventRepository;
@@ -47,7 +49,7 @@ public class EventService implements PanacheRepository<Event> {
     @Transactional
     public Event save(String sessionId, Event event) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         event.setId(UUID.randomUUID().toString());
         persist(event);
@@ -57,7 +59,7 @@ public class EventService implements PanacheRepository<Event> {
     @Transactional
     public void deleteById(String sessionId, String id) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         eventRepository.deleteById(id);
     }
@@ -65,7 +67,7 @@ public class EventService implements PanacheRepository<Event> {
     @Transactional
     public int update(String sessionId, String id, Event event) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         return eventRepository.update(id, event);
     }
