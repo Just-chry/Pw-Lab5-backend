@@ -11,5 +11,5 @@ public class Messages {
     public static final String PHONE_ALREADY_USED = "Il numero di telefono è già in uso.";
     public static final String USER_NOT_FOUND = "Utente non trovato.";
     public static final String INVALID_TOKEN = "Token non valido.";
-    public static final String ADMIN_REQUIRED = "Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.";
+    public static final String ADMIN_REQUIRED = "Accesso negato. Solo gli amministratori hanno questa funzionalità";
 }
