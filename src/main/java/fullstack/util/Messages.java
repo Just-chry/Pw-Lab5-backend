@@ -18,4 +18,5 @@ public class Messages {
     public static final String BOOKING_NOT_FOUND = "Prenotazione non trovata";
     public static final String EVENT_NOT_FOUND = "Evento non trovato";
     public static final String SPEAKER_EVENT_NOT_FOUND = "Eventi non trovati per il partner";
+    public static final String PARTNER_NOT_FOUND = "Partner non trovato";
 }

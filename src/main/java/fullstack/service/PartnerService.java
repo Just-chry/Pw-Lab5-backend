@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static fullstack.util.Messages.ADMIN_REQUIRED;
+import static fullstack.util.Messages.PARTNER_NOT_FOUND;
 
 @ApplicationScoped
 public class PartnerService {
@@ -29,7 +30,7 @@ public class PartnerService {
     public List<Partner> getAllPartners() throws NoContentException {
         List<Partner> partners = partnerRepository.listAll();
         if (partners.isEmpty()) {
-            throw new NoContentException("No partners found.");
+            throw new NoContentException(PARTNER_NOT_FOUND);
         }
         return partners;
     }
@@ -37,7 +38,7 @@ public class PartnerService {
     public Partner findById(String id) throws NoContentException {
         Partner partner = partnerRepository.findById(id);
         if (partner == null) {
-            throw new NoContentException("Partner not found");
+            throw new NoContentException(PARTNER_NOT_FOUND);
         }
         return partner;
     }
@@ -71,7 +72,7 @@ public class PartnerService {
     public List<Partner> findByValue(String value) throws NoContentException {
         List<Partner> partners = partnerRepository.findByValue(value);
         if (partners.isEmpty()) {
-            throw new NoContentException("No partners found for the given value.");
+            throw new NoContentException(PARTNER_NOT_FOUND);
         }
         return partners;
     }
