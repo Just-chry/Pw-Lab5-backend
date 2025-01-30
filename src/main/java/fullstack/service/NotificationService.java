@@ -8,6 +8,7 @@ import io.quarkus.mailer.Mailer;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 
+import static fullstack.util.Messages.INVALID_EMAIL;
 import static fullstack.util.Messages.INVALID_PHONE;
 
 @ApplicationScoped
@@ -24,7 +25,7 @@ public class NotificationService {
 
     public void sendVerificationEmail(User user, String verificationLink) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un'email valida.");
+            throw new IllegalArgumentException(INVALID_EMAIL);
         }
         mailer.send(Mail.withHtml(user.getEmail(),
                 "Conferma la tua email",
@@ -47,7 +48,7 @@ public class NotificationService {
 
     public void sendPasswordResetEmail(User user) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un'email valida.");
+            throw new IllegalArgumentException(INVALID_EMAIL);
         }
         mailer.send(Mail.withHtml(user.getEmail(),
                 "Reimposta la tua password",
@@ -69,7 +70,7 @@ public class NotificationService {
 
     public void sendBookingConfirmationEmail(User user, Event event) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un'email valida.");
+            throw new IllegalArgumentException(INVALID_EMAIL);
         }
         String emailContent = "<h1>Conferma Prenotazione</h1>" +
                 "<p>Ciao " + user.getName() + " " + user.getSurname() + ",</p>" +
@@ -96,7 +97,7 @@ public class NotificationService {
 
     public void sendBookingCancellationEmail(User user, Event event) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException("L'utente non ha un'email valida.");
+            throw new IllegalArgumentException(INVALID_EMAIL);
         }
         String emailContent = "<h1>Cancellazione Prenotazione</h1>" +
                 "<p>Ciao " + user.getName() + " " + user.getSurname() + ",</p>" +
