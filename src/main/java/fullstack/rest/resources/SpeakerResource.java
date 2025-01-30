@@ -34,7 +34,7 @@ public class SpeakerResource {
             List<Speaker> speakers = speakerService.getAllSpeakers();
             return Response.ok(speakers).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -56,7 +56,7 @@ public class SpeakerResource {
             List<Event> events = eventService.getEventsBySpeakerId(speakerId);
             return Response.ok(events).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -67,7 +67,7 @@ public class SpeakerResource {
             List<Talk> talks = talkService.getTalksBySpeakerId(speakerId);
             return Response.ok(talks).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
