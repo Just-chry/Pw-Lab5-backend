@@ -21,6 +21,8 @@ public class Messages {
     public static final String PARTNER_NOT_FOUND = "Partner non trovato";
     public static final String WRONG_PASSWORD = "Password errata.";
     public static final String UNVERIFIED_CONTACT = "Contatto non verificato. Verifica il tuo indirizzo email o il tuo numero di telefono.";
+    public static final String BOOKING_FULL = "Prenotazioni esaurite.";
+    public static final String BOOKING_EXISTS = "Prenotazione già esistente.";
 
     //Success
     public static final String LOGiN_SUCCESS = "Login avvenuto con successo.";

@@ -56,11 +56,11 @@ public class BookingService implements PanacheRepository<Booking> {
 
         Booking existingBooking = bookingRepository.findExistingBooking(userId, eventId);
         if (existingBooking != null) {
-            throw new BookingException("User has already booked this event");
+            throw new BookingException(BOOKING_EXISTS);
         }
 
         if (event.getParticipantsCount() >= event.getMaxParticipants()) {
-            throw new BookingException("Cannot confirm booking: event is fully booked");
+            throw new BookingException(BOOKING_FULL);
         }
 
         Booking booking = bookingRepository.createBooking(userId, eventId);
