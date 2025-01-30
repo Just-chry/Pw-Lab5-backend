@@ -11,6 +11,8 @@ import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
+import static fullstack.util.Messages.ADMIN_REQUIRED;
+
 @ApplicationScoped
 public class SpeakerService {
 
@@ -41,7 +43,7 @@ public class SpeakerService {
     @Transactional
     public Speaker save(String sessionId, Speaker speaker) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         speaker.setId(UUID.randomUUID().toString());
         speakerRepository.persist(speaker);
@@ -51,7 +53,7 @@ public class SpeakerService {
     @Transactional
     public void deleteById(String sessionId, String id) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         speakerRepository.deleteById(id);
     }
@@ -59,7 +61,7 @@ public class SpeakerService {
     @Transactional
     public int update(String sessionId, String id, Speaker speaker) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         return speakerRepository.update(id, speaker);
     }
