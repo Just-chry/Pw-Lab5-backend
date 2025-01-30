@@ -8,6 +8,8 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Event;
+import jakarta.ws.rs.core.NoContentException;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -36,8 +38,12 @@ public class EventService implements PanacheRepository<Event> {
         return eventRepository.findByDate(date);
     }
 
-    public List<Event> getEventsBySpeakerId(String speakerId) {
-        return eventRepository.getEventsBySpeakerId(speakerId);
+    public List<Event> getEventsBySpeakerId(String speakerId) throws NoContentException {
+        List<Event> events = eventRepository.getEventsBySpeakerId(speakerId);
+        if (events.isEmpty()) {
+            throw new NoContentException("No events found for the given speaker ID.");
+        }
+        return events;
     }
 
     public List<Event> getEventsByPartnerId(String partnerId) {

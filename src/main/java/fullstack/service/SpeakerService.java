@@ -25,12 +25,20 @@ public class SpeakerService {
         this.userService = userService;
     }
 
-    public List<Speaker> getAllSpeakers() {
-        return speakerRepository.listAll();
+    public List<Speaker> getAllSpeakers() throws NoContentException {
+        List<Speaker> speakers = speakerRepository.listAll();
+        if (speakers.isEmpty()) {
+            throw new NoContentException("No speakers found.");
+        }
+        return speakers;
     }
 
-    public Speaker findById(String id) {
-        return speakerRepository.findById(id);
+    public Speaker findById(String id) throws UserNotFoundException {
+        Speaker speaker = speakerRepository.findById(id);
+        if (speaker == null) {
+            throw new UserNotFoundException("Speaker not found");
+        }
+        return speaker;
     }
 
     public List<Speaker> getSpeakerByTalkId(String talkId) throws NoContentException {
@@ -64,10 +72,13 @@ public class SpeakerService {
     }
 
     @Transactional
-    public int update(String sessionId, String id, Speaker speaker) throws UserNotFoundException {
+    public void update(String sessionId, String id, Speaker speaker) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
-        return speakerRepository.update(id, speaker);
+        int updated = speakerRepository.update(id, speaker);
+        if (updated == 0) {
+            throw new UserNotFoundException("Speaker not found");
+        }
     }
 }

@@ -8,6 +8,7 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.NoContentException;
 
 import java.util.List;
 import java.util.UUID;
@@ -38,8 +39,12 @@ public class TalkService implements PanacheRepository<Talk> {
         return talkRepository.getTalksByEventId(eventId);
     }
 
-    public List<Talk> getTalksBySpeakerId(String speakerId) {
-        return talkRepository.getTalksBySpeakerId(speakerId);
+    public List<Talk> getTalksBySpeakerId(String speakerId) throws NoContentException {
+        List<Talk> talks = talkRepository.getTalksBySpeakerId(speakerId);
+        if (talks.isEmpty()) {
+            throw new NoContentException("No talks found for the given speaker ID.");
+        }
+        return talks;
     }
 
     public List<Talk> getTagsByTalkId(String tagId) {

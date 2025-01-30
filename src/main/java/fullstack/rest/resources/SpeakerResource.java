@@ -9,6 +9,7 @@ import fullstack.persistence.model.Talk;
 import fullstack.service.EventService;
 import fullstack.service.SpeakerService;
 import fullstack.service.TalkService;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
@@ -28,26 +29,46 @@ public class SpeakerResource {
     }
 
     @GET
-    public List<Speaker> getAllSpeakers() {
-        return speakerService.getAllSpeakers();
+    public Response getAllSpeakers() {
+        try {
+            List<Speaker> speakers = speakerService.getAllSpeakers();
+            return Response.ok(speakers).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    public Speaker getSpeakerById(@PathParam("id") String id) {
-        return speakerService.findById(id);
+    public Response getSpeakerById(@PathParam("id") String id) {
+        try {
+            Speaker speaker = speakerService.findById(id);
+            return Response.ok(speaker).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}/events")
-    public List<Event> getEventsBySpeakerId(@PathParam("id") String speakerId) {
-        return eventService.getEventsBySpeakerId(speakerId);
+    public Response getEventsBySpeakerId(@PathParam("id") String speakerId) {
+        try {
+            List<Event> events = eventService.getEventsBySpeakerId(speakerId);
+            return Response.ok(events).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}/talks")
-    public List<Talk> getSpeakersByTalkId(@PathParam("id") String speakerId) {
-        return talkService.getTalksBySpeakerId(speakerId);
+    public Response getSpeakersByTalkId(@PathParam("id") String speakerId) {
+        try {
+            List<Talk> talks = talkService.getTalksBySpeakerId(speakerId);
+            return Response.ok(talks).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
 
@@ -74,14 +95,10 @@ public class SpeakerResource {
 
     @PUT
     @Path("/{id}")
-
-    public Response updateSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Speaker speaker)  {
+    public Response updateSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Speaker speaker) {
         try {
-        int updated = speakerService.update(sessionId, id, speaker);
-        if (updated == 0) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Speaker not found").build();
-        }
-        return Response.ok(updated).build();
+            speakerService.update(sessionId, id, speaker);
+            return Response.ok().build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
