@@ -44,9 +44,9 @@ public class TagResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response createTag(@CookieParam("sessionId") String sessionId, Tag tag) {
+    public Response createTag(Tag tag) {
         try {
-            Tag savedTag = tagService.save(sessionId, tag);
+            Tag savedTag = tagService.save(tag);
             return Response.ok(savedTag).build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Utente non trovato").build();

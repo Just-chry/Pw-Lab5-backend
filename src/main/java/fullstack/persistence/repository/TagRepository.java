@@ -22,11 +22,23 @@ public class TagRepository implements PanacheRepository<Tag> {
         return find("id", id).firstResult();
     }
 
+    public Tag findByName(String name) {
+        return find("name", name).firstResult();
+    }
+
     public int update(String id, Tag tag) {
         return update("name = ?1 where id = ?2", tag.getName(), id);
     }
 
     public void deleteById(String id) {
         delete("id", id);
+    }
+
+    public void associateTagWithTalk(String talkId, String tagId) {
+        getEntityManager().createNativeQuery(
+                        "INSERT INTO talk_tag (talk_id, tag_id) VALUES (:talkId, :tagId)")
+                .setParameter("talkId", talkId)
+                .setParameter("tagId", tagId)
+                .executeUpdate();
     }
 }

@@ -38,10 +38,7 @@ public class TagService implements PanacheRepository<Tag> {
     }
 
     @Transactional
-    public Tag save(String sessionId, Tag tag) throws UserNotFoundException {
-        if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException(ADMIN_REQUIRED);
-        }
+    public Tag save(Tag tag) throws UserNotFoundException {
         tag.setId(UUID.randomUUID().toString());
         persist(tag);
         return tag;
