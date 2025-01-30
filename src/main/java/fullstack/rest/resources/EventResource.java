@@ -9,6 +9,7 @@ import fullstack.persistence.model.Talk;
 import fullstack.service.EventService;
 import fullstack.service.SpeakerService;
 import fullstack.service.TalkService;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
@@ -29,32 +30,57 @@ public class EventResource {
     }
 
     @GET
-    public List<Event> getAllEvents() {
-        return eventService.getAllEvents();
+    public Response getAllEvents() {
+        try {
+            List<Event> events = eventService.getAllEvents();
+            return Response.ok(events).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    public Event getEventById(@PathParam("id") String id) {
-        return eventService.findById(id);
+    public Response getEventById(@PathParam("id") String id) {
+        try {
+            Event event = eventService.findById(id);
+            return Response.ok(event).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}/talks")
-    public List<Talk> getTalksByEventId(@PathParam("id") String eventId) {
-        return talkService.getTalksByEventId(eventId);
+    public Response getTalksByEventId(@PathParam("id") String eventId) {
+        try {
+            List<Talk> talks = talkService.getTalksByEventId(eventId);
+            return Response.ok(talks).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}/speakers")
-    public List<Speaker> getSpeakersByEventId(@PathParam("id") String eventId) {
-        return speakerService.getSpeakersByEventId(eventId);
+    public Response getSpeakersByEventId(@PathParam("id") String eventId) {
+        try {
+            List<Speaker> speakers = speakerService.getSpeakersByEventId(eventId);
+            return Response.ok(speakers).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("date/{date}")
-    public List<Event> getEventByDate(@PathParam("date") String date) {
-        return eventService.findByDate(date);
+    public Response getEventByDate(@PathParam("date") String date) {
+        try {
+            List<Event> events = eventService.findByDate(date);
+            return Response.ok(events).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @POST

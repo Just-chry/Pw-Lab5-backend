@@ -26,16 +26,28 @@ public class EventService implements PanacheRepository<Event> {
         this.userService = userService;
     }
 
-    public List<Event> getAllEvents() {
-        return listAll();
+    public List<Event> getAllEvents() throws NoContentException {
+        List<Event> events = listAll();
+        if (events.isEmpty()) {
+            throw new NoContentException("No events found.");
+        }
+        return events;
     }
 
-    public Event findById(String id) {
-        return eventRepository.findById(id);
+    public Event findById(String id) throws NoContentException {
+        Event event = eventRepository.findById(id);
+        if (event == null) {
+            throw new NoContentException("Event not found");
+        }
+        return event;
     }
 
-    public List<Event> findByDate(String date) {
-        return eventRepository.findByDate(date);
+    public List<Event> findByDate(String date) throws NoContentException {
+        List<Event> events = eventRepository.findByDate(date);
+        if (events.isEmpty()) {
+            throw new NoContentException("No events found for the given date.");
+        }
+        return events;
     }
 
     public List<Event> getEventsBySpeakerId(String speakerId) throws NoContentException {

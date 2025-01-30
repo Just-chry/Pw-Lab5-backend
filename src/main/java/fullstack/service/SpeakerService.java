@@ -49,8 +49,12 @@ public class SpeakerService {
         return speakers;
     }
 
-    public List<Speaker> getSpeakersByEventId(String eventId) {
-        return speakerRepository.getSpeakersByEventId(eventId);
+    public List<Speaker> getSpeakersByEventId(String eventId) throws NoContentException {
+        List<Speaker> speakers = speakerRepository.getSpeakersByEventId(eventId);
+        if (speakers.isEmpty()) {
+            throw new NoContentException("No speakers found for the given event ID.");
+        }
+        return speakers;
     }
 
     @Transactional

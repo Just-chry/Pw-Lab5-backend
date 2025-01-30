@@ -43,8 +43,12 @@ public class TalkService implements PanacheRepository<Talk> {
         return talk;
     }
 
-    public List<Talk> getTalksByEventId(String eventId) {
-        return talkRepository.getTalksByEventId(eventId);
+    public List<Talk> getTalksByEventId(String eventId) throws NoContentException {
+        List<Talk> talks = talkRepository.getTalksByEventId(eventId);
+        if (talks.isEmpty()) {
+            throw new NoContentException("No talks found for the given event ID.");
+        }
+        return talks;
     }
 
     public List<Talk> getTalksBySpeakerId(String speakerId) throws NoContentException {

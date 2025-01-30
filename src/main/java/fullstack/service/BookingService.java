@@ -11,6 +11,8 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.NoContentException;
+
 import java.util.List;
 
 import static fullstack.util.Messages.*;
@@ -38,15 +40,10 @@ public class BookingService implements PanacheRepository<Booking> {
 
 
     @Transactional
-    public Booking save(String sessionId, String eventId) throws UserNotFoundException {
+    public Booking save(String sessionId, String eventId) throws UserNotFoundException, NoContentException {
         User user = userService.getUserBySessionId(sessionId);
         String userId = user.getId();
-
-        // Check if the event exists
         Event event = eventService.findById(eventId);
-        if (event == null) {
-            throw new RuntimeException(EVENT_NOT_FOUND + eventId);
-        }
 
         Booking existingBooking = bookingRepository.findExistingBooking(userId, eventId);
         if (existingBooking != null) {
@@ -72,16 +69,13 @@ public class BookingService implements PanacheRepository<Booking> {
     }
 
     @Transactional
-    public Booking cancelBooking(String id) throws UserNotFoundException {
+    public Booking cancelBooking(String id) throws UserNotFoundException, NoContentException {
         Booking booking = bookingRepository.findById(id);
         if (booking == null) {
             throw new IllegalArgumentException(BOOKING_NOT_FOUND + id);
         }
 
         Event event = eventService.findById(booking.getEventId());
-        if (event == null) {
-            throw new IllegalArgumentException(EVENT_NOT_FOUND + booking.getEventId());
-        }
 
         if (booking.getStatus() == Status.confirmed) {
             event.setParticipantsCount(event.getParticipantsCount() - 1);
