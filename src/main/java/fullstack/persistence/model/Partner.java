@@ -1,9 +1,6 @@
 package fullstack.persistence.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "partner")
@@ -17,10 +14,10 @@ public class Partner {
     private String website;
     private String email;
     private String image;
-    @Column(name = "value", columnDefinition = "varchar(255)")
-    private String  value;
+    @Enumerated(EnumType.STRING)
+    private Value value = Value.bronze;
 
-    public Partner(String id, String name, String description, String place, String website, String email, String image, String value) {
+    public Partner(String id, String name, String description, String place, String website, String email, String image, Value value) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -91,11 +88,11 @@ public class Partner {
         this.image = image;
     }
 
-    public String getValue() {
+    public Value getValue() {
         return value;
     }
 
-    public void setValue(String value) {
+    public void setValue(Value value) {
         this.value = value;
     }
 }

@@ -1,21 +1,27 @@
 package fullstack.service;
 
 import fullstack.persistence.repository.EventRepository;
+import fullstack.service.exception.AdminAccessException;
+import fullstack.service.exception.UserNotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Event;
-
-import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
+
+import static fullstack.util.Messages.ADMIN_REQUIRED;
 
 @ApplicationScoped
 public class EventService implements PanacheRepository<Event> {
     private final EventRepository eventRepository;
+    private final UserService userService;
 
-    public EventService(EventRepository eventRepository) {
+    @Inject
+    public EventService(EventRepository eventRepository, UserService userService) {
         this.eventRepository = eventRepository;
+        this.userService = userService;
     }
 
     public List<Event> getAllEvents() {
@@ -23,12 +29,11 @@ public class EventService implements PanacheRepository<Event> {
     }
 
     public Event findById(String id) {
-        return find("id", id).firstResult();
+        return eventRepository.findById(id);
     }
 
     public List<Event> findByDate(String date) {
-        LocalDate localDate = LocalDate.parse(date);
-        return list("date", localDate);
+        return eventRepository.findByDate(date);
     }
 
     public List<Event> getEventsBySpeakerId(String speakerId) {
@@ -36,24 +41,33 @@ public class EventService implements PanacheRepository<Event> {
     }
 
     public List<Event> getEventsByPartnerId(String partnerId) {
-        return list("partnerId", partnerId);
+        return eventRepository.getEventsByPartnerId(partnerId);
     }
 
     @Transactional
-    public Event save(Event event) {
+    public Event save(String sessionId, Event event) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException(ADMIN_REQUIRED);
+        }
         event.setId(UUID.randomUUID().toString());
         persist(event);
         return event;
     }
 
     @Transactional
-    public void deleteById(String id) {
-        delete("id", id);
+    public void deleteById(String sessionId, String id) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException(ADMIN_REQUIRED);
+        }
+        eventRepository.deleteById(id);
     }
 
     @Transactional
-    public int update(String id, Event event) {
-        return update("title = ?1, description = ?2, date = ?3 where id = ?4", event.getTitle(), event.getDescription(), event.getDate(), id);
+    public int update(String sessionId, String id, Event event) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException(ADMIN_REQUIRED);
+        }
+        return eventRepository.update(id, event);
     }
 }
 

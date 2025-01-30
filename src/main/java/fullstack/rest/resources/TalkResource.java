@@ -1,7 +1,6 @@
 package fullstack.rest.resources;
 
-import fullstack.persistence.model.Role;
-import fullstack.service.UserService;
+import fullstack.rest.model.CreateTalkRequest;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -20,13 +19,11 @@ public class TalkResource {
     private final TalkService talkService;
     private final SpeakerService speakerService;
     private final TagService tagService;
-    private final UserService userService;
 
-    public TalkResource(TalkService talkService, SpeakerService speakerService, TagService tagService, UserService userService) {
+    public TalkResource(TalkService talkService, SpeakerService speakerService, TagService tagService) {
         this.talkService = talkService;
         this.speakerService = speakerService;
         this.tagService = tagService;
-        this.userService = userService;
     }
 
     @GET
@@ -57,41 +54,41 @@ public class TalkResource {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createTalk(@CookieParam("sessionId") String sessionId, Talk talk) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+    @Consumes("application/json")
+    @Produces("application/json")
+    public Response createTalk(@CookieParam("sessionId") String sessionId, CreateTalkRequest request) {
+        try {
+            Talk talk = talkService.save(sessionId, request.getTalk(), request.getTagNames());
+            return Response.ok(talk).build();
+        } catch (Exception e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
-        Talk savedTalk = talkService.save(talk);
-        return Response.ok(savedTalk).build();
     }
 
     @DELETE
     @Path("/{id}")
-    public Response deleteTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole!= Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+    public Response deleteTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id)  {
+        try {
+            talkService.deleteById(sessionId, id);
+            return Response.noContent().build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
-        talkService.deleteById(id);
-        return Response.noContent().build();
     }
 
     @PUT
     @Path("/{id}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response updateTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Talk talk) throws UserNotFoundException {
-        Role userRole = userService.getUserRoleBySessionId(sessionId);
-        if (userRole != Role.admin) {
-            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
+    public Response updateTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Talk talk) {
+        try {
+            int updated = talkService.updateTalk(sessionId, id, talk);
+            if (updated == 0) {
+                return Response.status(Response.Status.NOT_FOUND).entity("Talk not found").build();
+            }
+            return Response.ok().build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
-        int updated = talkService.update(id, talk);
-        if (updated == 0) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Talk not found").build();
-        }
-        return Response.ok().build();
     }
 }

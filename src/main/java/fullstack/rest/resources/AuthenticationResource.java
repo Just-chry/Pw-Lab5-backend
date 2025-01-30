@@ -34,10 +34,10 @@ public class AuthenticationResource {
     @Path("/login")
     public Response login(LoginRequest request) {
         try {
-            LoginResponse response = authenticationService.authenticate(request);
+            LoginResponse response = authenticationService.authenticate(request, request.getRememberMe());
             NewCookie sessionCookie = new NewCookie("sessionId", response.getSessionId(), "/", null, "Session Cookie", -1, true, true);
             return Response.ok(response).cookie(sessionCookie).build();
-        } catch (UserNotFoundException | WrongPasswordException | SessionAlreadyExistsException e) {
+        } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         }
     }
@@ -71,5 +71,6 @@ public class AuthenticationResource {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
+
 
 }
