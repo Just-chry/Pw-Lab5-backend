@@ -3,6 +3,7 @@ package fullstack.rest.resources;
 import fullstack.persistence.model.Booking;
 import fullstack.service.BookingService;
 import fullstack.service.exception.UserNotFoundException;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
@@ -11,11 +12,8 @@ import java.util.List;
 
 @Path("/bookings")
 public class BookingResource {
-    private BookingService bookingService;
-
-    public BookingResource(BookingService bookingService) {
-        this.bookingService = bookingService;
-    }
+    @Inject
+    BookingService bookingService;
 
     @GET
     public List<Booking> getAllBookings() {
@@ -41,24 +39,6 @@ public class BookingResource {
         } catch (RuntimeException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
-    }
-
-    @PUT
-    @Path("/{id}/confirm")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Booking confirmBooking(@PathParam("id") String id) {
-        //admin
-        return bookingService.confirmBooking(id);
-    }
-
-    @PUT
-    @Path("/{id}/decline")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Booking declineBooking(@PathParam("id") String id) {
-        //admin
-        return bookingService.declineBooking(id);
     }
 
     @PUT

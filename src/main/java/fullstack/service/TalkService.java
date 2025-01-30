@@ -22,7 +22,7 @@ public class TalkService implements PanacheRepository<Talk> {
     }
 
     public Talk findById(String id) {
-        return find("id", id).firstResult();
+        return talkRepository.findById(id);
     }
 
     public List<Talk> getTalksByEventId(String eventId) {
@@ -46,11 +46,11 @@ public class TalkService implements PanacheRepository<Talk> {
 
     @Transactional
     public void deleteById(String id) {
-        delete("id", id);
+        talkRepository.deleteById(id);
     }
 
     @Transactional
     public int update(String id, Talk talk) {
-        return update("title = ?1, description = ?2 where id = ?3", talk.getTitle(), talk.getDescription(), id);
+        return talkRepository.update(id, talk);
     }
 }

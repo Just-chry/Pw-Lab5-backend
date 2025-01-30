@@ -3,14 +3,23 @@ package fullstack.persistence.repository;
 import fullstack.persistence.model.Speaker;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.transaction.Transactional;
-import fullstack.persistence.model.Speaker;
-
-
 import java.util.List;
 
 @ApplicationScoped
 public class SpeakerRepository implements PanacheRepository<Speaker> {
+
+    public Speaker findById(String id) {
+        return find("id", id).firstResult();
+    }
+
+    public void deleteById(String id) {
+        delete("id", id);
+    }
+
+    public int update(String id, Speaker speaker) {
+        return update("name = ?1, surname = ?2, biography = ?3 where id = ?4",
+                speaker.getName(), speaker.getSurname(), speaker.getBiography(), id);
+    }
 
     public List<Speaker> getSpeakerByTalkId(String talkId) {
         return getEntityManager().createNativeQuery(

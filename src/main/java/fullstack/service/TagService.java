@@ -22,7 +22,7 @@ public class TagService implements PanacheRepository<Tag> {
     }
 
     public Tag findById(String id) {
-        return find("id", id).firstResult();
+        return tagRepository.findById(id);
     }
 
     public List<Tag> getTagsByTalkId(String talkId) {
@@ -38,11 +38,11 @@ public class TagService implements PanacheRepository<Tag> {
 
     @Transactional
     public void delete(String id) {
-        delete("id", id);
+        tagRepository.deleteById(id);
     }
 
     @Transactional
     public int update(String id, Tag tag) {
-        return update("name = ?1 where id = ?2", tag.getName(), id);
+        return tagRepository.update(id, tag);
     }
 }

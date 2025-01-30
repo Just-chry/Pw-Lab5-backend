@@ -4,6 +4,8 @@ import fullstack.persistence.repository.UserRepository;
 import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
+import fullstack.persistence.repository.UserRepository;
+import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.rest.model.CreateUserRequest;
 import fullstack.rest.model.LoginRequest;
 import fullstack.rest.model.LoginResponse;
@@ -163,7 +165,6 @@ public class AuthenticationService {
             return new LoginResponse(user.getName(), sessionId, "Login avvenuto con successo");
         }
     }
-
 
     private String createSession(User user) {
         String sessionId = UUID.randomUUID().toString();

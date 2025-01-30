@@ -8,6 +8,7 @@ import java.util.List;
 
 @ApplicationScoped
 public class TagRepository implements PanacheRepository<Tag> {
+
     public List<Tag> getTagsByTalkId(String talkId) {
         return getEntityManager().createNativeQuery(
                         "SELECT t.* FROM tag t " +
@@ -15,5 +16,17 @@ public class TagRepository implements PanacheRepository<Tag> {
                                 "WHERE et.talk_id = :talkId", Tag.class)
                 .setParameter("talkId", talkId)
                 .getResultList();
+    }
+
+    public Tag findById(String id) {
+        return find("id", id).firstResult();
+    }
+
+    public int update(String id, Tag tag) {
+        return update("name = ?1 where id = ?2", tag.getName(), id);
+    }
+
+    public void deleteById(String id) {
+        delete("id", id);
     }
 }

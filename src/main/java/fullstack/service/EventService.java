@@ -23,12 +23,11 @@ public class EventService implements PanacheRepository<Event> {
     }
 
     public Event findById(String id) {
-        return find("id", id).firstResult();
+        return eventRepository.findById(id);
     }
 
     public List<Event> findByDate(String date) {
-        LocalDate localDate = LocalDate.parse(date);
-        return list("date", localDate);
+        return eventRepository.findByDate(date);
     }
 
     public List<Event> getEventsBySpeakerId(String speakerId) {
@@ -36,7 +35,7 @@ public class EventService implements PanacheRepository<Event> {
     }
 
     public List<Event> getEventsByPartnerId(String partnerId) {
-        return list("partnerId", partnerId);
+        return eventRepository.getEventsByPartnerId(partnerId);
     }
 
     @Transactional
@@ -48,12 +47,12 @@ public class EventService implements PanacheRepository<Event> {
 
     @Transactional
     public void deleteById(String id) {
-        delete("id", id);
+        eventRepository.deleteById(id);
     }
 
-    @Transactional
+        @Transactional
     public int update(String id, Event event) {
-        return update("title = ?1, description = ?2, date = ?3 where id = ?4", event.getTitle(), event.getDescription(), event.getDate(), id);
+            return eventRepository.update(id, event);
     }
 }
 

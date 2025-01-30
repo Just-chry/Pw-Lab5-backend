@@ -2,7 +2,6 @@ package fullstack.service;
 
 import fullstack.persistence.model.Speaker;
 import fullstack.persistence.repository.SpeakerRepository;
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -11,16 +10,20 @@ import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
-public class SpeakerService implements PanacheRepository<Speaker> {
-    @Inject
-    SpeakerRepository speakerRepository;
+public class SpeakerService {
+
+    private final SpeakerRepository speakerRepository;
+
+    public SpeakerService(SpeakerRepository speakerRepository) {
+        this.speakerRepository = speakerRepository;
+    }
 
     public List<Speaker> getAllSpeakers() {
-        return listAll();
+        return speakerRepository.listAll();
     }
 
     public Speaker findById(String id) {
-        return find("id", id).firstResult();
+        return speakerRepository.findById(id);
     }
 
     public List<Speaker> getSpeakerByTalkId(String talkId) {
@@ -34,17 +37,17 @@ public class SpeakerService implements PanacheRepository<Speaker> {
     @Transactional
     public Speaker save(Speaker speaker) {
         speaker.setId(UUID.randomUUID().toString());
-        persist(speaker);
+        speakerRepository.persist(speaker);
         return speaker;
     }
 
     @Transactional
     public void deleteById(String id) {
-        delete("id", id);
+        speakerRepository.deleteById(id);
     }
 
     @Transactional
     public int update(String id, Speaker speaker) {
-        return update("name = ?1, surname = ?2, biography = ?3 where id = ?4", speaker.getName(), speaker.getSurname(), speaker.getBiography(), id);
+        return speakerRepository.update(id, speaker);
     }
 }

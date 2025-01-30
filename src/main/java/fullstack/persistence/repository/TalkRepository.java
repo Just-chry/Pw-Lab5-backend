@@ -38,4 +38,16 @@ public class TalkRepository implements PanacheRepository<Talk> {
                 .setParameter("tagId", tagId)
                 .getResultList();
     }
+
+    public Talk findById(String id) {
+        return find("id", id).firstResult();
+    }
+
+    public int update(String id, Talk talk) {
+        return update("title = ?1, description = ?2 where id = ?3", talk.getTitle(), talk.getDescription(), id);
+    }
+
+    public void deleteById(String id) {
+        delete("id", id);
+    }
 }
