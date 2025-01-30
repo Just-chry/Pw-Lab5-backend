@@ -92,9 +92,9 @@ public class TalkService implements PanacheRepository<Talk> {
             if (tag == null) {
                 tag = new Tag();
                 tag.setName(tagName);
-                tagService.save(tag);
+                tagService.save(sessionId, tag);
             }
-            tagRepository.associateTagWithTalk(talk.getId(), tag.getId().toString());
+            tagRepository.associateTagWithTalk(talk.getId(), tag.getId());
         }
 
         return talk;

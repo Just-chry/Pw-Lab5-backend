@@ -40,7 +40,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public List<AdminResponse> listUsers(String sessionId) throws AdminAccessException, SessionException, UserNotFoundException {
+    public List<AdminResponse> listUsers(String sessionId) throws AdminAccessException, SessionException {
         if (isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -50,7 +50,7 @@ public class UserService {
     }
 
     @Transactional
-    public void promoteUserToAdmin(String userId, String sessionId) throws SessionException, UserNotFoundException {
+    public void promoteUserToAdmin(String userId, String sessionId) throws SessionException {
         if (isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }

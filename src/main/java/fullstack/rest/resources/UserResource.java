@@ -115,7 +115,7 @@ public class UserResource {
     @Path("/{userId}/promote")
     public Response promoteUserToAdmin(@CookieParam("sessionId") String sessionId, @PathParam("userId") String userId) {
         try {
-            userService.promoteUserToAdmin(userId, sessionId);
+            userService.    promoteUserToAdmin(userId, sessionId);
             return Response.ok("Utente promosso ad admin con successo.").build();
         } catch (AdminAccessException e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();

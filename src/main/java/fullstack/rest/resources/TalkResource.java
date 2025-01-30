@@ -1,5 +1,6 @@
 package fullstack.rest.resources;
 
+import fullstack.rest.model.CreateTalkRequest;
 import fullstack.service.exception.SessionAlreadyExistsException;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.ws.rs.*;
@@ -19,7 +20,8 @@ import java.util.List;
 @Path("/talks")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class TalkResource {
+public class
+TalkResource {
     private final TalkService talkService;
     private final SpeakerService speakerService;
     private final TagService tagService;
@@ -80,8 +82,8 @@ public class TalkResource {
         try {
             Talk talk = talkService.save(sessionId, request.getTalk(), request.getTagNames());
             return Response.ok(talk).build();
-        } catch (SessionException e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        } catch (SessionException | UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 
@@ -91,7 +93,7 @@ public class TalkResource {
         try {
             talkService.deleteById(sessionId, id);
             return Response.noContent().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

@@ -25,11 +25,13 @@ import static fullstack.util.Messages.ADMIN_REQUIRED;
 public class EventService implements PanacheRepository<Event> {
     private final EventRepository eventRepository;
     private final UserService userService;
+    private final TalkRepository talkRepository;
 
     @Inject
-    public EventService(EventRepository eventRepository, UserService userService) {
+    public EventService(EventRepository eventRepository, UserService userService, TalkRepository talkRepository) {
         this.eventRepository = eventRepository;
         this.userService = userService;
+        this.talkRepository = talkRepository;
     }
 
     public List<Event> getAllEvents() throws NoContentException {
@@ -73,7 +75,7 @@ public class EventService implements PanacheRepository<Event> {
     }
 
     @Transactional
-    public Event save(String sessionId, Event event) throws SessionException {
+    public Event save(String sessionId, Event event, List<Talk> talks) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
