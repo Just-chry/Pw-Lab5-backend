@@ -63,16 +63,12 @@ public class TagResource {
 
     @PUT
     @Path("/{id}")
-    public Response updateTag(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Tag tag)  {
+    public Response updateTag(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Tag tag) {
         try {
-        int updated = tagService.update(sessionId, id, tag);
-        if (updated == 0) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Tag not found").build();
-        }
-        return Response.ok().build();
+            tagService.update(sessionId, id, tag);
+            return Response.ok().build();
         } catch (UserNotFoundException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Utente non trovato").build();
         }
-
     }
 }

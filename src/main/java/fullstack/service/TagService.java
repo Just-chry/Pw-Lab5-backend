@@ -61,10 +61,13 @@ public class TagService implements PanacheRepository<Tag> {
     }
 
     @Transactional
-    public int update(String sessionId, String id, Tag tag) throws UserNotFoundException {
+    public void update(String sessionId, String id, Tag tag) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
-        return tagRepository.update(id, tag);
+        int updated = tagRepository.update(id, tag);
+        if (updated == 0) {
+            throw new UserNotFoundException("Tag not found");
+        }
     }
 }
