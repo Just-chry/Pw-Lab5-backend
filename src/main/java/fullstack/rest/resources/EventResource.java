@@ -11,6 +11,7 @@ import fullstack.service.SpeakerService;
 import fullstack.service.TalkService;
 import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
@@ -88,7 +89,7 @@ public class EventResource {
         try {
             Event savedEvent = eventService.save(sessionId, event);
             return Response.ok(savedEvent).build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
@@ -99,7 +100,7 @@ public class EventResource {
         try {
             eventService.deleteById(sessionId, id);
             return Response.noContent().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
@@ -110,7 +111,7 @@ public class EventResource {
         try {
             eventService.update(sessionId, id, event);
             return Response.ok().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

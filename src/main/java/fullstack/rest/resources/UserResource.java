@@ -9,6 +9,7 @@ import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
@@ -107,8 +108,8 @@ public class UserResource {
             return Response.ok(users).build();
         } catch (AdminAccessException e) {
             return Response.status(Response.Status.FORBIDDEN).entity(e.getMessage()).build();
-        } catch (UserNotFoundException e) {
-            return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
+        } catch (SessionException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 
@@ -118,7 +119,7 @@ public class UserResource {
         try {
             userService.promoteUserToAdmin(userId, sessionId);
             return Response.ok("Utente promosso ad admin con successo.").build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

@@ -10,6 +10,7 @@ import fullstack.service.EventService;
 import fullstack.service.PartnerService;
 import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
@@ -84,7 +85,7 @@ public class PartnerResource {
         try {
             partnerService.deleteById(sessionId, id);
             return Response.noContent().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
@@ -98,7 +99,7 @@ public class PartnerResource {
                 return Response.status(Response.Status.NOT_FOUND).entity("Partner not found").build();
             }
             return Response.ok(updated).build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

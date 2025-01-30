@@ -8,6 +8,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.NoContentException;
+import org.hibernate.SessionException;
 
 import java.util.List;
 import java.util.UUID;
@@ -58,7 +59,7 @@ public class SpeakerService {
     }
 
     @Transactional
-    public Speaker save(String sessionId, Speaker speaker) throws UserNotFoundException {
+    public Speaker save(String sessionId, Speaker speaker) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -68,7 +69,7 @@ public class SpeakerService {
     }
 
     @Transactional
-    public void deleteById(String sessionId, String id) throws UserNotFoundException {
+    public void deleteById(String sessionId, String id) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -76,13 +77,13 @@ public class SpeakerService {
     }
 
     @Transactional
-    public void update(String sessionId, String id, Speaker speaker) throws UserNotFoundException {
+    public void update(String sessionId, String id, Speaker speaker) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
         int updated = speakerRepository.update(id, speaker);
         if (updated == 0) {
-            throw new UserNotFoundException("Speaker not found");
+            throw new SessionException("Speaker not found");
         }
     }
 }

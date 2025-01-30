@@ -9,6 +9,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.NoContentException;
+import org.hibernate.SessionException;
 
 import java.util.List;
 import java.util.UUID;
@@ -68,7 +69,7 @@ public class TalkService implements PanacheRepository<Talk> {
     }
 
     @Transactional
-    public Talk save(String sessionId, Talk talk) throws UserNotFoundException {
+    public Talk save(String sessionId, Talk talk) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -78,7 +79,7 @@ public class TalkService implements PanacheRepository<Talk> {
     }
 
     @Transactional
-    public void deleteById(String sessionId,String id) throws UserNotFoundException {
+    public void deleteById(String sessionId,String id) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -86,13 +87,13 @@ public class TalkService implements PanacheRepository<Talk> {
     }
 
     @Transactional
-    public void updateTalk(String sessionId, String id, Talk talk) throws UserNotFoundException {
+    public void updateTalk(String sessionId, String id, Talk talk) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
         int updated = update(id, talk);
         if (updated == 0) {
-            throw new UserNotFoundException("Talk not found");
+            throw new SessionException("Talk not found");
         }
     }
 }

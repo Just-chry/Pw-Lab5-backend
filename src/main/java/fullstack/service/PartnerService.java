@@ -8,6 +8,7 @@ import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Partner;
 import jakarta.ws.rs.core.NoContentException;
+import org.hibernate.SessionException;
 
 import java.util.List;
 import java.util.UUID;
@@ -52,7 +53,7 @@ public class PartnerService {
     }
 
     @Transactional
-    public void deleteById(String sessionId, String id) throws UserNotFoundException {
+    public void deleteById(String sessionId, String id) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -60,7 +61,7 @@ public class PartnerService {
     }
 
     @Transactional
-    public int update(String sessionId, String id, Partner partner) throws UserNotFoundException {
+    public int update(String sessionId, String id, Partner partner) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }

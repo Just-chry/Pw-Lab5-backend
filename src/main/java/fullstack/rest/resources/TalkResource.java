@@ -11,6 +11,7 @@ import fullstack.service.TagService;
 import fullstack.service.TalkService;
 import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
@@ -76,7 +77,7 @@ public class TalkResource {
         try {
             Talk savedTalk = talkService.save(sessionId, talk);
             return Response.ok(savedTalk).build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
@@ -87,7 +88,7 @@ public class TalkResource {
         try {
             talkService.deleteById(sessionId, id);
             return Response.noContent().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
@@ -98,7 +99,7 @@ public class TalkResource {
         try {
             talkService.updateTalk(sessionId, id, talk);
             return Response.ok().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

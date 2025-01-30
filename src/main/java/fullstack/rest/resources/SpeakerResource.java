@@ -11,6 +11,7 @@ import fullstack.service.SpeakerService;
 import fullstack.service.TalkService;
 import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class SpeakerResource {
         try {
             Speaker savedSpeaker = speakerService.save(sessionId, speaker);
             return Response.ok(savedSpeaker).build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
@@ -88,7 +89,7 @@ public class SpeakerResource {
         try {
             speakerService.deleteById(sessionId, id);
             return Response.noContent().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
@@ -99,7 +100,7 @@ public class SpeakerResource {
         try {
             speakerService.update(sessionId, id, speaker);
             return Response.ok().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

@@ -9,6 +9,7 @@ import fullstack.service.TagService;
 import fullstack.service.TalkService;
 import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public class TagResource {
             List<Tag> tags = tagService.getAllTags();
             return Response.ok(tags).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -52,7 +53,7 @@ public class TagResource {
             List<Talk> tags = talkService.getTagsByTalkId(tagId);
             return Response.ok(tags).build();
         } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).build();
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
     }
 
@@ -61,7 +62,7 @@ public class TagResource {
         try {
             Tag savedTag = tagService.save(sessionId, tag);
             return Response.ok(savedTag).build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Utente non trovato").build();
         }
     }
@@ -72,7 +73,7 @@ public class TagResource {
         try {
             tagService.delete(sessionId, id);
             return Response.ok().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity("Utente non trovato").build();
         }
     }
