@@ -20,6 +20,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static fullstack.util.Messages.ADMIN_REQUIRED;
 import static fullstack.util.Messages.USER_NOT_FOUND;
 
 @ApplicationScoped
@@ -42,7 +43,7 @@ public class UserService {
 
     public List<AdminResponse> listUsers(String sessionId) throws AdminAccessException, UserNotFoundException {
         if (isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono visualizzare tutti gli utenti.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         return userRepository.listAll().stream()
                 .map(user -> new AdminResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone(), user.getRole().name()))
@@ -52,7 +53,7 @@ public class UserService {
     @Transactional
     public void promoteUserToAdmin(String userId, String sessionId) throws UserNotFoundException {
         if (isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         Optional<User> userOpt = userRepository.findUserById(userId);
         if (userOpt.isEmpty()) {
