@@ -24,6 +24,7 @@ public class Messages {
     public static final String BOOKING_FULL = "Prenotazioni esaurite.";
     public static final String BOOKING_EXISTS = "Prenotazione già esistente.";
     public static final String TAG_NOT_FOUND = "Tag non trovato.";
+    public static final String TALK_NOT_FOUND = "Talk non trovato.";
 
     //Success
     public static final String LOGiN_SUCCESS = "Login avvenuto con successo.";
