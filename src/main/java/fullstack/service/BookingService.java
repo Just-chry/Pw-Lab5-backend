@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.UUID;
 import java.util.Optional;
 
+import static fullstack.util.Messages.BOOKING_NOT_FOUND;
+
 @ApplicationScoped
 public class BookingService implements PanacheRepository<Booking> {
     @Inject
@@ -78,7 +80,7 @@ public class BookingService implements PanacheRepository<Booking> {
     public Booking cancelBooking(String id) {
         Booking booking = bookingRepository.findById(id);
         if (booking == null) {
-            throw new IllegalArgumentException("Booking not found with id: " + id);
+            throw new IllegalArgumentException(BOOKING_NOT_FOUND + id);
         }
 
         Event event = eventService.findById(booking.getEventId());
