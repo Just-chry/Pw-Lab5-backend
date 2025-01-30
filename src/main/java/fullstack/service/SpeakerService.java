@@ -2,6 +2,8 @@ package fullstack.service;
 
 import fullstack.persistence.model.Speaker;
 import fullstack.persistence.repository.SpeakerRepository;
+import fullstack.service.exception.AdminAccessException;
+import fullstack.service.exception.UserNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -13,9 +15,11 @@ import java.util.UUID;
 public class SpeakerService {
 
     private final SpeakerRepository speakerRepository;
-
-    public SpeakerService(SpeakerRepository speakerRepository) {
+    private final UserService userService;
+    @Inject
+    public SpeakerService(SpeakerRepository speakerRepository, UserService userService) {
         this.speakerRepository = speakerRepository;
+        this.userService = userService;
     }
 
     public List<Speaker> getAllSpeakers() {
@@ -35,19 +39,28 @@ public class SpeakerService {
     }
 
     @Transactional
-    public Speaker save(Speaker speaker) {
+    public Speaker save(String sessionId, Speaker speaker) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+        }
         speaker.setId(UUID.randomUUID().toString());
         speakerRepository.persist(speaker);
         return speaker;
     }
 
     @Transactional
-    public void deleteById(String id) {
+    public void deleteById(String sessionId, String id) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+        }
         speakerRepository.deleteById(id);
     }
 
     @Transactional
-    public int update(String id, Speaker speaker) {
+    public int update(String sessionId, String id, Speaker speaker) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+        }
         return speakerRepository.update(id, speaker);
     }
 }
