@@ -12,6 +12,8 @@ import fullstack.persistence.model.Tag;
 import java.util.List;
 import java.util.UUID;
 
+import static fullstack.util.Messages.ADMIN_REQUIRED;
+
 @ApplicationScoped
 public class TagService implements PanacheRepository<Tag> {
     private final TagRepository tagRepository;
@@ -38,7 +40,7 @@ public class TagService implements PanacheRepository<Tag> {
     @Transactional
     public Tag save(String sessionId, Tag tag) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         tag.setId(UUID.randomUUID().toString());
         persist(tag);
@@ -48,7 +50,7 @@ public class TagService implements PanacheRepository<Tag> {
     @Transactional
     public void delete(String sessionId, String id) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         tagRepository.deleteById(id);
     }
@@ -56,7 +58,7 @@ public class TagService implements PanacheRepository<Tag> {
     @Transactional
     public int update(String sessionId, String id, Tag tag) throws UserNotFoundException {
         if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         return tagRepository.update(id, tag);
     }
