@@ -9,8 +9,8 @@ import fullstack.rest.model.LoginRequest;
 import fullstack.rest.model.LoginResponse;
 import fullstack.service.exception.*;
 import fullstack.util.ContactValidator;
-import fullstack.util.Messages;
 import fullstack.util.Validation;
+import fullstack.util.Messages;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -20,8 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static fullstack.util.Messages.INVALID_TOKEN;
-import static fullstack.util.Messages.USER_NOT_FOUND;
+import static fullstack.util.Messages.*;
 
 @ApplicationScoped
 public class AuthenticationService {
@@ -200,7 +199,7 @@ public class AuthenticationService {
     public void logout(String sessionId) throws UserSessionNotFoundException {
         Optional<UserSession> optionalSession = userSessionRepository.findBySessionId(sessionId);
         if (optionalSession.isEmpty()) {
-            throw new UserSessionNotFoundException("Non c'è una sessione valida.");
+            throw new UserSessionNotFoundException(SESSION_NOT_FOUND);
         }
         userSessionRepository.delete(optionalSession.get());
     }

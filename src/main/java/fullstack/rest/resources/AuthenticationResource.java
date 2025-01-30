@@ -35,7 +35,8 @@ public class AuthenticationResource {
     public Response login(LoginRequest request) {
         try {
             LoginResponse response = authenticationService.authenticate(request, request.getRememberMe());
-            return Response.ok(response).build();
+            NewCookie sessionCookie = new NewCookie("sessionId", response.getSessionId(), "/", null, "Session Cookie", -1, true, true);
+            return Response.ok(response).cookie(sessionCookie).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         }

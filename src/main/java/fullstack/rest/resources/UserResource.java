@@ -1,6 +1,5 @@
 package fullstack.rest.resources;
 
-import fullstack.persistence.model.User;
 import fullstack.rest.model.*;
 import fullstack.service.UserService;
 import fullstack.service.exception.AdminAccessException;

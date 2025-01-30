@@ -46,6 +46,10 @@ public class BookingResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Booking cancelBooking(@PathParam("id") String id) {
-        return bookingService.cancelBooking(id);
+        try {
+            return bookingService.cancelBooking(id);
+        } catch (UserNotFoundException e) {
+            throw new WebApplicationException(e.getMessage(), Response.Status.NOT_FOUND);
+        }
     }
 }
