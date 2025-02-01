@@ -1,7 +1,6 @@
 package fullstack.rest.resources;
 
 import fullstack.rest.model.EventRequest;
-import fullstack.service.exception.UserNotFoundException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import fullstack.persistence.model.Event;
@@ -88,7 +87,7 @@ public class EventResource {
     @POST
     public Response createEvent(@CookieParam("sessionId") String sessionId, EventRequest eventRequest) {
         try {
-            Event savedEvent = eventService.save(sessionId, eventRequest.getEvent(), eventRequest.getTalks());
+            Event savedEvent = eventService.save(sessionId, eventRequest.getEvent(), eventRequest.getTalks(), eventRequest.getTags());
             return Response.ok(savedEvent).build();
         } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();

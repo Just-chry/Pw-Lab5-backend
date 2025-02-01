@@ -2,9 +2,11 @@ package fullstack.service;
 
 import fullstack.persistence.model.Tag;
 import fullstack.persistence.model.Talk;
+import fullstack.persistence.model.Ticket;
 import fullstack.persistence.repository.EventRepository;
 import fullstack.persistence.repository.TagRepository;
 import fullstack.persistence.repository.TalkRepository;
+import fullstack.persistence.repository.TicketRepository;
 import fullstack.service.exception.AdminAccessException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
@@ -29,6 +31,10 @@ public class EventService implements PanacheRepository<Event> {
     UserService userService;
     @Inject
     TalkRepository talkRepository;
+    @Inject
+    TagRepository tagRepository;
+    @Inject
+    TicketService ticketService;
 
     public List<Event> getAllEvents() throws NoContentException {
         List<Event> events = listAll();
@@ -71,12 +77,12 @@ public class EventService implements PanacheRepository<Event> {
     }
 
     @Transactional
-    public Event save(String sessionId, Event event, List<Talk> talks) throws SessionException {
+    public Event save(String sessionId, Event event, List<Talk> talks, List<Tag> tags) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
+
         event.setId(UUID.randomUUID().toString());
-        event.setMaxParticipants(event.getMaxParticipants());
         persist(event);
 
         for (Talk talk : talks) {
@@ -89,6 +95,19 @@ public class EventService implements PanacheRepository<Event> {
             }
             talkRepository.associateTalkWithEvent(event.getId(), talk.getId());
         }
+
+        for (Tag tag : tags) {
+            Tag existingTag = tagRepository.findByName(tag.getName());
+            if (existingTag == null) {
+                tag.setId(UUID.randomUUID().toString());
+                tagRepository.persist(tag);
+            } else {
+                tag = existingTag;
+            }
+            tagRepository.associateTagWithEvent(event.getId(), tag.getId());
+        }
+        ticketService.createTicketsForEvent(event.getId(), event.getMaxParticipants());
+
         return event;
     }
 

@@ -1,10 +1,8 @@
 package fullstack.service;
 
-import fullstack.persistence.model.Booking;
-import fullstack.persistence.model.Event;
-import fullstack.persistence.model.Status;
-import fullstack.persistence.model.User;
+import fullstack.persistence.model.*;
 import fullstack.persistence.repository.BookingRepository;
+import fullstack.persistence.repository.TicketRepository;
 import fullstack.persistence.repository.UserRepository;
 import fullstack.service.exception.BookingException;
 import fullstack.service.exception.UserNotFoundException;
@@ -30,6 +28,8 @@ public class BookingService implements PanacheRepository<Booking> {
     NotificationService notificationService;
     @Inject
     UserRepository userRepository;
+    @Inject
+    TicketRepository ticketRepository;
 
     public List<Booking> getAllBookings() throws NoContentException {
         List<Booking> bookings = bookingRepository.listAll();
@@ -47,35 +47,36 @@ public class BookingService implements PanacheRepository<Booking> {
         return booking;
     }
 
-
     @Transactional
     public Booking save(String sessionId, String eventId) throws UserNotFoundException, NoContentException, BookingException {
         User user = userService.getUserBySessionId(sessionId);
         String userId = user.getId();
         Event event = eventService.findById(eventId);
+
         if (event == null) {
             throw new RuntimeException(EVENT_NOT_FOUND + eventId);
         }
 
-        Booking existingBooking = bookingRepository.findExistingBooking(userId, eventId);
-        if (existingBooking != null) {
+        if (bookingRepository.findExistingBooking(userId, eventId) != null) {
             throw new BookingException(BOOKING_EXISTS);
         }
 
-        if (event.getParticipantsCount() >= event.getMaxParticipants()) {
+        Ticket ticket = ticketRepository.findAvailableTicketForEvent(eventId);
+        if (ticket == null) {
             throw new BookingException(BOOKING_FULL);
         }
 
-        Booking booking = bookingRepository.createBooking(userId, eventId);
+        ticket.setUserId(userId);
+        ticketRepository.persist(ticket);
 
-        event.setParticipantsCount(event.getParticipantsCount() + 1);
-        eventService.persist(event);
+        Booking booking = bookingRepository.createBooking(userId, eventId);
 
         if (user.getEmail() == null || user.getEmail().isEmpty() && user.getPhone() != null && !user.getPhone().isEmpty()) {
             notificationService.sendBookingConfirmationSms(user, event);
         } else {
             notificationService.sendBookingConfirmationEmail(user, event);
         }
+
         return booking;
     }
 

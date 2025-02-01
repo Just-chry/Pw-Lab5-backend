@@ -23,8 +23,9 @@ public class Event {
     private int maxParticipants;
     @Column(name = "participants_count")
     private int participantsCount = 0;
+    private String address;
 
-    public Event(String id, String title, String description, LocalDate date, String partnerId, String sponsorId, int maxParticipants, int participantsCount) {
+    public Event(String id, String title, String description, LocalDate date, String partnerId, String sponsorId, int maxParticipants, int participantsCount, String address) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -33,6 +34,7 @@ public class Event {
         this.sponsorId = sponsorId;
         this.maxParticipants = maxParticipants;
         this.participantsCount = participantsCount;
+        this.address = address;
     }
 
     public Event() {}
@@ -101,6 +103,14 @@ public class Event {
         this.participantsCount = participantsCount;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     @Override
     public String toString() {
         return "Event{" +
@@ -112,6 +122,7 @@ public class Event {
                 ", sponsorId='" + sponsorId + '\'' +
                 ", maxParticipants=" + maxParticipants +
                 ", participantsCount=" + participantsCount +
+                ", address='" + address + '\'' +
                 '}';
     }
 }

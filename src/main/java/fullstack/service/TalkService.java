@@ -77,8 +77,8 @@ public class TalkService implements PanacheRepository<Talk> {
 
     @Transactional
     public Talk save(String sessionId, Talk talk, List<String> tagNames) throws SessionException, UserNotFoundException {
-        if (userService.isAdmin(sessionId)) {
-            throw new AdminAccessException(ADMIN_REQUIRED);
+        if (talk == null) {
+            throw new IllegalArgumentException("Talk cannot be null");
         }
         User user = userService.getUserBySessionId(sessionId);
         String userId = user.getId();
