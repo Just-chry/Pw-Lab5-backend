@@ -15,19 +15,22 @@ public class Event {
     private String title;
     private String description;
     private LocalDate date;
-    @Column(name = "partner_id")
+    @Column(name = "host_id")
     private String partnerId;
+    @Column(name = "sponsor_id")
+    private String sponsorId;
     @Column(name = "max_participants")
     private int maxParticipants;
     @Column(name = "participants_count")
     private int participantsCount = 0;
 
-    public Event(String id, String title, String description, LocalDate date, String partnerId, int maxParticipants, int participantsCount) {
+    public Event(String id, String title, String description, LocalDate date, String partnerId, String sponsorId, int maxParticipants, int participantsCount) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.date = date;
         this.partnerId = partnerId;
+        this.sponsorId = sponsorId;
         this.maxParticipants = maxParticipants;
         this.participantsCount = participantsCount;
     }
@@ -70,6 +73,18 @@ public class Event {
         return partnerId;
     }
 
+    public void setPartnerId(String partnerId) {
+        this.partnerId = partnerId;
+    }
+
+    public String getSponsorId() {
+        return sponsorId;
+    }
+
+    public void setSponsorId(String sponsorId) {
+        this.sponsorId = sponsorId;
+    }
+
     public int getMaxParticipants() {
         return maxParticipants;
     }
@@ -86,9 +101,6 @@ public class Event {
         this.participantsCount = participantsCount;
     }
 
-    public void setPartnerId(String partnerId) {
-        this.partnerId = partnerId;
-    }
     @Override
     public String toString() {
         return "Event{" +
@@ -97,6 +109,7 @@ public class Event {
                 ", description='" + description + '\'' +
                 ", date=" + date +
                 ", partnerId='" + partnerId + '\'' +
+                ", sponsorId='" + sponsorId + '\'' +
                 ", maxParticipants=" + maxParticipants +
                 ", participantsCount=" + participantsCount +
                 '}';
