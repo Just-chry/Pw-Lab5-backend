@@ -39,7 +39,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public User register(CreateUserRequest request) throws UserCreationException {
+    public User register(CreateUserRequest request) throws ContactException, UserCreationException {
         Validation.validateUserRequest(request);
         checkIfEmailOrPhoneExists(request);
 
@@ -76,14 +76,14 @@ public class AuthenticationService {
         return hashCalculator.calculateHash(password);
     }
 
-    private void checkIfEmailOrPhoneExists(CreateUserRequest request) throws UserCreationException {
+    private void checkIfEmailOrPhoneExists(CreateUserRequest request) throws ContactException {
         String email = request.getEmail();
         String phone = request.getPhone();
 
         if (email != null && !email.trim().isEmpty()) {
             boolean emailInUse = userRepository.findByEmail(email).isPresent();
             if (emailInUse) {
-                throw new UserCreationException(Messages.EMAIL_ALREADY_USED);
+                throw new ContactException(Messages.EMAIL_ALREADY_USED);
             }
         }
 
@@ -91,21 +91,21 @@ public class AuthenticationService {
             phone = ContactValidator.formatPhone(phone);
             boolean phoneInUse = userRepository.findByPhone(phone).isPresent();
             if (phoneInUse) {
-                throw new UserCreationException(Messages.PHONE_ALREADY_USED);
+                throw new ContactException(Messages.PHONE_ALREADY_USED);
             }
         }
     }
 
     @Transactional
-    public void verifyEmail(String token, String email) throws UserCreationException {
+    public void verifyEmail(String token, String email) throws TokenException, UserCreationException {
         Optional<User> userOpt = userRepository.findByEmail(email);
         if (userOpt.isEmpty()) {
-            throw new UserCreationException("Utente non trovato.");
+            throw new UserCreationException(USER_NOT_FOUND);
         }
 
         User user = userOpt.get();
         if (user.getTokenEmail() == null || !user.getTokenEmail().equals(token)) {
-            throw new UserCreationException("Token di verifica non valido.");
+            throw new TokenException(INVALID_TOKEN);
         }
 
         user.setEmailVerified(true);
@@ -114,12 +114,12 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public void verifyPhone(String token, String phone) throws UserCreationException {
+    public void verifyPhone(String token, String phone) throws TokenException, UserCreationException {
         Optional<User> optionalUser = userRepository.findByPhone(phone);
         User user = optionalUser.orElseThrow(() -> new UserCreationException(USER_NOT_FOUND));
 
         if (user.getTokenPhone() == null || !user.getTokenPhone().equals(token)) {
-            throw new UserCreationException(INVALID_TOKEN);
+            throw new TokenException(INVALID_TOKEN);
         }
 
         user.setPhoneVerified(true);
@@ -135,12 +135,12 @@ public class AuthenticationService {
         User user = optionalUser.orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         if (!user.getEmailVerified() && !user.getPhoneVerified()) {
-            throw new UnAuthorizedAccessException("Contatto non verificato. Verifica il tuo indirizzo email o il tuo numero di telefono.");
+            throw new ContactException(UNVERIFIED_CONTACT);
         }
 
         String hashedProvidedPassword = hashPassword(request.getPassword());
         if (!verifyPassword(user.getPassword(), hashedProvidedPassword)) {
-            throw new WrongPasswordException("Password errata.");
+            throw new WrongPasswordException(WRONG_PASSWORD);
         }
 
         Optional<UserSession> existingSession = userSessionRepository.findByUserId(user.getId());
@@ -149,7 +149,7 @@ public class AuthenticationService {
             if (session.getExpiresAt().isBefore(LocalDateTime.now())) {
                 userSessionRepository.delete(session);
             } else {
-                throw new SessionAlreadyExistsException("Utente ha già una sessione attiva.");
+                throw new SessionAlreadyExistsException(SESSION_ALREADY_EXISTS);
             }
         }
 
@@ -157,10 +157,10 @@ public class AuthenticationService {
 
         if (Boolean.TRUE.equals(rememberMe)) {
             String sessionId = createSessionLong(user);
-            return new LoginResponse(user.getName(), sessionId, "Login avvenuto con successo");
+            return new LoginResponse(user.getName(), sessionId, LOGIN_SUCCESS);
         } else {
             String sessionId = createSession(user);
-            return new LoginResponse(user.getName(), sessionId, "Login avvenuto con successo");
+            return new LoginResponse(user.getName(), sessionId, LOGIN_SUCCESS);
         }
     }
 
@@ -187,7 +187,7 @@ public class AuthenticationService {
     private void checkIfSessionExists(String userId) throws SessionAlreadyExistsException {
         Optional<UserSession> existingSession = userSessionRepository.findByUserId(userId);
         if (existingSession.isPresent()) {
-            throw new SessionAlreadyExistsException("Utente ha già una sessione attiva.");
+            throw new SessionAlreadyExistsException(SESSION_ALREADY_EXISTS);
         }
     }
 

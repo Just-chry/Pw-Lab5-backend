@@ -25,9 +25,13 @@ public class AuthenticationResource {
 
     @POST
     @Path("/register")
-    public Response register(CreateUserRequest request) throws UserCreationException {
-        authenticationService.register(request);
-        return Response.ok("Registrazione completata con successo, controlla il tuo contatto per confermare.").build();
+    public Response register(CreateUserRequest request) {
+        try{
+            authenticationService.register(request);
+            return Response.ok("Registrazione completata con successo, controlla il tuo contatto per confermare.").build();
+        } catch (UserCreationException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
     }
 
     @POST
@@ -56,7 +60,7 @@ public class AuthenticationResource {
         try {
             authenticationService.verifyEmail(token, email);
             return Response.ok("Email verificata con successo.").build();
-        } catch (UserCreationException e) {
+        } catch (TokenException | UserCreationException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
@@ -67,7 +71,7 @@ public class AuthenticationResource {
         try {
             authenticationService.verifyPhone(token, phone);
             return Response.ok("Numero di telefono verificato con successo.").build();
-        } catch (UserCreationException e) {
+        } catch (TokenException | UserCreationException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }

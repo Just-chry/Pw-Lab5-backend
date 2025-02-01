@@ -12,11 +12,14 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.NoContentException;
+import org.hibernate.SessionException;
 
 import java.util.List;
 import java.util.UUID;
 
 import static fullstack.util.Messages.ADMIN_REQUIRED;
+import static fullstack.util.Messages.TALK_NOT_FOUND;
 
 @ApplicationScoped
 public class TalkService implements PanacheRepository<Talk> {
@@ -32,29 +35,51 @@ public class TalkService implements PanacheRepository<Talk> {
     @Inject
     TagService tagService;
 
-    public List<Talk> getAllTalks() {
-        return listAll();
+    public List<Talk> getAllTalks() throws NoContentException {
+        List<Talk> talks = listAll();
+        if (talks.isEmpty()) {
+            throw new NoContentException(TALK_NOT_FOUND);
+        }
+        return talks;
     }
 
-    public Talk findById(String id) {
-        return talkRepository.findById(id);
+    public Talk findById(String id) throws UserNotFoundException {
+        Talk talk = talkRepository.findById(id);
+        if (talk == null) {
+            throw new UserNotFoundException(TALK_NOT_FOUND);
+        }
+        return talk;
     }
 
-    public List<Talk> getTalksByEventId(String eventId) {
-        return talkRepository.getTalksByEventId(eventId);
+    public List<Talk> getTalksByEventId(String eventId) throws NoContentException {
+        List<Talk> talks = talkRepository.getTalksByEventId(eventId);
+        if (talks.isEmpty()) {
+            throw new NoContentException(TALK_NOT_FOUND);
+        }
+        return talks;
     }
 
-    public List<Talk> getTalksBySpeakerId(String speakerId) {
-        return talkRepository.getTalksBySpeakerId(speakerId);
+    public List<Talk> getTalksBySpeakerId(String speakerId) throws NoContentException {
+        List<Talk> talks = talkRepository.getTalksBySpeakerId(speakerId);
+        if (talks.isEmpty()) {
+            throw new NoContentException(TALK_NOT_FOUND);
+        }
+        return talks;
     }
 
-    public List<Talk> getTagsByTalkId(String tagId) {
-        return talkRepository.getTagsByTalkId(tagId);
+    public List<Talk> getTagsByTalkId(String tagId) throws NoContentException {
+        List<Talk> tags = talkRepository.getTagsByTalkId(tagId);
+        if (tags.isEmpty()) {
+            throw new NoContentException(TALK_NOT_FOUND);
+        }
+        return tags;
     }
-
 
     @Transactional
-    public Talk save(String sessionId, Talk talk, List<String> tagNames) throws UserNotFoundException {
+    public Talk save(String sessionId, Talk talk, List<String> tagNames) throws SessionException, UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException(ADMIN_REQUIRED);
+        }
         User user = userService.getUserBySessionId(sessionId);
         String userId = user.getId();
         Speaker speaker = speakerService.findOrCreateSpeaker(userId);
@@ -67,16 +92,16 @@ public class TalkService implements PanacheRepository<Talk> {
             if (tag == null) {
                 tag = new Tag();
                 tag.setName(tagName);
-                tagService.save(tag);
+                tagService.save(sessionId, tag);
             }
-            tagRepository.associateTagWithTalk(talk.getId(), tag.getId().toString());
+            tagRepository.associateTagWithTalk(talk.getId(), tag.getId());
         }
 
         return talk;
     }
 
     @Transactional
-    public void deleteById(String sessionId,String id) throws UserNotFoundException {
+    public void deleteById(String sessionId,String id) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -84,10 +109,13 @@ public class TalkService implements PanacheRepository<Talk> {
     }
 
     @Transactional
-    public int updateTalk(String sessionId, String id, Talk talk) throws UserNotFoundException {
+    public void updateTalk(String sessionId, String id, Talk talk) throws NoContentException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
-        return update(id, talk);
+        int updated = update(id, talk);
+        if (updated == 0) {
+            throw new NoContentException(TALK_NOT_FOUND);
+        }
     }
 }

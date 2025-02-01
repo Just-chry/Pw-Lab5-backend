@@ -8,52 +8,68 @@ import fullstack.persistence.model.Event;
 import fullstack.persistence.model.Partner;
 import fullstack.service.EventService;
 import fullstack.service.PartnerService;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
 @Path("/partners")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class PartnerResource {
     private final PartnerService partnerService;
     private final EventService eventService;
-    private final UserService userService;
 
-    public PartnerResource(PartnerService partnerService, EventService eventService, UserService userService) {
+    public PartnerResource(PartnerService partnerService, EventService eventService) {
         this.partnerService = partnerService;
         this.eventService = eventService;
-        this.userService = userService;
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Partner> getAllPartners() {
-        return partnerService.getAllPartners();
+    public Response getAllPartners() {
+        try {
+            List<Partner> partners = partnerService.getAllPartners();
+            return Response.ok(partners).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Partner getPartnerById(@PathParam("id") String id) {
-        return partnerService.findById(id);
+    public Response getPartnerById(@PathParam("id") String id) {
+        try {
+            Partner partner = partnerService.findById(id);
+            return Response.ok(partner).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}/events")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Event> getEventsByPartnerId(@PathParam("id") String partnerId) {
-        return eventService.getEventsByPartnerId(partnerId);
+    public Response getEventsByPartnerId(@PathParam("id") String partnerId) {
+        try {
+            List<Event> events = eventService.getEventsByPartnerId(partnerId);
+            return Response.ok(events).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/value/{value}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Partner> getPartnerByName(@PathParam("value") String value) {
-        return partnerService.findByValue(value);
+    public Response getPartnerByName(@PathParam("value") String value) {
+        try {
+            List<Partner> partners = partnerService.findByValue(value);
+            return Response.ok(partners).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response createPartner(@CookieParam("sessionId") String sessionId, Partner partner) {
         try {
             Partner savedPartner = partnerService.save(sessionId, partner);
@@ -65,28 +81,22 @@ public class PartnerResource {
 
     @DELETE
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response deletePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
         try {
             partnerService.deleteById(sessionId, id);
             return Response.noContent().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response updatePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) {
         try {
             int updated = partnerService.update(sessionId, id, partner);
-            if (updated == 0) {
-                return Response.status(Response.Status.NOT_FOUND).entity("Partner not found").build();
-            }
             return Response.ok(updated).build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException | NoContentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }

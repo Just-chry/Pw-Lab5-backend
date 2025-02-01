@@ -6,14 +6,14 @@ import fullstack.persistence.model.Role;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.*;
-import fullstack.service.exception.AdminAccessException;
-import fullstack.service.exception.UserCreationException;
-import fullstack.service.exception.UserNotFoundException;
+import fullstack.service.exception.*;
 import fullstack.util.Messages;
 import fullstack.util.Validation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.hibernate.SessionException;
+
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
@@ -40,7 +40,7 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public List<AdminResponse> listUsers(String sessionId) throws AdminAccessException, UserNotFoundException {
+    public List<AdminResponse> listUsers(String sessionId) throws AdminAccessException, SessionException {
         if (isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -50,13 +50,13 @@ public class UserService {
     }
 
     @Transactional
-    public void promoteUserToAdmin(String userId, String sessionId) throws UserNotFoundException {
+    public void promoteUserToAdmin(String userId, String sessionId) throws SessionException {
         if (isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
         Optional<User> userOpt = userRepository.findUserById(userId);
         if (userOpt.isEmpty()) {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new SessionException(USER_NOT_FOUND);
         }
 
         User user = userOpt.get();
@@ -65,10 +65,10 @@ public class UserService {
     }
 
 
-    public boolean isAdmin(String sessionId) throws UserNotFoundException {
+    public boolean isAdmin(String sessionId) throws SessionException {
         Optional<UserSession> session = userSessionRepository.findBySessionId(sessionId);
         if (session.isEmpty()) {
-            throw new UserNotFoundException(SESSION_NOT_FOUND);
+            throw new SessionException(SESSION_NOT_FOUND);
         }
         User user = session.get().getUser();
         return user.getRole() != Role.ADMIN;
@@ -158,11 +158,11 @@ public class UserService {
         String hashedOldPassword = hashCalculator.calculateHash(newPasswordRequest.getOldPassword());
 
         if (!user.getPassword().equals(hashedOldPassword)) {
-            throw new UserCreationException("La vecchia password non corrisponde.");
+            throw new PasswordException(OLD_PASSWORD_NOT_MATCH);
         }
 
         if (!newPasswordRequest.getNewPassword().equals(newPasswordRequest.getRepeatNewPassword())) {
-            throw new UserCreationException("La nuova password e la ripetizione della nuova password non corrispondono.");
+            throw new PasswordException(NEW_PASSWORD_NOT_MATCH);
         }
 
         user.setPassword(hashCalculator.calculateHash(newPasswordRequest.getNewPassword()));
@@ -172,7 +172,7 @@ public class UserService {
     @Transactional
     public void forgottenPassword(String emailOrPhone) throws UserNotFoundException {
         Optional<User> optionalUser = userRepository.findByEmailOrPhone(emailOrPhone);
-        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         String verificationCode = generateOtp();
         user.setTokenPassword(verificationCode);
@@ -188,18 +188,18 @@ public class UserService {
     @Transactional
     public void updatePasswordWithCode(String emailOrPhone, String verificationCode, String newPassword, String repeatNewPassword) throws UserNotFoundException, UserCreationException {
         Optional<User> optionalUser = userRepository.findByEmailOrPhone(emailOrPhone);
-        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
 
         if (!user.getTokenPassword().equals(verificationCode)) {
-            throw new UserCreationException("Codice di verifica non valido.");
+            throw new TokenException(INVALID_TOKEN);
         }
 
         if (!newPassword.equals(repeatNewPassword)) {
-            throw new UserCreationException("Le due password non corrispondono.");
+            throw new PasswordException(NEW_PASSWORD_NOT_MATCH);
         }
 
         user.setPassword(hashCalculator.calculateHash(newPassword));
-        user.setTokenPassword(null); // Invalidate the token after use
+        user.setTokenPassword(null);
         userRepository.persist(user);
     }
 }

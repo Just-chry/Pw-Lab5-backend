@@ -10,11 +10,15 @@ import fullstack.persistence.model.Talk;
 import fullstack.service.EventService;
 import fullstack.service.SpeakerService;
 import fullstack.service.TalkService;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
 @Path("/events")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class EventResource {
 
     private final EventService eventService;
@@ -28,75 +32,87 @@ public class EventResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Event> getAllEvents() {
-        return eventService.getAllEvents();
+    public Response getAllEvents() {
+        try {
+            List<Event> events = eventService.getAllEvents();
+            return Response.ok(events).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Event getEventById(@PathParam("id") String id) {
-        return eventService.findById(id);
+    public Response getEventById(@PathParam("id") String id) {
+        try {
+            Event event = eventService.findById(id);
+            return Response.ok(event).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}/talks")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Talk> getTalksByEventId(@PathParam("id") String eventId) {
-        return talkService.getTalksByEventId(eventId);
+    public Response getTalksByEventId(@PathParam("id") String eventId) {
+        try {
+            List<Talk> talks = talkService.getTalksByEventId(eventId);
+            return Response.ok(talks).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}/speakers")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Speaker> getSpeakersByEventId(@PathParam("id") String eventId) {
-        return speakerService.getSpeakersByEventId(eventId);
+    public Response getSpeakersByEventId(@PathParam("id") String eventId) {
+        try {
+            List<Speaker> speakers = speakerService.getSpeakersByEventId(eventId);
+            return Response.ok(speakers).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("date/{date}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Event> getEventByDate(@PathParam("date") String date) {
-        return eventService.findByDate(date);
+    public Response getEventByDate(@PathParam("date") String date) {
+        try {
+            List<Event> events = eventService.findByDate(date);
+            return Response.ok(events).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response createEvent(@CookieParam("sessionId") String sessionId, EventRequest eventRequest) {
         try {
             Event savedEvent = eventService.save(sessionId, eventRequest.getEvent(), eventRequest.getTalks());
             return Response.ok(savedEvent).build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 
     @DELETE
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
     public Response deleteEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
         try {
-        eventService.deleteById(sessionId, id);
-        return Response.noContent().build();
-        } catch (UserNotFoundException e) {
+            eventService.deleteById(sessionId, id);
+            return Response.noContent().build();
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Event event)  {
+    public Response updateEvent(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Event event) {
         try {
-        int updated = eventService.update(sessionId, id, event);
-        if (updated == 0) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Event not found").build();
-        }
-        return Response.ok().build();
-        } catch (UserNotFoundException e) {
+            eventService.update(sessionId, id, event);
+            return Response.ok().build();
+        } catch (SessionException | NoContentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
