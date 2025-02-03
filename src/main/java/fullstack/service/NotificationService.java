@@ -14,14 +14,10 @@ import static fullstack.util.Messages.*;
 @ApplicationScoped
 public class NotificationService {
 
-    private final Mailer mailer;
-    private final SmsService smsService;
-
     @Inject
-    public NotificationService(Mailer mailer, SmsService smsService) {
-        this.mailer = mailer;
-        this.smsService = smsService;
-    }
+    Mailer mailer;
+    @Inject
+    SmsService smsService;
 
     public void sendVerificationEmail(User user, String verificationLink) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {

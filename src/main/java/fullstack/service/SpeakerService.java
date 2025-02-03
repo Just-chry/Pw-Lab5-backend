@@ -22,16 +22,12 @@ import static fullstack.util.Messages.SPEAKER_NOT_FOUND;
 @ApplicationScoped
 public class SpeakerService {
 
-    private final SpeakerRepository speakerRepository;
-    private final UserService userService;
-    private final UserRepository userRepository;
-
     @Inject
-    public SpeakerService(SpeakerRepository speakerRepository, UserService userService, UserRepository userRepository) {
-        this.speakerRepository = speakerRepository;
-        this.userService = userService;
-        this.userRepository = userRepository;
-    }
+    SpeakerRepository speakerRepository;
+    @Inject
+    UserService userService;
+    @Inject
+    UserRepository userRepository;
 
     public List<Speaker> getAllSpeakers() throws NoContentException {
         List<Speaker> speakers = speakerRepository.listAll();

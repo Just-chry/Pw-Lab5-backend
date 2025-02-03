@@ -1,6 +1,7 @@
 package fullstack.rest.resources;
 
 import fullstack.service.exception.UserNotFoundException;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import fullstack.persistence.model.Tag;
@@ -17,13 +18,11 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class TagResource {
-    private final TagService tagService;
-    private final TalkService talkService;
 
-    public TagResource(TagService tagService, TalkService talkService) {
-        this.tagService = tagService;
-        this.talkService = talkService;
-    }
+    @Inject
+    TagService tagService;
+    @Inject
+    TalkService talkService;
 
     @GET
     public Response getAllTags() {

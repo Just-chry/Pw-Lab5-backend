@@ -1,6 +1,7 @@
 package fullstack.rest.resources;
 
 import fullstack.rest.model.EventRequest;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import fullstack.persistence.model.Event;
@@ -20,15 +21,12 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 public class EventResource {
 
-    private final EventService eventService;
-    private final TalkService talkService;
-    private final SpeakerService speakerService;
-
-    public EventResource(EventService eventService, TalkService talkService, SpeakerService speakerService) {
-        this.eventService = eventService;
-        this.talkService = talkService;
-        this.speakerService = speakerService;
-    }
+    @Inject
+    EventService eventService;
+    @Inject
+    TalkService talkService;
+    @Inject
+    SpeakerService speakerService;
 
     @GET
     public Response getAllEvents() {

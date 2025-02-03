@@ -16,12 +16,8 @@ import jakarta.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthenticationResource {
 
-    private final AuthenticationService authenticationService;
-
     @Inject
-    public AuthenticationResource(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
+    AuthenticationService authenticationService;
 
     @POST
     @Path("/register")
