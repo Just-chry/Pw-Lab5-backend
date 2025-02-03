@@ -126,7 +126,7 @@ public class UserResource {
 
     @POST
     @Path("/forgottenPassword")
-    public Response forgottenPassword(ForgottenPasswordRequest request) {
+    public Response sendVerificationCode(ForgottenPasswordRequest request) {
         try {
             userService.forgottenPassword(request.getEmailOrPhone());
             return Response.ok("Codice di verifica inviato con successo.").build();
@@ -136,15 +136,24 @@ public class UserResource {
     }
 
     @POST
-    @Path("/updatePasswordWithCode")
-    public Response updatePasswordWithCode(UpdatePasswordWithCodeRequest request) {
+    @Path("/verifyCode")
+    public Response verifyCode(@QueryParam("emailOrPhone") String emailOrPhone, VerifyCodeRequest request) {
         try {
-            userService.updatePasswordWithCode(request.getEmailOrPhone(), request.getVerificationCode(), request.getNewPassword(), request.getRepeatNewPassword());
-            return Response.ok("Password aggiornata con successo.").build();
-        } catch ( UserCreationException | PasswordException | TokenException e) {
+            userService.verifyCode(emailOrPhone, request.getVerificationCode());
+            return Response.ok("Codice verificato con successo.").build();
+        } catch (TokenException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
-        } catch (UserNotFoundException e) {
-            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
+    }
+
+    @POST
+    @Path("/updatePassword")
+    public Response updatePassword(@QueryParam("emailOrPhone") String emailOrPhone, UpdatePasswordRequest request) {
+        try {
+            userService.updatePasswordWithCode(emailOrPhone, request.getNewPassword(), request.getRepeatNewPassword());
+            return Response.ok("Password aggiornata con successo.").build();
+        } catch (UserNotFoundException | PasswordException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
 }

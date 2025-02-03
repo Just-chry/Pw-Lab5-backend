@@ -5,6 +5,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Column;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "event")
@@ -14,7 +15,7 @@ public class Event {
     private String id;
     private String title;
     private String description;
-    private LocalDate date;
+    private LocalDateTime date;
     @Column(name = "host_id")
     private String partnerId;
     @Column(name = "sponsor_id")
@@ -25,7 +26,7 @@ public class Event {
     private int participantsCount = 0;
     private String address;
 
-    public Event(String id, String title, String description, LocalDate date, String partnerId, String sponsorId, int maxParticipants, int participantsCount, String address) {
+    public Event(String id, String title, String description, LocalDateTime date, String partnerId, String sponsorId, int maxParticipants, int participantsCount, String address) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -63,11 +64,11 @@ public class Event {
         this.description = description;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

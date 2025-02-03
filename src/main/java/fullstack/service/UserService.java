@@ -186,16 +186,23 @@ public class UserService {
     }
 
     @Transactional
-    public void updatePasswordWithCode(String emailOrPhone, String verificationCode, String newPassword, String repeatNewPassword) throws UserNotFoundException, UserCreationException {
+    public void verifyCode(String emailOrPhone, String verificationCode) throws TokenException {
         Optional<User> optionalUser = userRepository.findByEmailOrPhone(emailOrPhone);
-        User user = optionalUser.orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+        User user = optionalUser.orElseThrow(() -> new TokenException("Utente non trovato."));
 
         if (!user.getTokenPassword().equals(verificationCode)) {
-            throw new TokenException(INVALID_TOKEN);
+            throw new TokenException("Codice di verifica non valido.");
         }
+    }
+
+    @Transactional
+    public void updatePasswordWithCode(String emailOrPhone, String newPassword, String repeatNewPassword)
+            throws UserNotFoundException, PasswordException {
+        Optional<User> optionalUser = userRepository.findByEmailOrPhone(emailOrPhone);
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
 
         if (!newPassword.equals(repeatNewPassword)) {
-            throw new PasswordException(NEW_PASSWORD_NOT_MATCH);
+            throw new PasswordException("Le password non coincidono.");
         }
 
         user.setPassword(hashCalculator.calculateHash(newPassword));
