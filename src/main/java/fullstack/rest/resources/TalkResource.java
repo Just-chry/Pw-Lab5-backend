@@ -1,7 +1,6 @@
 package fullstack.rest.resources;
 
 import fullstack.rest.model.CreateTalkRequest;
-import fullstack.service.exception.SessionAlreadyExistsException;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;

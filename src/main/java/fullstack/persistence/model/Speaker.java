@@ -16,13 +16,17 @@ public class Speaker {
     private String name;
     private String surname;
     private String biography;
+    private String image;
+    private String linkedin;
 
-    public Speaker(String id, String userId, String name, String surname, String biography) {
+    public Speaker(String id, String userId, String name, String surname, String biography, String image, String linkedin) {
         this.id = id;
         this.userId = userId;
         this.name = name;
         this.surname = surname;
         this.biography = biography;
+        this.image = image;
+        this.linkedin = linkedin;
     }
 
     public Speaker() {
@@ -67,5 +71,21 @@ public class Speaker {
 
     public void setBiography(String biography) {
         this.biography = biography;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
+
+    public String getLinkedin() {
+        return linkedin;
+    }
+
+    public void setLinkedin(String linkedin) {
+        this.linkedin = linkedin;
     }
 }
