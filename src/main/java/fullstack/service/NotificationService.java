@@ -2,6 +2,7 @@ package fullstack.service;
 
 import fullstack.persistence.model.Event;
 import fullstack.persistence.model.User;
+import fullstack.service.exception.ContactException;
 import fullstack.service.exception.SmsSendingException;
 import io.quarkus.mailer.Mail;
 import io.quarkus.mailer.Mailer;
@@ -13,14 +14,10 @@ import static fullstack.util.Messages.*;
 @ApplicationScoped
 public class NotificationService {
 
-    private final Mailer mailer;
-    private final SmsService smsService;
-
     @Inject
-    public NotificationService(Mailer mailer, SmsService smsService) {
-        this.mailer = mailer;
-        this.smsService = smsService;
-    }
+    Mailer mailer;
+    @Inject
+    SmsService smsService;
 
     public void sendVerificationEmail(User user, String verificationLink) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
@@ -41,7 +38,7 @@ public class NotificationService {
         try {
             smsService.sendSms(user.getPhone(), "Il tuo codice OTP è: " + otp);
         } catch (SmsSendingException e) {
-            throw new RuntimeException(SMS_ERROR + e.getMessage(), e);
+            throw new SmsSendingException(SMS_ERROR + e.getMessage());
         }
     }
 
@@ -58,12 +55,12 @@ public class NotificationService {
 
     public void sendPasswordResetSms(User user) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException(INVALID_PHONE);
+            throw new ContactException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "Il tuo codice per reimpostare la password è: " + user.getTokenPassword());
         } catch (SmsSendingException e) {
-            throw new RuntimeException(SMS_ERROR + e.getMessage(), e);
+            throw new SmsSendingException(SMS_ERROR + e.getMessage());
         }
     }
 
@@ -86,7 +83,7 @@ public class NotificationService {
 
     public void sendBookingConfirmationSms(User user, Event event) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException(INVALID_PHONE);
+            throw new ContactException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "La tua prenotazione per l'evento \"" + event.getTitle() + "\" è stata confermata.");
@@ -97,7 +94,7 @@ public class NotificationService {
 
     public void sendBookingCancellationEmail(User user, Event event) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException(INVALID_EMAIL);
+            throw new ContactException(INVALID_EMAIL);
         }
         String emailContent = "<h1>Cancellazione Prenotazione</h1>" +
                 "<p>Ciao " + user.getName() + " " + user.getSurname() + ",</p>" +
@@ -112,12 +109,12 @@ public class NotificationService {
 
     public void sendBookingCancellationSms(User user, Event event) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new IllegalArgumentException(INVALID_PHONE);
+            throw new ContactException(INVALID_PHONE);
         }
         try {
             smsService.sendSms(user.getPhone(), "La tua prenotazione per l'evento \"" + event.getTitle() + "\" è stata cancellata.");
         } catch (SmsSendingException e) {
-            throw new RuntimeException(SMS_ERROR + e.getMessage(), e);
+            throw new SmsSendingException(SMS_ERROR + e.getMessage());
         }
     }
 }

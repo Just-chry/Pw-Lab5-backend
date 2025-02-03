@@ -16,12 +16,8 @@ import jakarta.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthenticationResource {
 
-    private final AuthenticationService authenticationService;
-
     @Inject
-    public AuthenticationResource(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
+    AuthenticationService authenticationService;
 
     @POST
     @Path("/register")
@@ -60,7 +56,7 @@ public class AuthenticationResource {
         try {
             authenticationService.verifyEmail(token, email);
             return Response.ok("Email verificata con successo.").build();
-        } catch (UserCreationException e) {
+        } catch (TokenException | UserCreationException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
@@ -71,7 +67,7 @@ public class AuthenticationResource {
         try {
             authenticationService.verifyPhone(token, phone);
             return Response.ok("Numero di telefono verificato con successo.").build();
-        } catch (UserCreationException e) {
+        } catch (TokenException | UserCreationException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }

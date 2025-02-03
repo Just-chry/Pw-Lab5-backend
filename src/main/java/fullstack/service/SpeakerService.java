@@ -9,45 +9,60 @@ import fullstack.service.exception.UserNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import jakarta.ws.rs.core.NoContentException;
+import org.hibernate.SessionException;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static fullstack.util.Messages.ADMIN_REQUIRED;
+import static fullstack.util.Messages.SPEAKER_NOT_FOUND;
 
 @ApplicationScoped
 public class SpeakerService {
 
-    private final SpeakerRepository speakerRepository;
-    private final UserService userService;
-    private final UserRepository userRepository;
-
     @Inject
-    public SpeakerService(SpeakerRepository speakerRepository, UserService userService, UserRepository userRepository) {
-        this.speakerRepository = speakerRepository;
-        this.userService = userService;
-        this.userRepository = userRepository;
+    SpeakerRepository speakerRepository;
+    @Inject
+    UserService userService;
+    @Inject
+    UserRepository userRepository;
+
+    public List<Speaker> getAllSpeakers() throws NoContentException {
+        List<Speaker> speakers = speakerRepository.listAll();
+        if (speakers.isEmpty()) {
+            throw new NoContentException(SPEAKER_NOT_FOUND);
+        }
+        return speakers;
     }
 
-    public List<Speaker> getAllSpeakers() {
-        return speakerRepository.listAll();
+    public Speaker findById(String id) throws UserNotFoundException {
+        Speaker speaker = speakerRepository.findById(id);
+        if (speaker == null) {
+            throw new UserNotFoundException(SPEAKER_NOT_FOUND);
+        }
+        return speaker;
     }
 
-    public Speaker findById(String id) {
-        return speakerRepository.findById(id);
+    public List<Speaker> getSpeakerByTalkId(String talkId) throws NoContentException {
+        List<Speaker> speakers = speakerRepository.getSpeakerByTalkId(talkId);
+        if (speakers.isEmpty()) {
+            throw new NoContentException(SPEAKER_NOT_FOUND);
+        }
+        return speakers;
     }
 
-    public List<Speaker> getSpeakerByTalkId(String talkId) {
-        return speakerRepository.getSpeakerByTalkId(talkId);
-    }
-
-    public List<Speaker> getSpeakersByEventId(String eventId) {
-        return speakerRepository.getSpeakersByEventId(eventId);
+    public List<Speaker> getSpeakersByEventId(String eventId) throws NoContentException {
+        List<Speaker> speakers = speakerRepository.getSpeakersByEventId(eventId);
+        if (speakers.isEmpty()) {
+            throw new NoContentException(SPEAKER_NOT_FOUND);
+        }
+        return speakers;
     }
 
     @Transactional
-    public Speaker save(String sessionId, Speaker speaker) throws UserNotFoundException {
+    public Speaker save(String sessionId, Speaker speaker) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -57,7 +72,7 @@ public class SpeakerService {
     }
 
     @Transactional
-    public void deleteById(String sessionId, String id) throws UserNotFoundException {
+    public void deleteById(String sessionId, String id) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -65,11 +80,14 @@ public class SpeakerService {
     }
 
     @Transactional
-    public int update(String sessionId, String id, Speaker speaker) throws UserNotFoundException {
+    public void update(String sessionId, String id, Speaker speaker) throws NoContentException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
-        return speakerRepository.update(id, speaker);
+        int updated = speakerRepository.update(id, speaker);
+        if (updated == 0) {
+            throw new NoContentException(SPEAKER_NOT_FOUND);
+        }
     }
 
     @Transactional

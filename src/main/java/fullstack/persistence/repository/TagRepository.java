@@ -41,4 +41,12 @@ public class TagRepository implements PanacheRepository<Tag> {
                 .setParameter("tagId", tagId)
                 .executeUpdate();
     }
+
+    public void associateTagWithEvent(String eventId, String tagId) {
+        getEntityManager().createNativeQuery(
+                        "INSERT INTO event_tag (event_id, tag_id) VALUES (:eventId, :tagId)")
+                .setParameter("eventId", eventId)
+                .setParameter("tagId", tagId)
+                .executeUpdate();
+    }
 }
