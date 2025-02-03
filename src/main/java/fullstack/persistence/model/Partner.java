@@ -15,7 +15,7 @@ public class Partner {
     private String email;
     private String image;
     @Enumerated(EnumType.STRING)
-    private Value value = Value.bronze;
+    private Value value = Value.BRONZE;
 
     public Partner(String id, String name, String description, String place, String website, String email, String image, Value value) {
         this.id = id;

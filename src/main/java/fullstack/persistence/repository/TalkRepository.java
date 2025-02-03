@@ -41,6 +41,10 @@ public class TalkRepository implements PanacheRepository<Talk> {
         return find("id", id).firstResult();
     }
 
+    public Talk findByTitle(String title) {
+        return find("title", title).firstResult();
+    }
+
     public int update(String id, Talk talk) {
         return update("title = ?1, description = ?2 where id = ?3", talk.getTitle(), talk.getDescription(), id);
     }
@@ -57,4 +61,13 @@ public class TalkRepository implements PanacheRepository<Talk> {
                 .setParameter("speakerId", speakerId)
                 .executeUpdate();
     }
+
+    public void associateTalkWithEvent(String eventId, String talkId) {
+        getEntityManager().createNativeQuery(
+                        "INSERT INTO event_talk (event_id, talk_id) VALUES (:eventId, :talkId)")
+                .setParameter("eventId", eventId)
+                .setParameter("talkId", talkId)
+                .executeUpdate();
+    }
 }
+

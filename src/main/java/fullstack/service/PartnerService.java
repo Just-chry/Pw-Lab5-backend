@@ -7,10 +7,14 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Partner;
+import jakarta.ws.rs.core.NoContentException;
+import org.hibernate.SessionException;
+
 import java.util.List;
 import java.util.UUID;
 
 import static fullstack.util.Messages.ADMIN_REQUIRED;
+import static fullstack.util.Messages.PARTNER_NOT_FOUND;
 
 @ApplicationScoped
 public class PartnerService {
@@ -23,12 +27,20 @@ public class PartnerService {
         this.userService = userService;
     }
 
-    public List<Partner> getAllPartners() {
-        return partnerRepository.listAll();
+    public List<Partner> getAllPartners() throws NoContentException {
+        List<Partner> partners = partnerRepository.listAll();
+        if (partners.isEmpty()) {
+            throw new NoContentException(PARTNER_NOT_FOUND);
+        }
+        return partners;
     }
 
-    public Partner findById(String id) {
-        return partnerRepository.findById(id);
+    public Partner findById(String id) throws NoContentException {
+        Partner partner = partnerRepository.findById(id);
+        if (partner == null) {
+            throw new NoContentException(PARTNER_NOT_FOUND);
+        }
+        return partner;
     }
 
     @Transactional
@@ -42,7 +54,7 @@ public class PartnerService {
     }
 
     @Transactional
-    public void deleteById(String sessionId, String id) throws UserNotFoundException {
+    public void deleteById(String sessionId, String id) throws SessionException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
@@ -50,14 +62,22 @@ public class PartnerService {
     }
 
     @Transactional
-    public int update(String sessionId, String id, Partner partner) throws UserNotFoundException {
+    public int update(String sessionId, String id, Partner partner) throws SessionException, NoContentException {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
-        return partnerRepository.update(id, partner);
+        int updated = partnerRepository.update(id, partner);
+        if (updated == 0) {
+            throw new NoContentException(PARTNER_NOT_FOUND);
+        }
+        return updated;
     }
 
-    public List<Partner> findByValue(String value) {
-        return partnerRepository.findByValue(value);
+    public List<Partner> findByValue(String value) throws NoContentException {
+        List<Partner> partners = partnerRepository.findByValue(value);
+        if (partners.isEmpty()) {
+            throw new NoContentException(PARTNER_NOT_FOUND);
+        }
+        return partners;
     }
 }

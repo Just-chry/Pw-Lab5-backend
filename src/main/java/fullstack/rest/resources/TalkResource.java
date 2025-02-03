@@ -1,6 +1,7 @@
 package fullstack.rest.resources;
 
 import fullstack.rest.model.CreateTalkRequest;
+import fullstack.service.exception.SessionAlreadyExistsException;
 import fullstack.service.exception.UserNotFoundException;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
@@ -10,12 +11,17 @@ import fullstack.persistence.model.Talk;
 import fullstack.service.SpeakerService;
 import fullstack.service.TagService;
 import fullstack.service.TalkService;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
 @Path("/talks")
-public class TalkResource {
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+public class
+TalkResource {
     private final TalkService talkService;
     private final SpeakerService speakerService;
     private final TagService tagService;
@@ -27,30 +33,46 @@ public class TalkResource {
     }
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Talk> getAllTalks() {
-        return talkService.getAllTalks();
+    public Response getAllTalks() {
+        try {
+            List<Talk> talks = talkService.getAllTalks();
+            return Response.ok(talks).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Talk getTalkById(@PathParam("id") String id) {
-        return talkService.findById(id);
+    public Response getTalkById(@PathParam("id") String id) {
+        try {
+            Talk talk = talkService.findById(id);
+            return Response.ok(talk).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}/speakers")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Speaker> getSpeakersByTalkId(@PathParam("id") String talkId) {
-        return speakerService.getSpeakerByTalkId(talkId);
+    public Response getSpeakersByTalkId(@PathParam("id") String talkId) {
+        try {
+            List<Speaker> speakers = speakerService.getSpeakerByTalkId(talkId);
+            return Response.ok(speakers).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @GET
     @Path("/{id}/tags")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Tag> getTagsByTalkId(@PathParam("id") String talkId) {
-        return tagService.getTagsByTalkId(talkId);
+    public Response getTagsByTalkId(@PathParam("id") String talkId) {
+        try {
+            List<Tag> tags = tagService.getTagsByTalkId(talkId);
+            return Response.ok(tags).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).build();
+        }
     }
 
     @POST
@@ -60,8 +82,8 @@ public class TalkResource {
         try {
             Talk talk = talkService.save(sessionId, request.getTalk(), request.getTagNames());
             return Response.ok(talk).build();
-        } catch (Exception e) {
-            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
+        } catch (SessionException | UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 
@@ -71,23 +93,18 @@ public class TalkResource {
         try {
             talkService.deleteById(sessionId, id);
             return Response.noContent().build();
-        } catch (UserNotFoundException e) {
+        } catch (SessionException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response updateTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Talk talk) {
         try {
-            int updated = talkService.updateTalk(sessionId, id, talk);
-            if (updated == 0) {
-                return Response.status(Response.Status.NOT_FOUND).entity("Talk not found").build();
-            }
+            talkService.updateTalk(sessionId, id, talk);
             return Response.ok().build();
-        } catch (UserNotFoundException e) {
+        } catch (NoContentException e) {
             return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
     }
