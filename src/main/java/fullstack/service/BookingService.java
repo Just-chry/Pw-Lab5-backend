@@ -4,6 +4,7 @@ import fullstack.persistence.model.*;
 import fullstack.persistence.repository.BookingRepository;
 import fullstack.persistence.repository.TicketRepository;
 import fullstack.persistence.repository.UserRepository;
+import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.service.exception.BookingException;
 import fullstack.service.exception.UserNotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
@@ -30,6 +31,9 @@ public class BookingService implements PanacheRepository<Booking> {
     UserRepository userRepository;
     @Inject
     TicketRepository ticketRepository;
+    @Inject
+    UserSessionRepository userSessionRepository;
+
 
     public List<Booking> getAllBookings() throws NoContentException {
         List<Booking> bookings = bookingRepository.listAll();
@@ -109,5 +113,11 @@ public class BookingService implements PanacheRepository<Booking> {
         }
 
         return booking;
+    }
+
+    public List<Booking> findBySessionId(String sessionId) throws UserNotFoundException {
+        User user = userSessionRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new UserNotFoundException("Session not found")).getUser();
+        return bookingRepository.findByUserId(user.getId());
     }
 }

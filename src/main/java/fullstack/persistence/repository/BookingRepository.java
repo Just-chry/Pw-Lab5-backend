@@ -6,6 +6,7 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @ApplicationScoped
@@ -32,5 +33,9 @@ public class BookingRepository implements PanacheRepository<Booking> {
         booking.setStatus(Status.CONFIRMED);
         persist(booking);
         return booking;
+    }
+
+    public List<Booking> findByUserId(String id) {
+        return list("userId", id);
     }
 }

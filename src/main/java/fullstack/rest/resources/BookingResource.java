@@ -40,6 +40,21 @@ public class BookingResource {
         }
     }
 
+    @GET
+    @Path("/user")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getBookingsByUserSession(@CookieParam("sessionId") String sessionId) {
+        try {
+            List<Booking> bookings = bookingService.findBySessionId(sessionId);
+            return Response.ok(bookings).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+        } catch (RuntimeException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Unexpected error").build();
+        }
+    }
+
+
     @POST
     @Path("/{id}")
     public Response createBooking(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
