@@ -71,6 +71,8 @@ public class BookingService implements PanacheRepository<Booking> {
         event.setParticipantsCount(event.getParticipantsCount() + 1);
         eventService.persist(event);
 
+        event.setParticipantsCount(event.getParticipantsCount() + 1);
+
         if (user.getEmail() == null || user.getEmail().isEmpty() && user.getPhone() != null && !user.getPhone().isEmpty()) {
             notificationService.sendBookingConfirmationSms(user, event);
         } else {
