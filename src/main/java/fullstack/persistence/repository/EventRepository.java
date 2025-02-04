@@ -1,6 +1,8 @@
 package fullstack.persistence.repository;
 
 import fullstack.persistence.model.Event;
+import fullstack.persistence.model.Tag;
+import fullstack.persistence.model.Talk;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
@@ -18,6 +20,16 @@ public class EventRepository implements PanacheRepository<Event> {
                 .setParameter("speakerId", speakerId)
                 .getResultList();
     }
+
+    public List<Tag> getTagsByEventId(String eventId) {
+        return getEntityManager().createNativeQuery(
+                        "SELECT t.* FROM tag t " +
+                                "JOIN event_tag et ON t.id = et.tag_id " +
+                                "WHERE et.event_id = :eventId", Tag.class)
+                .setParameter("eventId", eventId)
+                .getResultList();
+    }
+
     public Event findById(String id) {
         return find("id", id).firstResult();
     }
