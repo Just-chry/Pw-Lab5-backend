@@ -6,6 +6,7 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,7 +30,7 @@ public class BookingRepository implements PanacheRepository<Booking> {
         booking.setId(UUID.randomUUID().toString());
         booking.setUserId(userId);
         booking.setEventId(eventId);
-        booking.setDate(LocalDate.now());
+        booking.setDate(LocalDateTime.now());
         booking.setStatus(Status.CONFIRMED);
         persist(booking);
         return booking;

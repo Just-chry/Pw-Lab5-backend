@@ -1,6 +1,7 @@
 package fullstack.rest.resources;
 
 import fullstack.persistence.model.Booking;
+import fullstack.rest.model.BookingDetailResponse;
 import fullstack.service.BookingService;
 import fullstack.service.exception.BookingException;
 import fullstack.service.exception.UserNotFoundException;
@@ -54,6 +55,19 @@ public class BookingResource {
         }
     }
 
+    @GET
+    @Path("/user/details")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserBookingDetails(@CookieParam("sessionId") String sessionId) {
+        try {
+            List<BookingDetailResponse> bookings = bookingService.getBookingDetailsBySessionId(sessionId);
+            return Response.ok(bookings).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found").build();
+        } catch (RuntimeException e) {
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity("Unexpected error").build();
+        }
+    }
 
     @POST
     @Path("/{id}")

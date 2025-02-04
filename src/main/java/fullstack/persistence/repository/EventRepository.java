@@ -51,6 +51,4 @@ public class EventRepository implements PanacheRepository<Event> {
     public void deleteById(String id) {
         delete("id", id);
     }
-
-
 }

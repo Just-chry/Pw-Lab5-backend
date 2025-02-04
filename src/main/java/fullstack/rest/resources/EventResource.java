@@ -75,12 +75,8 @@ public class EventResource {
     @GET
     @Path("/{id}/tags")
     public Response getTagsByEventId(@PathParam("id") String eventId) {
-        try {
-            List<Tag> tags = eventService.getTagsByEventId(eventId);
-            return Response.ok(tags).build();
-        } catch (NoContentException e) {
-            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
-        }
+        List<Tag> tags = eventService.getTagsByEventId(eventId);
+        return Response.ok(tags).build();
     }
 
     @GET

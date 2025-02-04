@@ -1,9 +1,8 @@
 package fullstack.service;
 
 import fullstack.persistence.model.*;
-import fullstack.persistence.repository.BookingRepository;
-import fullstack.persistence.repository.TicketRepository;
-import fullstack.persistence.repository.UserRepository;
+import fullstack.persistence.repository.*;
+import fullstack.rest.model.BookingDetailResponse;
 import fullstack.service.exception.BookingException;
 import fullstack.service.exception.UserNotFoundException;
 import io.quarkus.hibernate.orm.panache.PanacheRepository;
@@ -30,6 +29,10 @@ public class BookingService implements PanacheRepository<Booking> {
     UserRepository userRepository;
     @Inject
     TicketRepository ticketRepository;
+    @Inject
+    EventRepository eventRepository;
+    @Inject
+    UserSessionRepository userSessionRepository;
 
     public List<Booking> getAllBookings() throws NoContentException {
         List<Booking> bookings = bookingRepository.listAll();
@@ -111,5 +114,28 @@ public class BookingService implements PanacheRepository<Booking> {
         }
 
         return booking;
+    }
+
+    public List<Booking> findBySessionId(String sessionId) throws UserNotFoundException {
+        User user = userService.getUserBySessionId(sessionId);
+        return bookingRepository.findByUserId(user.getId());
+    }
+
+    public List<BookingDetailResponse> getBookingDetailsBySessionId(String sessionId) throws UserNotFoundException {
+        User user = userSessionRepository.findBySessionId(sessionId)
+                .orElseThrow(() -> new UserNotFoundException("Session not found")).getUser();
+        List<Booking> bookings = bookingRepository.findByUserId(user.getId());
+
+        return bookings.stream()
+                .map(booking -> {
+                    Event event = eventRepository.findById(booking.getEventId());
+                    return new BookingDetailResponse(
+                            booking.getId(),
+                            event.getTitle(),
+                            booking.getDate(),
+                            booking.getStatus()
+                    );
+                })
+                .toList();
     }
 }
