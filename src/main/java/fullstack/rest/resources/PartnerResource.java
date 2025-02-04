@@ -1,94 +1,102 @@
 package fullstack.rest.resources;
 
-import fullstack.persistence.model.Role;
 import fullstack.service.UserService;
 import fullstack.service.exception.UserNotFoundException;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import fullstack.persistence.model.Event;
 import fullstack.persistence.model.Partner;
 import fullstack.service.EventService;
 import fullstack.service.PartnerService;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
 @Path("/partners")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class PartnerResource {
-    private final PartnerService partnerService;
-    private final EventService eventService;
-    private final UserService userService;
 
-    public PartnerResource(PartnerService partnerService, EventService eventService, UserService userService) {
-        this.partnerService = partnerService;
-        this.eventService = eventService;
-        this.userService = userService;
-    }
+    @Inject
+    PartnerService partnerService;
+    @Inject
+    EventService eventService;
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Partner> getAllPartners() {
-        return partnerService.getAllPartners();
+    public Response getAllPartners() {
+        try {
+            List<Partner> partners = partnerService.getAllPartners();
+            return Response.ok(partners).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Partner getPartnerById(@PathParam("id") String id) {
-        return partnerService.findById(id);
+    public Response getPartnerById(@PathParam("id") String id) {
+        try {
+            Partner partner = partnerService.findById(id);
+            return Response.ok(partner).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}/events")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Event> getEventsByPartnerId(@PathParam("id") String partnerId) {
-        return eventService.getEventsByPartnerId(partnerId);
+    public Response getEventsByPartnerId(@PathParam("id") String partnerId) {
+        try {
+            List<Event> events = eventService.getEventsByPartnerId(partnerId);
+            return Response.ok(events).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/value/{value}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Partner> getPartnerByName(@PathParam("value") String value) {
-        return partnerService.findByValue(value);
+    public Response getPartnerByName(@PathParam("value") String value) {
+        try {
+            List<Partner> partners = partnerService.findByValue(value);
+            return Response.ok(partners).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response createPartner(@CookieParam("sessionId") String sessionId, Partner partner) throws UserNotFoundException {
-//        Role userRole = userService.getUserRoleBySessionId(sessionId);
-//        if (userRole != Role.admin) {
-//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-//        }
-        Partner savedPartner = partnerService.save(partner);
-        return Response.ok(savedPartner).build();
+    public Response createPartner(@CookieParam("sessionId") String sessionId, Partner partner) {
+        try {
+            Partner savedPartner = partnerService.save(sessionId, partner);
+            return Response.ok(savedPartner).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @DELETE
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response deletePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
-//        Role userRole = userService.getUserRoleBySessionId(sessionId);
-//        if (userRole != Role.admin) {
-//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-//        }
-        partnerService.delete(id);
-        return Response.noContent().build();
+    public Response deletePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
+        try {
+            partnerService.deleteById(sessionId, id);
+            return Response.noContent().build();
+        } catch (SessionException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updatePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) throws UserNotFoundException {
-//        Role userRole = userService.getUserRoleBySessionId(sessionId);
-//        if (userRole != Role.admin) {
-//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-//        }
-        int updated = partnerService.update(id, partner);
-        if (updated == 0) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Partner not found").build();
+    public Response updatePartner(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Partner partner) {
+        try {
+            int updated = partnerService.update(sessionId, id, partner);
+            return Response.ok(updated).build();
+        } catch (SessionException | NoContentException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
-        return Response.ok(updated).build();
     }
 }

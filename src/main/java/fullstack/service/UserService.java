@@ -6,21 +6,21 @@ import fullstack.persistence.model.Role;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
 import fullstack.rest.model.*;
-import fullstack.service.exception.AdminAccessException;
-import fullstack.service.exception.UserCreationException;
-import fullstack.service.exception.UserNotFoundException;
+import fullstack.service.exception.*;
 import fullstack.util.Messages;
 import fullstack.util.Validation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
+import org.hibernate.SessionException;
+
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static fullstack.util.Messages.USER_NOT_FOUND;
+import static fullstack.util.Messages.*;
 
 @ApplicationScoped
 public class UserService {
@@ -40,9 +40,9 @@ public class UserService {
         userRepository.delete(user);
     }
 
-    public List<AdminResponse> listUsers(String sessionId) throws AdminAccessException, UserNotFoundException {
+    public List<AdminResponse> listUsers(String sessionId) throws AdminAccessException, SessionException {
         if (isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono visualizzare tutti gli utenti.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         return userRepository.listAll().stream()
                 .map(user -> new AdminResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone(), user.getRole().name()))
@@ -50,13 +50,13 @@ public class UserService {
     }
 
     @Transactional
-    public void promoteUserToAdmin(String userId, String sessionId) throws UserNotFoundException {
+    public void promoteUserToAdmin(String userId, String sessionId) throws SessionException {
         if (isAdmin(sessionId)) {
-            throw new AdminAccessException("Accesso negato. Solo gli amministratori possono promuovere altri utenti ad admin.");
+            throw new AdminAccessException(ADMIN_REQUIRED);
         }
         Optional<User> userOpt = userRepository.findUserById(userId);
         if (userOpt.isEmpty()) {
-            throw new UserNotFoundException(USER_NOT_FOUND);
+            throw new SessionException(USER_NOT_FOUND);
         }
 
         User user = userOpt.get();
@@ -65,10 +65,10 @@ public class UserService {
     }
 
 
-    public boolean isAdmin(String sessionId) throws UserNotFoundException {
+    public boolean isAdmin(String sessionId) throws SessionException {
         Optional<UserSession> session = userSessionRepository.findBySessionId(sessionId);
         if (session.isEmpty()) {
-            throw new UserNotFoundException("Sessione non trovata.");
+            throw new SessionException(SESSION_NOT_FOUND);
         }
         User user = session.get().getUser();
         return user.getRole() != Role.ADMIN;
@@ -77,7 +77,7 @@ public class UserService {
     public User getUserBySessionId(String sessionId) throws UserNotFoundException {
         Optional<UserSession> session = userSessionRepository.findBySessionId(sessionId);
         if (session.isEmpty()) {
-            throw new UserNotFoundException("Sessione non trovata.");
+            throw new UserNotFoundException(SESSION_NOT_FOUND);
         }
         return session.get().getUser();
     }
@@ -158,14 +158,55 @@ public class UserService {
         String hashedOldPassword = hashCalculator.calculateHash(newPasswordRequest.getOldPassword());
 
         if (!user.getPassword().equals(hashedOldPassword)) {
-            throw new UserCreationException("La vecchia password non corrisponde.");
+            throw new PasswordException(OLD_PASSWORD_NOT_MATCH);
         }
 
         if (!newPasswordRequest.getNewPassword().equals(newPasswordRequest.getRepeatNewPassword())) {
-            throw new UserCreationException("La nuova password e la ripetizione della nuova password non corrispondono.");
+            throw new PasswordException(NEW_PASSWORD_NOT_MATCH);
         }
 
         user.setPassword(hashCalculator.calculateHash(newPasswordRequest.getNewPassword()));
+        userRepository.persist(user);
+    }
+
+    @Transactional
+    public void forgottenPassword(String emailOrPhone) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findByEmailOrPhone(emailOrPhone);
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+
+        String verificationCode = generateOtp();
+        user.setTokenPassword(verificationCode);
+        userRepository.persist(user);
+
+        if (emailOrPhone.contains("@")) {
+            notificationService.sendPasswordResetEmail(user);
+        } else {
+            notificationService.sendPasswordResetSms(user);
+        }
+    }
+
+    @Transactional
+    public void verifyCode(String emailOrPhone, String verificationCode) throws TokenException {
+        Optional<User> optionalUser = userRepository.findByEmailOrPhone(emailOrPhone);
+        User user = optionalUser.orElseThrow(() -> new TokenException("Utente non trovato."));
+
+        if (!user.getTokenPassword().equals(verificationCode)) {
+            throw new TokenException("Codice di verifica non valido.");
+        }
+    }
+
+    @Transactional
+    public void updatePasswordWithCode(String emailOrPhone, String newPassword, String repeatNewPassword)
+            throws UserNotFoundException, PasswordException {
+        Optional<User> optionalUser = userRepository.findByEmailOrPhone(emailOrPhone);
+        User user = optionalUser.orElseThrow(() -> new UserNotFoundException("Utente non trovato."));
+
+        if (!newPassword.equals(repeatNewPassword)) {
+            throw new PasswordException("Le password non coincidono.");
+        }
+
+        user.setPassword(hashCalculator.calculateHash(newPassword));
+        user.setTokenPassword(null);
         userRepository.persist(user);
     }
 }

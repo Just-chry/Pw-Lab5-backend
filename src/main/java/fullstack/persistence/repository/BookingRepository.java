@@ -16,7 +16,7 @@ public class BookingRepository implements PanacheRepository<Booking> {
     }
 
     public Booking findExistingBooking(String userId, String eventId) {
-        return find("userId = ?1 and eventId = ?2 and status != ?3", userId, eventId, Status.canceled).firstResult();
+        return find("userId = ?1 and eventId = ?2 and status != ?3", userId, eventId, Status.CANCELED).firstResult();
     }
 
     public void persistBooking(Booking booking) {
@@ -29,7 +29,7 @@ public class BookingRepository implements PanacheRepository<Booking> {
         booking.setUserId(userId);
         booking.setEventId(eventId);
         booking.setDate(LocalDate.now());
-        booking.setStatus(Status.confirmed);
+        booking.setStatus(Status.CONFIRMED);
         persist(booking);
         return booking;
     }

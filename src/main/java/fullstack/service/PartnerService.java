@@ -1,42 +1,80 @@
 package fullstack.service;
 
-import io.quarkus.hibernate.orm.panache.PanacheRepository;
+import fullstack.persistence.repository.PartnerRepository;
+import fullstack.service.exception.AdminAccessException;
+import fullstack.service.exception.UserNotFoundException;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import fullstack.persistence.model.Partner;
+import jakarta.ws.rs.core.NoContentException;
+import org.hibernate.SessionException;
 
 import java.util.List;
 import java.util.UUID;
 
+import static fullstack.util.Messages.ADMIN_REQUIRED;
+import static fullstack.util.Messages.PARTNER_NOT_FOUND;
+
 @ApplicationScoped
-public class PartnerService implements PanacheRepository<Partner> {
-    public List<Partner> getAllPartners() {
-        return listAll();
+public class PartnerService {
+
+    @Inject
+    PartnerRepository partnerRepository;
+    @Inject
+    UserService userService;
+
+    public List<Partner> getAllPartners() throws NoContentException {
+        List<Partner> partners = partnerRepository.listAll();
+        if (partners.isEmpty()) {
+            throw new NoContentException(PARTNER_NOT_FOUND);
+        }
+        return partners;
     }
 
-    public Partner findById(String id) {
-        return find("id", id).firstResult();
-    }
-
-    @Transactional
-    public Partner save(Partner partner) {
-        partner.setId(UUID.randomUUID().toString());
-        persist(partner);
+    public Partner findById(String id) throws NoContentException {
+        Partner partner = partnerRepository.findById(id);
+        if (partner == null) {
+            throw new NoContentException(PARTNER_NOT_FOUND);
+        }
         return partner;
     }
 
     @Transactional
-    public Partner deleteById(String id) {
-        delete("id", id);
-        return null;
+    public Partner save(String sessionId, Partner partner) throws UserNotFoundException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException(ADMIN_REQUIRED);
+        }
+        partner.setId(UUID.randomUUID().toString());
+        partnerRepository.persist(partner);
+        return partner;
     }
 
     @Transactional
-    public int update(String id, Partner partner) {
-        return update("name = ?1, description = ?2, place = ?3, website = ?4, email = ?5, image = ?6, value = ?7 where id = ?8", partner.getName(), partner.getDescription(), partner.getPlace(), partner.getWebsite(), partner.getEmail(), partner.getImage(), partner.getValue(), id);
+    public void deleteById(String sessionId, String id) throws SessionException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException(ADMIN_REQUIRED);
+        }
+        partnerRepository.deleteById(id);
     }
 
-    public List<Partner> findByValue(String value) {
-        return list("value", value);
+    @Transactional
+    public int update(String sessionId, String id, Partner partner) throws SessionException, NoContentException {
+        if (userService.isAdmin(sessionId)) {
+            throw new AdminAccessException(ADMIN_REQUIRED);
+        }
+        int updated = partnerRepository.update(id, partner);
+        if (updated == 0) {
+            throw new NoContentException(PARTNER_NOT_FOUND);
+        }
+        return updated;
+    }
+
+    public List<Partner> findByValue(String value) throws NoContentException {
+        List<Partner> partners = partnerRepository.findByValue(value);
+        if (partners.isEmpty()) {
+            throw new NoContentException(PARTNER_NOT_FOUND);
+        }
+        return partners;
     }
 }

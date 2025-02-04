@@ -16,18 +16,18 @@ import jakarta.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 public class AuthenticationResource {
 
-    private final AuthenticationService authenticationService;
-
     @Inject
-    public AuthenticationResource(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
+    AuthenticationService authenticationService;
 
     @POST
     @Path("/register")
-    public Response register(CreateUserRequest request) throws UserCreationException {
-        authenticationService.register(request);
-        return Response.ok("Registrazione completata con successo, controlla il tuo contatto per confermare.").build();
+    public Response register(CreateUserRequest request) {
+        try{
+            authenticationService.register(request);
+            return Response.ok("Registrazione completata con successo, controlla il tuo contatto per confermare.").build();
+        } catch (UserCreationException e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+        }
     }
 
     @POST
@@ -35,7 +35,8 @@ public class AuthenticationResource {
     public Response login(LoginRequest request) {
         try {
             LoginResponse response = authenticationService.authenticate(request, request.getRememberMe());
-            return Response.ok(response).build();
+            NewCookie sessionCookie = new NewCookie("sessionId", response.getSessionId(), "/", null, "Session Cookie", -1, true, true);
+            return Response.ok(response).cookie(sessionCookie).build();
         } catch (Exception e) {
             return Response.status(Response.Status.UNAUTHORIZED).entity(e.getMessage()).build();
         }
@@ -55,7 +56,7 @@ public class AuthenticationResource {
         try {
             authenticationService.verifyEmail(token, email);
             return Response.ok("Email verificata con successo.").build();
-        } catch (UserCreationException e) {
+        } catch (TokenException | UserCreationException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
@@ -66,9 +67,10 @@ public class AuthenticationResource {
         try {
             authenticationService.verifyPhone(token, phone);
             return Response.ok("Numero di telefono verificato con successo.").build();
-        } catch (UserCreationException e) {
+        } catch (TokenException | UserCreationException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
     }
+
 
 }

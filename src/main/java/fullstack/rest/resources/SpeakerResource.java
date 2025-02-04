@@ -1,8 +1,7 @@
 package fullstack.rest.resources;
 
-import fullstack.persistence.model.Role;
-import fullstack.service.UserService;
 import fullstack.service.exception.UserNotFoundException;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import fullstack.persistence.model.Event;
@@ -11,89 +10,97 @@ import fullstack.persistence.model.Talk;
 import fullstack.service.EventService;
 import fullstack.service.SpeakerService;
 import fullstack.service.TalkService;
+import jakarta.ws.rs.core.NoContentException;
 import jakarta.ws.rs.core.Response;
+import org.hibernate.SessionException;
 
 import java.util.List;
 
 @Path("/speakers")
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class SpeakerResource {
-    private final SpeakerService speakerService;
-    private final EventService eventService;
-    private final TalkService talkService;
-    private final UserService userService;
 
-    public SpeakerResource(SpeakerService speakerService, EventService eventService, TalkService talkService, UserService userService) {
-        this.speakerService = speakerService;
-        this.eventService = eventService;
-        this.talkService = talkService;
-        this.userService = userService;
-    }
+    @Inject
+    SpeakerService speakerService;
+    @Inject
+    EventService eventService;
+    @Inject
+    TalkService talkService;
 
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Speaker> getAllSpeakers() {
-        return speakerService.getAllSpeakers();
+    public Response getAllSpeakers() {
+        try {
+            List<Speaker> speakers = speakerService.getAllSpeakers();
+            return Response.ok(speakers).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}")
-    @Produces(MediaType.APPLICATION_JSON)
-    public Speaker getSpeakerById(@PathParam("id") String id) {
-        return speakerService.findById(id);
+    public Response getSpeakerById(@PathParam("id") String id) {
+        try {
+            Speaker speaker = speakerService.findById(id);
+            return Response.ok(speaker).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}/events")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Event> getEventsBySpeakerId(@PathParam("id") String speakerId) {
-        return eventService.getEventsBySpeakerId(speakerId);
+    public Response getEventsBySpeakerId(@PathParam("id") String speakerId) {
+        try {
+            List<Event> events = eventService.getEventsBySpeakerId(speakerId);
+            return Response.ok(events).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
     @GET
     @Path("/{id}/talks")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<Talk> getSpeakersByTalkId(@PathParam("id") String speakerId) {
-        return talkService.getTalksBySpeakerId(speakerId);
+    public Response getSpeakersByTalkId(@PathParam("id") String speakerId) {
+        try {
+            List<Talk> talks = talkService.getTalksBySpeakerId(speakerId);
+            return Response.ok(talks).build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
+        }
     }
 
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response createSpeaker(@CookieParam("sessionId") String sessionId, Speaker speaker) throws UserNotFoundException {
-//        Role userRole = userService.getUserRoleBySessionId(sessionId);
-//        if (userRole != Role.admin) {
-//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-//        }
-        Speaker savedSpeaker = speakerService.save(speaker);
-        return Response.ok(savedSpeaker).build();
+        try {
+            Speaker savedSpeaker = speakerService.save(sessionId, speaker);
+            return Response.ok(savedSpeaker).build();
+        } catch (SessionException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @DELETE
     @Path("/{id}")
-    public Response deleteSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) throws UserNotFoundException {
-//        Role userRole = userService.getUserRoleBySessionId(sessionId);
-//        if (userRole != Role.admin) {
-//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-//        }
-        speakerService.deleteById(id);
-        return Response.noContent().build();
+    public Response deleteSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
+        try {
+            speakerService.deleteById(sessionId, id);
+            return Response.noContent().build();
+        } catch (SessionException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
     }
 
     @PUT
     @Path("/{id}")
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response updateSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Speaker speaker) throws UserNotFoundException {
-//        Role userRole = userService.getUserRoleBySessionId(sessionId);
-//        if (userRole != Role.admin) {
-//            return Response.status(Response.Status.FORBIDDEN).entity("Access denied").build();
-//        }
-        int updated = speakerService.update(id, speaker);
-        if (updated == 0) {
-            return Response.status(Response.Status.NOT_FOUND).entity("Speaker not found").build();
+    public Response updateSpeaker(@CookieParam("sessionId") String sessionId, @PathParam("id") String id, Speaker speaker) {
+        try {
+            speakerService.update(sessionId, id, speaker);
+            return Response.ok().build();
+        } catch (NoContentException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
         }
-        return Response.ok(updated).build();
     }
-
 }

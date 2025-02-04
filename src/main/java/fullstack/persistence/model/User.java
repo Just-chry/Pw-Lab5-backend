@@ -26,6 +26,8 @@ public class User {
     private String tokenEmail;
     @Column(name = "token_phone")
     private String tokenPhone;
+    @Column(name = "token_password")
+    private String tokenPassword;
 
     public User() {
         this.id = UUID.randomUUID().toString();
@@ -119,5 +121,13 @@ public class User {
 
     public void setTokenPhone(String tokenPhone) {
         this.tokenPhone = tokenPhone;
+    }
+
+    public String getTokenPassword() {
+        return tokenPassword;
+    }
+
+    public void setTokenPassword(String tokenPassword) {
+        this.tokenPassword = tokenPassword;
     }
 }
