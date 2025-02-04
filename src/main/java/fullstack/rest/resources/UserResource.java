@@ -29,6 +29,20 @@ public class UserResource {
         }
     }
 
+    @GET
+    @Path("/session")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getUserIdBySessionId(@CookieParam("sessionId") String sessionId) {
+        try {
+            String userId = userService.getUserIdBySessionId(sessionId);
+            return Response.ok(new UserIdResponse(userId)).build();
+        } catch (SessionException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("Session not found: " + e.getMessage()).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity("User not found: " + e.getMessage()).build();
+        }
+    }
+
     @PUT
     @Path("/modify/email")
     public Response modifyEmail(@CookieParam("sessionId") String sessionId, ModifyEmailRequest newEmail) {

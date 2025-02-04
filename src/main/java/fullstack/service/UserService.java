@@ -82,6 +82,14 @@ public class UserService {
         return session.get().getUser();
     }
 
+    public String getUserIdBySessionId(String sessionId) throws UserNotFoundException {
+        Optional<UserSession> session = userSessionRepository.findBySessionId(sessionId);
+        if (session.isEmpty()) {
+            throw new UserNotFoundException(SESSION_NOT_FOUND);
+        }
+        return session.get().getUser().getId();
+    }
+
     public UserResponse getUserResponseById(String userId) throws UserNotFoundException {
         User user = userRepository.findUserById(userId).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
         return new UserResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone());
