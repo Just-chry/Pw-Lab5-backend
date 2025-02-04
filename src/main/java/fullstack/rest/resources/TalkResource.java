@@ -1,8 +1,8 @@
 package fullstack.rest.resources;
 
 import fullstack.rest.model.CreateTalkRequest;
-import fullstack.service.exception.SessionAlreadyExistsException;
 import fullstack.service.exception.UserNotFoundException;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import fullstack.persistence.model.Speaker;
@@ -20,11 +20,14 @@ import java.util.List;
 @Path("/talks")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
-public class
-TalkResource {
-    private final TalkService talkService;
-    private final SpeakerService speakerService;
-    private final TagService tagService;
+public class TalkResource {
+
+    @Inject
+    TalkService talkService;
+    @Inject
+    SpeakerService speakerService;
+    @Inject
+    TagService tagService;
 
     public TalkResource(TalkService talkService, SpeakerService speakerService, TagService tagService) {
         this.talkService = talkService;
@@ -89,7 +92,7 @@ TalkResource {
 
     @DELETE
     @Path("/{id}")
-    public Response deleteTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id)  {
+    public Response deleteTalk(@CookieParam("sessionId") String sessionId, @PathParam("id") String id) {
         try {
             talkService.deleteById(sessionId, id);
             return Response.noContent().build();

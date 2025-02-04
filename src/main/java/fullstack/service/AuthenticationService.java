@@ -24,19 +24,15 @@ import static fullstack.util.Messages.*;
 
 @ApplicationScoped
 public class AuthenticationService {
-    private final UserRepository userRepository;
-    private final HashCalculator hashCalculator;
-    private final UserSessionRepository userSessionRepository;
-    private final NotificationService notificationService;
 
     @Inject
-    public AuthenticationService(UserRepository userRepository, HashCalculator hashCalculator, UserSessionRepository userSessionRepository, NotificationService notificationService) {
-        this.userRepository = userRepository;
-        this.hashCalculator = hashCalculator;
-        this.userSessionRepository = userSessionRepository;
-        this.notificationService = notificationService;
-
-    }
+    HashCalculator hashCalculator;
+    @Inject
+    UserRepository userRepository;
+    @Inject
+    UserSessionRepository userSessionRepository;
+    @Inject
+    NotificationService notificationService;
 
     @Transactional
     public User register(CreateUserRequest request) throws ContactException, UserCreationException {

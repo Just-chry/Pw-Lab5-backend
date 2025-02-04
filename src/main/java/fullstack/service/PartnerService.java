@@ -19,13 +19,10 @@ import static fullstack.util.Messages.PARTNER_NOT_FOUND;
 @ApplicationScoped
 public class PartnerService {
 
-    private final PartnerRepository partnerRepository;
-    private final UserService userService;
     @Inject
-    public PartnerService(PartnerRepository partnerRepository, UserService userService) {
-        this.partnerRepository = partnerRepository;
-        this.userService = userService;
-    }
+    PartnerRepository partnerRepository;
+    @Inject
+    UserService userService;
 
     public List<Partner> getAllPartners() throws NoContentException {
         List<Partner> partners = partnerRepository.listAll();

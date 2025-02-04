@@ -35,4 +35,6 @@ public class Messages {
 
     //Success
     public static final String LOGIN_SUCCESS = "Login avvenuto con successo.";
+    public static final String PASSWORD_CONFIRMATION_REQUIRED = "Conferma password obbligatoria.";
+    public static final String PASSWORD_MISMATCH = "Le due password non corrispondono.";
 }

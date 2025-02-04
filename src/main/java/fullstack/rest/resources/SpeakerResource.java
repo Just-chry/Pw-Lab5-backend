@@ -1,6 +1,7 @@
 package fullstack.rest.resources;
 
 import fullstack.service.exception.UserNotFoundException;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import fullstack.persistence.model.Event;
@@ -19,15 +20,13 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class SpeakerResource {
-    private final SpeakerService speakerService;
-    private final EventService eventService;
-    private final TalkService talkService;
 
-    public SpeakerResource(SpeakerService speakerService, EventService eventService, TalkService talkService) {
-        this.speakerService = speakerService;
-        this.eventService = eventService;
-        this.talkService = talkService;
-    }
+    @Inject
+    SpeakerService speakerService;
+    @Inject
+    EventService eventService;
+    @Inject
+    TalkService talkService;
 
     @GET
     public Response getAllSpeakers() {

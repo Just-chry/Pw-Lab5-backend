@@ -4,6 +4,7 @@ public class CreateUserRequest {
     private String name;
     private String surname;
     private String password;
+    private String passwordConfirmation;
     private String email;
     private String phone;
 
@@ -24,6 +25,12 @@ public class CreateUserRequest {
     }
     public void setPassword(String password) {
         this.password = password;
+    }
+    public String getPasswordConfirmation() {
+        return passwordConfirmation;
+    }
+    public void setPasswordConfirmation(String passwordConfirmation) {
+        this.passwordConfirmation = passwordConfirmation;
     }
     public String getEmail() {
         return email;

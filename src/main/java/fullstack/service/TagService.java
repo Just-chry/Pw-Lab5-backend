@@ -19,14 +19,11 @@ import static fullstack.util.Messages.TAG_NOT_FOUND;
 
 @ApplicationScoped
 public class TagService implements PanacheRepository<Tag> {
-    private final TagRepository tagRepository;
-    private  final UserService userService;
 
     @Inject
-    public TagService(TagRepository tagRepository, UserService userService) {
-        this.tagRepository = tagRepository;
-        this.userService = userService;
-    }
+    TagRepository tagRepository;
+    @Inject
+    UserService userService;
 
     public List<Tag> getAllTags() throws NoContentException {
         List<Tag> tags = listAll();

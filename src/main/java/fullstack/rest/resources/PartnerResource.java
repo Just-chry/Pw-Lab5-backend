@@ -2,6 +2,7 @@ package fullstack.rest.resources;
 
 import fullstack.service.UserService;
 import fullstack.service.exception.UserNotFoundException;
+import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
 import fullstack.persistence.model.Event;
@@ -18,13 +19,11 @@ import java.util.List;
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 public class PartnerResource {
-    private final PartnerService partnerService;
-    private final EventService eventService;
 
-    public PartnerResource(PartnerService partnerService, EventService eventService) {
-        this.partnerService = partnerService;
-        this.eventService = eventService;
-    }
+    @Inject
+    PartnerService partnerService;
+    @Inject
+    EventService eventService;
 
     @GET
     public Response getAllPartners() {
