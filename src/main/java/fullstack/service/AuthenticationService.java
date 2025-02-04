@@ -124,7 +124,7 @@ public class AuthenticationService {
     }
 
     @Transactional
-    public LoginResponse authenticate(LoginRequest request, Boolean rememberMe) throws UserNotFoundException, WrongPasswordException, SessionAlreadyExistsException {
+    public LoginResponse authenticate(LoginRequest request, Boolean rememberMe) throws UserNotFoundException, WrongPasswordException {
         Validation.validateLoginRequest(request);
 
         Optional<User> optionalUser = userRepository.findByEmailOrPhone(request.getEmailOrPhone());
@@ -140,24 +140,16 @@ public class AuthenticationService {
         }
 
         Optional<UserSession> existingSession = userSessionRepository.findByUserId(user.getId());
-        if (existingSession.isPresent()) {
-            UserSession session = existingSession.get();
-            if (session.getExpiresAt().isBefore(LocalDateTime.now())) {
-                userSessionRepository.delete(session);
-            } else {
-                throw new SessionAlreadyExistsException(SESSION_ALREADY_EXISTS);
-            }
-        }
+        existingSession.ifPresent(userSessionRepository::delete);
 
-        checkIfSessionExists(user.getId());
-
+        String sessionId;
         if (Boolean.TRUE.equals(rememberMe)) {
-            String sessionId = createSessionLong(user);
-            return new LoginResponse(user.getName(), sessionId, LOGIN_SUCCESS);
+            sessionId = createSessionLong(user);
         } else {
-            String sessionId = createSession(user);
-            return new LoginResponse(user.getName(), sessionId, LOGIN_SUCCESS);
+            sessionId = createSession(user);
         }
+
+        return new LoginResponse(user.getName(), sessionId, LOGIN_SUCCESS);
     }
 
     private String createSession(User user) {
