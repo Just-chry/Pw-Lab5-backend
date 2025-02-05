@@ -1,5 +1,6 @@
 package fullstack.service;
 
+import fullstack.persistence.model.SanitationUtil;
 import fullstack.persistence.repository.UserRepository;
 import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.persistence.model.User;
@@ -38,6 +39,12 @@ public class AuthenticationService {
 
     @Transactional
     public User register(CreateUserRequest request) throws ContactException, UserCreationException {
+        request.setName(SanitationUtil.sanitize(request.getName()));
+        request.setSurname(SanitationUtil.sanitize(request.getSurname()));
+        request.setEmail(SanitationUtil.sanitize(request.getEmail()));
+        request.setPhone(SanitationUtil.sanitize(request.getPhone()));
+        request.setPassword(SanitationUtil.sanitize(request.getPassword()));
+
         Validation.validateUserRequest(request);
         checkIfEmailOrPhoneExists(request);
 
@@ -127,6 +134,8 @@ public class AuthenticationService {
 
     @Transactional
     public LoginResponse authenticate(LoginRequest request, Boolean rememberMe) throws UserNotFoundException, WrongPasswordException {
+
+
         Validation.validateLoginRequest(request);
 
         Optional<User> optionalUser = userRepository.findByEmailOrPhone(request.getEmailOrPhone());
