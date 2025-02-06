@@ -69,5 +69,10 @@ public class TalkRepository implements PanacheRepository<Talk> {
                 .setParameter("talkId", talkId)
                 .executeUpdate();
     }
+
+    public int updateTalk(String id, Talk talk) {
+        return update("title = ?1, description = ?2 WHERE id = ?3",
+                talk.getTitle(), talk.getDescription(), id);
+    }
 }
 
