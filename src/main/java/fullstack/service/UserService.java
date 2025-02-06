@@ -94,10 +94,14 @@ public class UserService {
 
     public UserResponse getUserResponseById(String userId) throws UserNotFoundException {
         User user = userRepository.findUserById(userId).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
-        return new UserResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone());
+        return new UserResponse(user.getName(), user.getSurname(), user.getEmail(), user.getPhone(), user.getRole());
     }
 
-
+    public UserResponse getUserRoleResponseById(String userId) throws UserNotFoundException {
+        User user = userRepository.findUserById(userId).orElseThrow(() -> new UserNotFoundException(USER_NOT_FOUND));
+        Role userRole = user.getRole();
+        return new UserResponse(userRole);
+    }
 
     @Transactional
     public void updateEmail(String sessionId, ModifyEmailRequest newEmail) throws UserNotFoundException, UserCreationException {

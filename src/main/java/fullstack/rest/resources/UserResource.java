@@ -30,6 +30,16 @@ public class UserResource {
     }
 
     @GET
+    @Path("/{userId}/role")
+    public Response getUserRole(@PathParam("userId") String userId) {
+        try {
+            return Response.ok(userService.getUserRoleResponseById(userId)).build();
+        } catch (UserNotFoundException e) {
+            return Response.status(Response.Status.NOT_FOUND).entity(e.getMessage()).build();
+        }
+    }
+
+    @GET
     @Path("/session")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getUserIdBySessionId(@CookieParam("sessionId") String sessionId) {
