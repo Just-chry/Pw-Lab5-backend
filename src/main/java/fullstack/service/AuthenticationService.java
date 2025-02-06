@@ -1,16 +1,19 @@
 package fullstack.service;
 
+import fullstack.persistence.model.SanitationUtil;
 import fullstack.persistence.repository.UserRepository;
 import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.persistence.model.User;
 import fullstack.persistence.model.UserSession;
+import fullstack.persistence.repository.UserRepository;
+import fullstack.persistence.repository.UserSessionRepository;
 import fullstack.rest.model.CreateUserRequest;
 import fullstack.rest.model.LoginRequest;
 import fullstack.rest.model.LoginResponse;
 import fullstack.service.exception.*;
 import fullstack.util.ContactValidator;
-import fullstack.util.Validation;
 import fullstack.util.Messages;
+import fullstack.util.Validation;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -36,6 +39,11 @@ public class AuthenticationService {
 
     @Transactional
     public User register(CreateUserRequest request) throws ContactException, UserCreationException {
+        request.setName(SanitationUtil.sanitize(request.getName()));
+        request.setSurname(SanitationUtil.sanitize(request.getSurname()));
+        request.setPhone(SanitationUtil.sanitize(request.getPhone()));
+        request.setPassword(SanitationUtil.sanitize(request.getPassword()));
+
         Validation.validateUserRequest(request);
         checkIfEmailOrPhoneExists(request);
 
@@ -43,8 +51,8 @@ public class AuthenticationService {
         user.setId(UUID.randomUUID().toString());
         user.setName(request.getName());
         user.setSurname(request.getSurname());
-        user.setPassword(hashPassword(request.getPassword()));
         user.setEmail(request.getEmail());
+        user.setPassword(hashPassword(request.getPassword()));
         if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
             user.setPhone(request.getPhone());
         }
@@ -125,6 +133,8 @@ public class AuthenticationService {
 
     @Transactional
     public LoginResponse authenticate(LoginRequest request, Boolean rememberMe) throws UserNotFoundException, WrongPasswordException {
+
+
         Validation.validateLoginRequest(request);
 
         Optional<User> optionalUser = userRepository.findByEmailOrPhone(request.getEmailOrPhone());

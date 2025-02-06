@@ -16,6 +16,7 @@ import fullstack.persistence.model.Event;
 import jakarta.ws.rs.core.NoContentException;
 import org.hibernate.SessionException;
 
+import javax.lang.model.util.SimpleTypeVisitor7;
 import java.util.List;
 import java.util.UUID;
 
@@ -74,6 +75,11 @@ public class EventService implements PanacheRepository<Event> {
             throw new NoContentException(SPEAKER_EVENT_NOT_FOUND);
         }
         return events;
+    }
+
+    public List<Tag> getTagsByEventId(String eventId) {
+        List<Tag> tags = eventRepository.getTagsByEventId(eventId);
+        return tags;
     }
 
     @Transactional

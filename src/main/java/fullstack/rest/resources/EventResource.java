@@ -1,5 +1,6 @@
 package fullstack.rest.resources;
 
+import fullstack.persistence.model.Tag;
 import fullstack.rest.model.EventRequest;
 import jakarta.inject.Inject;
 import jakarta.ws.rs.*;
@@ -69,6 +70,13 @@ public class EventResource {
         } catch (NoContentException e) {
             return Response.status(Response.Status.NO_CONTENT).entity(e.getMessage()).build();
         }
+    }
+
+    @GET
+    @Path("/{id}/tags")
+    public Response getTagsByEventId(@PathParam("id") String eventId) {
+        List<Tag> tags = eventService.getTagsByEventId(eventId);
+        return Response.ok(tags).build();
     }
 
     @GET

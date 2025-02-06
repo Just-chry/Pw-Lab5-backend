@@ -4,6 +4,7 @@ package fullstack.persistence.model;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "booking")
@@ -15,11 +16,11 @@ public class Booking {
     private String userId;
     @Column(name = "event_id")
     private String eventId;
-    private LocalDate date;
+    private LocalDateTime date;
     @Enumerated(EnumType.STRING)
     private Status status = Status.CONFIRMED;
 
-    public Booking(String id, String userId, String eventId, LocalDate date, Status status) {
+    public Booking(String id, String userId, String eventId, LocalDateTime date, Status status) {
         this.id = id;
         this.userId = userId;
         this.eventId = eventId;
@@ -54,11 +55,11 @@ public class Booking {
         this.eventId = eventId;
     }
 
-    public LocalDate getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 
