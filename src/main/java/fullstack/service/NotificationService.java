@@ -64,10 +64,9 @@ public class NotificationService {
         }
     }
 
-
     public void sendBookingConfirmationEmail(User user, Event event) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException(INVALID_EMAIL);
+            throw new IllegalArgumentException("L'utente non ha un'email valida.");
         }
         String emailContent = "<h1>Conferma Prenotazione</h1>" +
                 "<p>Ciao " + user.getName() + " " + user.getSurname() + ",</p>" +
@@ -83,18 +82,18 @@ public class NotificationService {
 
     public void sendBookingConfirmationSms(User user, Event event) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new ContactException(INVALID_PHONE);
+            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
         }
         try {
             smsService.sendSms(user.getPhone(), "La tua prenotazione per l'evento \"" + event.getTitle() + "\" è stata confermata.");
         } catch (SmsSendingException e) {
-            throw new RuntimeException(SMS_ERROR+ e.getMessage(), e);
+            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
         }
     }
 
     public void sendBookingCancellationEmail(User user, Event event) {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new ContactException(INVALID_EMAIL);
+            throw new IllegalArgumentException("L'utente non ha un'email valida.");
         }
         String emailContent = "<h1>Cancellazione Prenotazione</h1>" +
                 "<p>Ciao " + user.getName() + " " + user.getSurname() + ",</p>" +
@@ -109,12 +108,12 @@ public class NotificationService {
 
     public void sendBookingCancellationSms(User user, Event event) {
         if (user.getPhone() == null || user.getPhone().isEmpty()) {
-            throw new ContactException(INVALID_PHONE);
+            throw new IllegalArgumentException("L'utente non ha un numero di telefono valido.");
         }
         try {
             smsService.sendSms(user.getPhone(), "La tua prenotazione per l'evento \"" + event.getTitle() + "\" è stata cancellata.");
         } catch (SmsSendingException e) {
-            throw new SmsSendingException(SMS_ERROR + e.getMessage());
+            throw new RuntimeException("Errore durante l'invio dell'SMS: " + e.getMessage(), e);
         }
     }
 }
