@@ -113,7 +113,7 @@ public class TalkService implements PanacheRepository<Talk> {
         if (userService.isAdmin(sessionId)) {
             throw new AdminAccessException(ADMIN_REQUIRED);
         }
-        int updated = update(id, talk);
+        int updated = talkRepository.updateTalk(id, talk);
         if (updated == 0) {
             throw new NoContentException(TALK_NOT_FOUND);
         }
