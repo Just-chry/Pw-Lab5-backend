@@ -41,7 +41,6 @@ public class AuthenticationService {
     public User register(CreateUserRequest request) throws ContactException, UserCreationException {
         request.setName(SanitationUtil.sanitize(request.getName()));
         request.setSurname(SanitationUtil.sanitize(request.getSurname()));
-        request.setEmail(SanitationUtil.sanitize(request.getEmail()));
         request.setPhone(SanitationUtil.sanitize(request.getPhone()));
         request.setPassword(SanitationUtil.sanitize(request.getPassword()));
 
@@ -52,8 +51,8 @@ public class AuthenticationService {
         user.setId(UUID.randomUUID().toString());
         user.setName(request.getName());
         user.setSurname(request.getSurname());
-        user.setPassword(hashPassword(request.getPassword()));
         user.setEmail(request.getEmail());
+        user.setPassword(hashPassword(request.getPassword()));
         if (request.getPhone() != null && !request.getPhone().trim().isEmpty()) {
             user.setPhone(request.getPhone());
         }
